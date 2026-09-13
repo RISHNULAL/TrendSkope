@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Local datasets
+data/raw/*.csv
+data/interim/*.csv
+data/processed/*.csv
+
+# Generated ML files
+models/*.joblib
+reports/*.json
+reports/*.csv
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Antigravity / old project files
+.agents/
+files-mentioned-by-the-user-ml/

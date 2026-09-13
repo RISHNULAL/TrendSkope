@@ -1,0 +1,2 @@
+post_id,account_id,published_at,media_type,caption,likes,comments,followers_at_or_near_collection,saves,shares,reel_duration,image_url,media_path
+post_001,account_001,2025-01-15T19:00:00Z,image,"A sample caption #example",120,8,2500,4,2,,,
