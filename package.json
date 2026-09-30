@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -k -n \"next,api\" -c \"cyan,magenta\" \"next dev\" \"python -m uvicorn api.index:app --reload --port 8000\"",
+    "dev": "concurrently -k -n \"next,api\" -c \"cyan,magenta\" \"next dev\" \"node scripts/dev-api.js\"",
     "dev:next": "next dev",
-    "dev:api": "python -m uvicorn api.index:app --reload --port 8000",
+    "dev:api": "node scripts/dev-api.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
