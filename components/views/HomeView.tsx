@@ -1,18 +1,35 @@
 "use client";
 
 import React from "react";
-import { ArrowRight, Sparkles, FileText, Cpu, Target, Sliders } from "lucide-react";
+import {
+  ArrowRight,
+  Sparkles,
+  Database,
+  Cpu,
+  Target,
+  BarChart3,
+  ShieldCheck,
+  Info,
+  Layers,
+  CheckCircle2,
+} from "lucide-react";
 import MetricCard from "../MetricCard";
+import PerformancePreview from "../PerformancePreview";
+import HowToUse from "./HowToUse";
 import { ModelStatusResponse } from "@/types";
 
 interface HomeViewProps {
   modelStatus: ModelStatusResponse | null;
   onNavigateToPredict: () => void;
+  onNavigateToWhatIf?: () => void;
+  onNavigateToInsights?: () => void;
 }
 
 export default function HomeView({
   modelStatus,
   onNavigateToPredict,
+  onNavigateToWhatIf,
+  onNavigateToInsights,
 }: HomeViewProps) {
   const isTrained = Boolean(modelStatus?.trained);
   const metrics = modelStatus?.metrics;
@@ -23,74 +40,177 @@ export default function HomeView({
   const datasetSize = modelStatus?.dataset_size
     ? modelStatus.dataset_size.toLocaleString()
     : "--";
+  const selectedModelName = modelStatus?.selected_model || "Random Forest Regressor";
 
   const workflowSteps = [
     {
       num: "01",
-      icon: FileText,
-      title: "Enter post details",
-      desc: "Add your planned caption, media type, publication schedule, and follower context.",
+      icon: Database,
+      title: "DATA",
+      heading: "Historical post records",
+      desc: "Historical post records are cleaned, normalized, and validated for empirical analysis.",
     },
     {
       num: "02",
       icon: Cpu,
-      title: "AI feature extraction",
-      desc: "Pre-publication linguistic, temporal, and account features are extracted safely without leakage.",
+      title: "FEATURES",
+      heading: "Pre-publication signals",
+      desc: "Caption, timing, media type, and account signals are extracted without target leakage.",
     },
     {
       num: "03",
       icon: Target,
-      title: "Get prediction",
-      desc: "Receive an engagement rate estimate with empirical uncertainty intervals and performance band.",
+      title: "ML MODEL",
+      heading: "Ensemble estimation",
+      desc: "The trained machine learning model estimates expected engagement rate.",
     },
     {
       num: "04",
-      icon: Sliders,
-      title: "Explore & optimize",
-      desc: "Compare what-if publishing scenarios side-by-side to understand expected performance differences.",
+      icon: BarChart3,
+      title: "INSIGHT",
+      heading: "Actionable interpretation",
+      desc: "TrendSkope converts predictions into clear performance bands and what-if comparisons.",
     },
   ];
 
   return (
-    <div className="space-y-10 animate-fade-in max-w-7xl mx-auto">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl p-8 md:p-12 glass-card border-border/80">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(circle,rgba(255,112,72,0.12)_0%,rgba(255,64,95,0.03)_60%,transparent_80%)] blur-2xl pointer-events-none" />
+    <div className="space-y-12 animate-fade-in max-w-7xl mx-auto pb-8">
+      {/* 1. Hero Section with Decision Intelligence Preview */}
+      <section className="relative overflow-hidden rounded-3xl p-7 sm:p-9 md:p-10 lg:p-12 glass-card border-border/80">
+        {/* Subtle Background Lighting */}
+        <div className="absolute top-0 right-0 w-[460px] h-[400px] bg-[radial-gradient(circle,rgba(255,112,72,0.1)_0%,rgba(255,64,95,0.02)_60%,transparent_80%)] blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-orange/10 border border-primary-orange/30 text-primary-orange text-xs font-bold uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>AI-Powered Content Performance Intelligence</span>
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          {/* Left Column: Brand Hero Text & Primary CTA */}
+          <div className="lg:col-span-7 space-y-4 text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-orange/10 border border-primary-orange/30 text-primary-orange text-xs font-bold uppercase tracking-widest">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>AI-Powered Content Performance Intelligence</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-[1.15]">
+              Welcome to <span className="gradient-text">TrendSkope</span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl font-normal">
+              Predict your post&apos;s engagement rate before you publish and make
+              smarter content decisions with a transparent, research-first ML workflow.
+            </p>
+
+            <div className="pt-3 flex flex-wrap items-center gap-3">
+              <button
+                onClick={onNavigateToPredict}
+                className="btn-primary group shadow-[0_6px_20px_rgba(255,112,72,0.28)] hover:shadow-[0_8px_25px_rgba(255,112,72,0.4)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+              >
+                <span>Analyze Your Post</span>
+                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1.5" />
+              </button>
+
+              {onNavigateToWhatIf && (
+                <button
+                  onClick={onNavigateToWhatIf}
+                  className="btn-secondary text-xs sm:text-sm hover:bg-white/10 transition-colors"
+                >
+                  <span>Explore What-If Scenarios</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
-            Welcome to <span className="gradient-text">TrendSkope</span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
-            Predict your post&apos;s engagement rate before you publish and make
-            smarter content decisions with a transparent, research-first ML workflow.
-          </p>
-
-          <div className="pt-2">
-            <button
-              onClick={onNavigateToPredict}
-              className="btn-primary group"
-            >
-              <span>Analyze Your Post</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </button>
+          {/* Right Column: Content Performance Preview Visualization */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <PerformancePreview />
           </div>
         </div>
       </section>
 
-      {/* Metrics Row */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">
-            Key Performance Metrics
-          </h3>
-          <span className="text-xs text-slate-400">
+      {/* 2. How TrendSkope Works (Workflow Pipeline Section) */}
+      <section className="glass-card p-7 sm:p-9 md:p-10 rounded-3xl border-border/80 relative overflow-hidden">
+        <div className="max-w-3xl mb-8">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            How <span className="gradient-accent">TrendSkope</span> Works
+          </h2>
+          <p className="text-sm text-slate-400 mt-1.5 leading-relaxed">
+            A research-first machine learning workflow designed to estimate engagement before publication.
+          </p>
+        </div>
+
+        {/* 4-Step Process Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 relative">
+          {workflowSteps.map((step, idx) => {
+            const Icon = step.icon;
+            return (
+              <div
+                key={step.num}
+                className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-primary-orange/40 hover:bg-white/[0.035] hover:-translate-y-1 transition-all duration-200 relative group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-xs font-mono font-bold tracking-widest text-primary-orange/70 group-hover:text-primary-orange transition-colors">
+                      {step.num} · {step.title}
+                    </span>
+                    <div className="p-2.5 rounded-xl bg-primary-orange/10 border border-primary-orange/20 text-primary-orange">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                  </div>
+
+                  <h3 className="text-sm font-bold text-white mb-2 tracking-tight">
+                    {step.heading}
+                  </h3>
+
+                  <p className="text-xs text-slate-400 leading-relaxed font-normal">
+                    {step.desc}
+                  </p>
+                </div>
+
+                {/* Step Connector Indicator for Large Viewports */}
+                {idx < workflowSteps.length - 1 && (
+                  <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 z-20 text-slate-600">
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Research-First Methodology Banner */}
+        <div className="mt-7 pt-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="font-medium text-slate-300">
+              Predictions use information available strictly before publication.
+            </span>
+          </div>
+          <span className="text-[11px] font-mono text-slate-500 bg-white/[0.03] px-2.5 py-1 rounded-md border border-white/[0.05]">
+            Pre-publication signals only · Zero target leakage
+          </span>
+        </div>
+      </section>
+
+      {/* 3. NEW: How to Use TrendSkope (Interactive 4-Step Walkthrough) */}
+      <HowToUse
+        onNavigateToPredict={onNavigateToPredict}
+        onNavigateToWhatIf={onNavigateToWhatIf}
+      />
+
+      {/* 4. Key Performance Metrics */}
+      <section className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+              Key Performance Metrics
+            </h3>
+            <div className="relative group inline-flex items-center">
+              <Info className="w-3.5 h-3.5 text-slate-500 hover:text-slate-300 cursor-help transition-colors" />
+              <div className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-30 w-64 p-2.5 rounded-lg bg-[#0c1626] border border-white/10 text-[11px] font-normal leading-normal text-slate-300 shadow-xl pointer-events-none">
+                Metrics are calculated on the held-out test partition and are intended to provide an honest evaluation of model performance.
+                <div className="absolute top-full left-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0c1626]" />
+              </div>
+            </div>
+          </div>
+
+          <span className="text-xs text-slate-400 font-medium">
             {isTrained ? "Validated test partition evaluation" : "Awaiting training artifacts"}
           </span>
         </div>
@@ -99,71 +219,82 @@ export default function HomeView({
           <MetricCard
             label="AI Model Status"
             value={isTrained ? "Ready" : "Not Trained"}
-            subtitle={isTrained ? (modelStatus?.selected_model || "Active Model") : "Train via offline pipeline"}
+            subtitle={isTrained ? selectedModelName : "Train via pipeline"}
             isReady={isTrained}
           />
           <MetricCard
             label="Test MAE"
             value={testMae}
             subtitle="Mean Absolute Error (pp)"
+            tooltip="Mean Absolute Error in percentage points between predicted and actual test engagement rates."
           />
           <MetricCard
             label="R² Score"
             value={testR2}
-            subtitle="Held-out variance explained"
+            subtitle="Held-out test performance"
+            tooltip="R² measures how much variance in the held-out test data is explained by the model. A negative value indicates performance below the mean-prediction baseline on this test split."
           />
           <MetricCard
             label="Features Used"
             value={featuresCount}
             subtitle="Pre-publication signals"
+            tooltip="Count of engineered signals available strictly before post publication."
           />
           <MetricCard
             label="Dataset Size"
             value={datasetSize}
             subtitle="Validated training posts"
+            tooltip="Total post records in the validated training repository."
           />
         </div>
       </section>
 
-      {/* How TrendSkope Works */}
-      <section className="glass-card p-8 rounded-3xl border-border/80">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white">
-            How <span className="gradient-accent">TrendSkope</span> Works
-          </h2>
-          <p className="text-sm text-slate-400 mt-2">
-            A rigorously engineered pre-publication machine learning workflow
-            designed without future-data leakage.
-          </p>
+      {/* 5. Model Configuration / Research Context */}
+      <section className="glass-card p-6 sm:p-7 rounded-2xl border-border/80">
+        <div className="flex items-center gap-2 mb-4">
+          <Layers className="w-4 h-4 text-primary-orange" />
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+            Model Configuration
+          </h4>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {workflowSteps.map((step) => {
-            const Icon = step.icon;
-            return (
-              <div
-                key={step.num}
-                className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-primary-orange/40 hover:bg-white/[0.04] transition-all duration-200 relative group flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-black text-primary-orange/60 group-hover:text-primary-orange transition-colors">
-                      {step.num}
-                    </span>
-                    <div className="p-2.5 rounded-xl bg-primary-orange/10 border border-primary-orange/20 text-primary-orange">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                  </div>
-                  <h3 className="text-base font-bold text-white mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    {step.desc}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+            <span className="text-[11px] font-mono text-slate-500 uppercase block mb-1">
+              Model Architecture
+            </span>
+            <span className="text-sm font-semibold text-white">
+              {isTrained ? selectedModelName : "Random Forest Regressor"}
+            </span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+            <span className="text-[11px] font-mono text-slate-500 uppercase block mb-1">
+              Target Metric
+            </span>
+            <span className="text-sm font-semibold text-white">
+              Engagement Rate (%)
+            </span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+            <span className="text-[11px] font-mono text-slate-500 uppercase block mb-1">
+              Validation Strategy
+            </span>
+            <span className="text-sm font-semibold text-white">
+              Chronological hold-out (80/20)
+            </span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+            <span className="text-[11px] font-mono text-slate-500 uppercase block mb-1">
+              Prediction Type
+            </span>
+            <span className="text-sm font-semibold text-emerald-400 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Pre-publication only
+            </span>
+          </div>
         </div>
       </section>
     </div>

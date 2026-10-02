@@ -1,4 +1,5 @@
 import {
+  AnalyzeContentResponse,
   CsvValidationResponse,
   InsightsResponse,
   ModelStatusResponse,
@@ -81,6 +82,55 @@ export async function predictPost(input: PostPredictionInput): Promise<Predictio
   }
 }
 
+export async function analyzeContent(formData: FormData): Promise<AnalyzeContentResponse> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/api/analyze-content`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({
+        detail: "Content analysis service is currently unavailable.",
+      }));
+      throw new Error(errorData.detail || `Analysis failed (HTTP ${res.status})`);
+    }
+
+    return res.json();
+  } catch (err: any) {
+    if (err.message && !err.message.includes("fetch") && !err.message.includes("ECONNREFUSED")) {
+      throw err;
+    }
+    throw new Error("Content analysis service is currently unavailable. Please check the backend connection.");
+  }
+}
+
+export async function analyzeContentJson(payload: Record<string, any>): Promise<AnalyzeContentResponse> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/api/analyze-content-json`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({
+        detail: "Content analysis service is currently unavailable.",
+      }));
+      throw new Error(errorData.detail || `Analysis failed (HTTP ${res.status})`);
+    }
+
+    return res.json();
+  } catch (err: any) {
+    if (err.message && !err.message.includes("fetch") && !err.message.includes("ECONNREFUSED")) {
+      throw err;
+    }
+    throw new Error("Content analysis service is currently unavailable.");
+  }
+}
+
 export async function fetchInsights(): Promise<InsightsResponse> {
   try {
     const res = await fetch(`${getApiBaseUrl()}/api/insights`, {
@@ -126,3 +176,32 @@ export async function uploadAndValidateCsv(file: File): Promise<CsvValidationRes
     throw new Error("Dataset validation service is currently unavailable.");
   }
 }
+
+export async function compareScenarios(
+  payload: import("@/types").CompareScenariosRequest
+): Promise<import("@/types").CompareScenariosResponse> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/api/compare-scenarios`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({
+        detail: "Scenario comparison service is currently unavailable.",
+      }));
+      throw new Error(errorData.detail || `Comparison failed (HTTP ${res.status})`);
+    }
+
+    return res.json();
+  } catch (err: any) {
+    if (err.message && !err.message.includes("fetch") && !err.message.includes("ECONNREFUSED")) {
+      throw err;
+    }
+    throw new Error("Scenario comparison service is currently unavailable. Please verify the backend is running.");
+  }
+}
+

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Activity, ShieldCheck } from "lucide-react";
 import { ModelStatusResponse } from "@/types";
 
 interface HeaderProps {
@@ -17,12 +16,12 @@ const tabTitles: Record<string, { title: string; subtitle: string }> = {
     subtitle: "AI-Powered Instagram Content Performance Intelligence",
   },
   "Predict Post": {
-    title: "Predict Post Performance",
-    subtitle: "Pre-publication feature modeling without post-hoc data leakage",
+    title: "Pre-Publish Content Analyzer",
+    subtitle: "Analyze your content, caption, publishing context, and media signals before you publish",
   },
   "What-If Analysis": {
-    title: "What-If Scenario Comparison",
-    subtitle: "Evaluate potential post adjustments against model-learned expectations",
+    title: "Pre-Publish Scenario Studio",
+    subtitle: "Compare complete content plans and evaluate how the trained model responds to different publishing scenarios",
   },
   "Model Insights": {
     title: "Model & Validation Insights",
@@ -49,14 +48,16 @@ export default function Header({
     subtitle: "TrendSkope Intelligence",
   };
 
+  const isModelReady = Boolean(modelStatus?.trained);
+
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-[#050b15]/80 backdrop-blur-md border-b border-border/80">
+    <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-[#050b15]/85 backdrop-blur-md border-b border-border/80">
       <div className="flex items-center gap-4">
         {/* Mobile menu trigger */}
         <button
           onClick={onMobileMenuToggle}
           aria-label="Toggle navigation menu"
-          className="lg:hidden p-2 rounded-lg bg-surface border border-border text-slate-300 hover:text-white"
+          className="lg:hidden p-2 rounded-lg bg-surface border border-border text-slate-300 hover:text-white transition-colors"
         >
           <svg
             className="w-5 h-5"
@@ -74,39 +75,47 @@ export default function Header({
         </button>
 
         <div>
-          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-tight">
             {current.title}
           </h2>
-          <p className="text-xs text-slate-400 hidden sm:block">
+          <p className="text-xs text-slate-400 font-medium hidden sm:block mt-0.5">
             {current.subtitle}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* API Health Pill */}
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        {/* Backend API Status */}
         <div
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
             apiHealthy
-              ? "bg-emerald-950/40 border-emerald-500/30 text-emerald-400"
-              : "bg-rose-950/40 border-rose-500/30 text-rose-400"
+              ? "bg-emerald-950/30 border-emerald-500/25 text-emerald-400"
+              : "bg-rose-950/30 border-rose-500/25 text-rose-400"
           }`}
         >
-          <Activity className="w-3.5 h-3.5 animate-pulse" />
-          <span className="hidden md:inline">Backend API:</span>
+          <span
+            className={`w-2 h-2 rounded-full ${
+              apiHealthy ? "bg-emerald-400 animate-pulse" : "bg-rose-400"
+            }`}
+          />
+          <span className="hidden md:inline text-slate-300 font-medium">Backend API:</span>
           <span>{apiHealthy ? "Online" : "Offline"}</span>
         </div>
 
-        {/* Model Status Pill */}
+        {/* Model Status */}
         <div
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
-            modelStatus?.trained
-              ? "bg-ready/10 border-ready/30 text-ready"
-              : "bg-primary-orange/10 border-primary-orange/30 text-primary-orange"
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+            isModelReady
+              ? "bg-emerald-950/30 border-emerald-500/25 text-emerald-400"
+              : "bg-amber-950/30 border-amber-500/25 text-amber-400"
           }`}
         >
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>{modelStatus?.trained ? "Model Ready" : "Model Not Trained"}</span>
+          <span
+            className={`w-2 h-2 rounded-full ${
+              isModelReady ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
+            }`}
+          />
+          <span>{isModelReady ? "Model Ready" : "Model Not Trained"}</span>
         </div>
       </div>
     </header>

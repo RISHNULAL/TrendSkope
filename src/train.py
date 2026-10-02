@@ -41,4 +41,9 @@ def main(csv_path: str):
     pd.DataFrame(rows).to_csv(REPORTS/"model_comparison.csv",index=False)
     (REPORTS/"metrics.json").write_text(json.dumps({"test":test_metrics,"dataset_size":n,"features_used":len(NUMERIC)+len(CATEGORICAL),"selected_model":best_name,"splits":{"train":len(tr),"validation":len(va),"test":len(te)}},indent=2))
     print(f"Saved {best_name}; test MAE: {test_metrics['mae']:.3f}")
-if __name__ == "__main__": main(sys.argv[1])
+
+if __name__ == "__main__":
+    from .config import DATA_RAW
+    target_path = sys.argv[1] if len(sys.argv) > 1 else str(DATA_RAW / "instagram_posts_1000.csv")
+    main(target_path)
+

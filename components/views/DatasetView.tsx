@@ -65,6 +65,65 @@ export default function DatasetView() {
         </button>
       </div>
 
+      {/* Active Dataset Overview Card */}
+      <div className="glass-card-accent p-6 md:p-8 rounded-3xl space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                Active Training Corpus
+              </span>
+              <span className="text-xs text-slate-300 font-mono">1,000 Unique Posts Verified</span>
+            </div>
+            <h2 className="text-lg font-bold text-white">Dataset Structure & Provenance</h2>
+          </div>
+          <span className="text-xs text-slate-400 font-mono bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 self-start sm:self-auto">
+            instagram_posts_1000.csv
+          </span>
+        </div>
+
+        {/* 4 Metrics Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+          <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+            <span className="text-slate-400 text-[11px] block mb-1">Dataset Size</span>
+            <strong className="text-xl font-mono font-black text-white">1,000</strong>
+            <span className="text-[10px] text-emerald-400 block mt-0.5">100% unique post_ids</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+            <span className="text-slate-400 text-[11px] block mb-1">Unique Accounts</span>
+            <strong className="text-xl font-mono font-black text-white">40</strong>
+            <span className="text-[10px] text-slate-300 block mt-0.5">20–32 posts/account</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+            <span className="text-slate-400 text-[11px] block mb-1">Date Range</span>
+            <strong className="text-sm font-mono font-bold text-white block mt-1">2025-01 → 2026-09</strong>
+            <span className="text-[10px] text-slate-300 block mt-0.5">600+ days span</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+            <span className="text-slate-400 text-[11px] block mb-1">Media Breakdown</span>
+            <strong className="text-xs font-mono font-bold text-primary-orange block mt-1">
+              Reel: 41% · Image: 35% · Carousel: 24%
+            </strong>
+            <span className="text-[10px] text-slate-300 block mt-0.5">Realistic distribution</span>
+          </div>
+        </div>
+
+        {/* Scientific Provenance Statement */}
+        <div className="p-4 rounded-2xl bg-[#040810]/80 border border-white/10 text-xs text-slate-300 flex items-start gap-3">
+          <Info className="w-4 h-4 text-primary-orange shrink-0 mt-0.5" />
+          <div>
+            <strong className="text-white block font-semibold mb-0.5">Dataset Source & Scientific Integrity Note</strong>
+            <p className="text-slate-400 leading-relaxed">
+              This research prototype uses a <strong>synthetic research dataset</strong> designed to emulate realistic Instagram post-performance distributions across 10 creator domains. Synthetic records are strictly labeled as simulation data and are not presented as proprietary observations collected from Instagram.
+            </p>
+          </div>
+        </div>
+      </div>
+
+
       {/* Upload and Validation Area */}
       <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-6">
         <h2 className="text-base font-bold text-white flex items-center gap-2">

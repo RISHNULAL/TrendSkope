@@ -49,12 +49,18 @@ export default function App() {
   return (
     <>
       {/* High-end animated splash screen */}
-      <LoadingScreen
-        durationMs={1300}
-        onComplete={() => setLoadingComplete(true)}
-      />
+      {!loadingComplete && (
+        <LoadingScreen
+          durationMs={2400}
+          onComplete={() => setLoadingComplete(true)}
+        />
+      )}
 
-      <div className="min-h-screen flex bg-[#050b15] text-slate-100 selection:bg-primary-orange/30 selection:text-white">
+      <div
+        className={`min-h-screen flex bg-[#050b15] text-slate-100 selection:bg-primary-orange/30 selection:text-white transition-opacity duration-500 ease-out ${
+          loadingComplete ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
         {/* Sidebar */}
         <Sidebar
           activeTab={activeTab}
@@ -80,6 +86,8 @@ export default function App() {
               <HomeView
                 modelStatus={modelStatus}
                 onNavigateToPredict={() => setActiveTab("Predict Post")}
+                onNavigateToWhatIf={() => setActiveTab("What-If Analysis")}
+                onNavigateToInsights={() => setActiveTab("Model Insights")}
               />
             )}
             {activeTab === "Predict Post" && (

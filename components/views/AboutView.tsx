@@ -45,20 +45,20 @@ export default function AboutView() {
         <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-3">
           <div className="flex items-center gap-2 text-white font-bold text-base">
             <BookOpen className="w-5 h-5 text-primary-orange" />
-            <span>Core Objectives</span>
+            <span>Core Objectives & Dataset Source</span>
           </div>
           <ul className="text-xs text-slate-300 space-y-2">
             <li className="flex items-start gap-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-ready shrink-0 mt-0.5" />
-              <span>Construct strictly pre-publication feature representations.</span>
+              <span><strong>Synthetic Research Dataset:</strong> 1,000 unique records generated across 40 accounts spanning Jan 2025–Sep 2026. Synthetic observations emulate realistic variance and are not represented as collected private user data.</span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-ready shrink-0 mt-0.5" />
-              <span>Enforce leakage-free chronological splitting (70/15/15).</span>
+              <span>Construct strictly pre-publication feature representations without post-publication leakage.</span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-ready shrink-0 mt-0.5" />
-              <span>Provide transparent uncertainty intervals and performance bands.</span>
+              <span>Enforce leakage-free chronological splitting (700 train / 150 val / 150 test).</span>
             </li>
           </ul>
         </div>
