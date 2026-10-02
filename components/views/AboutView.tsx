@@ -21,6 +21,7 @@ const developers = [
   { name: "Aman", src: "/assets/team/aman.jpg" },
   { name: "Thamanna", src: "/assets/team/thamanna.jpg" },
   { name: "Liya Fathima N", src: "/assets/team/liya-fathima-n.jpg" },
+  { name: "Nidhin", src: "/assets/team/nidhin.jpg", focus: "object-[center_18%]" },
 ];
 
 export default function AboutView() {
@@ -62,7 +63,7 @@ export default function AboutView() {
                   alt={person.name}
                   width={224}
                   height={224}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${"focus" in person ? person.focus : ""}`}
                 />
               </div>
               <h3 className="mt-4 text-sm font-bold text-[#3D4852] tracking-tight">
