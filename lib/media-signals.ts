@@ -384,39 +384,41 @@ export function detectScenarioDifferences(
 ): ScenarioComparisonDiff {
   const changed: ChangedParameter[] = [];
   const unchanged: UnchangedParameter[] = [];
+  const formatLabel = (mediaType: string) =>
+    mediaType === "image" ? "Photo" : mediaType === "carousel" ? "Carousel" : mediaType === "reel" ? "Reel" : mediaType;
 
   // 1. Media Type
   if (planA.mediaType !== planB.mediaType) {
     changed.push({
       field: "media_type",
-      label: "Media Type",
-      value_a: planA.mediaType.toUpperCase(),
-      value_b: planB.mediaType.toUpperCase(),
-      impact_note: "Model evaluates learned historical response by media format.",
+      label: "Format",
+      value_a: formatLabel(planA.mediaType),
+      value_b: formatLabel(planB.mediaType),
+      impact_note: "The estimate can change with the format.",
     });
   } else {
     unchanged.push({
       field: "media_type",
-      label: "Media Type",
-      value: planA.mediaType.toUpperCase(),
+      label: "Format",
+      value: formatLabel(planA.mediaType),
     });
   }
 
   // 2. Media Content / File
-  const mediaNameA = planA.media?.name || "(Default placeholder)";
-  const mediaNameB = planB.media?.name || "(Default placeholder)";
+  const mediaNameA = planA.media?.name || "No file";
+  const mediaNameB = planB.media?.name || "No file";
   if (planA.media?.id !== planB.media?.id && (planA.media || planB.media)) {
     changed.push({
       field: "content",
-      label: "Planned Media",
+      label: "File",
       value_a: mediaNameA,
       value_b: mediaNameB,
-      impact_note: "Visual and frame characteristics analyzed for pre-publication validation.",
+      impact_note: "File details are shown for context.",
     });
   } else if (planA.media && planB.media) {
     unchanged.push({
       field: "content",
-      label: "Planned Media",
+      label: "File",
       value: mediaNameA,
     });
   }
@@ -428,12 +430,12 @@ export function detectScenarioDifferences(
       label: "Caption",
       value_a: `${planA.caption.length} chars (${(planA.caption.match(/\b\w+\b/g) || []).length} words)`,
       value_b: `${planB.caption.length} chars (${(planB.caption.match(/\b\w+\b/g) || []).length} words)`,
-      impact_note: "Length, hashtag counts, and linguistic features affect model prediction.",
+      impact_note: "Caption length and hashtags can change the estimate.",
     });
   } else {
     unchanged.push({
       field: "caption",
-      label: "Caption Content",
+      label: "Caption",
       value: `${planA.caption.length} chars`,
     });
   }
@@ -442,15 +444,15 @@ export function detectScenarioDifferences(
   if (planA.followers !== planB.followers) {
     changed.push({
       field: "followers",
-      label: "Followers",
+      label: "Account followers",
       value_a: planA.followers.toLocaleString(),
       value_b: planB.followers.toLocaleString(),
-      impact_note: "Audience scale normalizes calculated expected engagement.",
+      impact_note: "Follower count changes how engagement is estimated.",
     });
   } else {
     unchanged.push({
       field: "followers",
-      label: "Followers",
+      label: "Account followers",
       value: planA.followers.toLocaleString(),
     });
   }
@@ -459,15 +461,15 @@ export function detectScenarioDifferences(
   if (planA.date !== planB.date) {
     changed.push({
       field: "date",
-      label: "Publication Date",
+      label: "Posting date",
       value_a: planA.date,
       value_b: planB.date,
-      impact_note: "Day of week and weekend patterns evaluated by model.",
+      impact_note: "The day of the week can change the estimate.",
     });
   } else {
     unchanged.push({
       field: "date",
-      label: "Publication Date",
+      label: "Posting date",
       value: planA.date,
     });
   }
@@ -476,16 +478,16 @@ export function detectScenarioDifferences(
   if (planA.time !== planB.time) {
     changed.push({
       field: "time",
-      label: "Posting Time (UTC)",
-      value_a: planA.time,
-      value_b: planB.time,
-      impact_note: "Posting hour sensitivity evaluated against historical trends.",
+      label: "Posting time",
+      value_a: `${planA.time} UTC`,
+      value_b: `${planB.time} UTC`,
+      impact_note: "The hour you post can change the estimate.",
     });
   } else {
     unchanged.push({
       field: "time",
-      label: "Posting Time (UTC)",
-      value: planA.time,
+      label: "Posting time",
+      value: `${planA.time} UTC`,
     });
   }
 
@@ -500,15 +502,15 @@ export function detectScenarioDifferences(
     if (audioA !== audioB) {
       changed.push({
         field: "audio",
-        label: "Planned Audio",
+        label: "Audio",
         value_a: audioA,
         value_b: audioB,
-        impact_note: "Audio metadata logged for Reel creative planning (not a trained predictive input).",
+        impact_note: "Audio is saved with the Reel. It is not part of the estimate.",
       });
     } else {
       unchanged.push({
         field: "audio",
-        label: "Planned Audio",
+        label: "Audio",
         value: audioA,
       });
     }
@@ -520,14 +522,14 @@ export function detectScenarioDifferences(
     if (planA.category !== planB.category) {
       changed.push({
         field: "category",
-        label: "Content Category",
+        label: "Category",
         value_a: planA.category,
         value_b: planB.category,
       });
     } else {
       unchanged.push({
         field: "category",
-        label: "Content Category",
+        label: "Category",
         value: planA.category,
       });
     }
@@ -537,14 +539,14 @@ export function detectScenarioDifferences(
     if (planA.goal !== planB.goal) {
       changed.push({
         field: "goal",
-        label: "Publishing Goal",
+        label: "Goal",
         value_a: planA.goal,
         value_b: planB.goal,
       });
     } else {
       unchanged.push({
         field: "goal",
-        label: "Publishing Goal",
+        label: "Goal",
         value: planA.goal,
       });
     }

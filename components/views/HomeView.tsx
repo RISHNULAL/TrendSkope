@@ -106,6 +106,19 @@ export default function HomeView({
                 <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1.5" />
               </button>
 
+              <button
+                type="button"
+                onClick={() => {
+                  document.getElementById("how-to-use")?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }}
+                className="btn-secondary text-xs sm:text-sm"
+              >
+                How to Use
+              </button>
+
               {onNavigateToWhatIf && (
                 <button
                   onClick={onNavigateToWhatIf}
@@ -124,7 +137,13 @@ export default function HomeView({
         </div>
       </section>
 
-      {/* 2. How TrendSkope Works (Workflow Pipeline Section) */}
+      {/* 2. How to Use TrendSkope (Interactive 4-Step Walkthrough) */}
+      <HowToUse
+        onNavigateToPredict={onNavigateToPredict}
+        onNavigateToWhatIf={onNavigateToWhatIf}
+      />
+
+      {/* 3. How TrendSkope Works (Workflow Pipeline Section) */}
       <section className="glass-card p-7 sm:p-9 md:p-10 rounded-3xl border-border/80 relative overflow-hidden">
         <div className="max-w-3xl mb-8">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-[#3D4852] tracking-tight">
@@ -187,12 +206,6 @@ export default function HomeView({
           </span>
         </div>
       </section>
-
-      {/* 3. NEW: How to Use TrendSkope (Interactive 4-Step Walkthrough) */}
-      <HowToUse
-        onNavigateToPredict={onNavigateToPredict}
-        onNavigateToWhatIf={onNavigateToWhatIf}
-      />
 
       {/* 4. Key Performance Metrics */}
       <section className="space-y-4">

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
   BookOpen,
   Target,
@@ -9,11 +10,22 @@ import {
   ShieldAlert,
   Compass,
   CheckCircle2,
+  Users,
 } from "lucide-react";
+
+const developers = [
+  { name: "Sreenanda S", src: "/assets/team/sreenanda-s.jpg" },
+  { name: "Rishnu", src: "/assets/team/rishnu.jpg" },
+  { name: "Amruthesh", src: "/assets/team/amruthesh.jpg" },
+  { name: "Fathima Hiba C", src: "/assets/team/fathima-hiba-c.jpg" },
+  { name: "Aman", src: "/assets/team/aman.jpg" },
+  { name: "Thamanna", src: "/assets/team/thamanna.jpg" },
+  { name: "Liya Fathima N", src: "/assets/team/liya-fathima-n.jpg" },
+];
 
 export default function AboutView() {
   return (
-    <div className="space-y-8 animate-fade-in max-w-5xl mx-auto">
+    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto">
       {/* Header */}
       <div className="glass-card p-8 md:p-10 rounded-3xl border-border/80 space-y-4">
         <span className="text-[11px] font-bold text-[#6C63FF] uppercase tracking-widest">
@@ -29,6 +41,37 @@ export default function AboutView() {
           observational, and never guarantees.
         </p>
       </div>
+
+      <section className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-6">
+        <div className="flex items-center gap-2 text-[#3D4852] font-bold text-base">
+          <Users className="w-5 h-5 text-[#6C63FF]" />
+          <span>Developers</span>
+        </div>
+        <p className="text-xs text-[#6B7280] leading-relaxed max-w-2xl">
+          The people who built TrendSkope.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+          {developers.map((person) => (
+            <article
+              key={person.name}
+              className="flex flex-col items-center text-center rounded-[32px] bg-[#E0E5EC] px-3 py-5 shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
+            >
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]">
+                <Image
+                  src={person.src}
+                  alt={person.name}
+                  width={224}
+                  height={224}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="mt-4 text-sm font-bold text-[#3D4852] tracking-tight">
+                {person.name}
+              </h3>
+            </article>
+          ))}
+        </div>
+      </section>
 
       {/* Research Question & Objectives */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -218,7 +218,10 @@ export default function HowToUse({
   const current = steps[activeStep];
 
   return (
-    <section className="glass-card p-7 sm:p-9 md:p-10 rounded-3xl border-border/80 relative overflow-hidden">
+    <section
+      id="how-to-use"
+      className="glass-card scroll-mt-24 p-7 sm:p-9 md:p-10 rounded-3xl border-border/80 relative overflow-hidden"
+    >
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
         <div>

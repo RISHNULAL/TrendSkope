@@ -19,7 +19,6 @@ import {
   TrendingUp,
   Layers,
   ArrowRight,
-  ShieldCheck,
   Tag,
   Target,
   Music,
@@ -316,17 +315,17 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
   // Validation State for Primary CTA Button
   const isFormValid = (): { valid: boolean; reason?: string } => {
     if (contentFormat === "photo") {
-      if (!photoFile) return { valid: false, reason: "Upload 1 photo to analyze" };
+      if (!photoFile) return { valid: false, reason: "Add a photo to continue." };
       return { valid: true };
     }
     if (contentFormat === "carousel") {
       if (carouselSlides.length < 2) {
-        return { valid: false, reason: `Add ${2 - carouselSlides.length} more image${carouselSlides.length === 1 ? "" : "s"} (minimum 2 for Carousel)` };
+        return { valid: false, reason: carouselSlides.length === 0 ? "Add at least 2 photos for a carousel." : "Add 1 more photo. A carousel needs at least 2." };
       }
       return { valid: true };
     }
     if (contentFormat === "reel") {
-      if (!reelFile) return { valid: false, reason: "Upload 1 Reel video to analyze" };
+      if (!reelFile) return { valid: false, reason: "Add a Reel video to continue." };
       return { valid: true };
     }
     return { valid: true };
@@ -357,10 +356,10 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
     setError(null);
     setAnalysisReport(null);
 
-    setLoadingStep("Extracting visual, sequence & audio signals...");
-    const timer1 = setTimeout(() => setLoadingStep("Evaluating pre-publication feature space..."), 400);
-    const timer2 = setTimeout(() => setLoadingStep("Executing trained engagement prediction model..."), 800);
-    const timer3 = setTimeout(() => setLoadingStep("Assembling pre-publish performance report..."), 1200);
+    setLoadingStep("Reading your post...");
+    const timer1 = setTimeout(() => setLoadingStep("Estimating engagement..."), 400);
+    const timer2 = setTimeout(() => setLoadingStep("Checking the result..."), 800);
+    const timer3 = setTimeout(() => setLoadingStep("Preparing your report..."), 1200);
 
     try {
       const formData = new FormData();
@@ -415,46 +414,25 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
   const getBandBadge = (band: string) => {
     switch (band) {
       case "High":
-        return "bg-emerald-950/60 text-[#0F766E] border-emerald-500/40 shadow-[0_0_12px_rgba(52,211,153,0.2)]";
+        return "bg-[#E0E5EC] text-[#0F766E] border-transparent shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]";
       case "Medium":
-        return "bg-amber-950/60 text-amber-300 border-amber-500/40 shadow-[0_0_12px_rgba(251,191,36,0.2)]";
+        return "bg-[#E0E5EC] text-[#B45309] border-transparent shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]";
       case "Low":
       default:
-        return "bg-rose-950/60 text-rose-300 border-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.2)]";
+        return "bg-[#E0E5EC] text-[#BE123C] border-transparent shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]";
     }
   };
 
   return (
     <div className="space-y-8 animate-fade-in max-w-6xl mx-auto pb-12">
-      {/* 1. Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-orange/10 border border-transparent text-[#6C63FF] text-xs font-bold uppercase tracking-widest mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Pre-Publish Content Intelligence</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#3D4852] tracking-tight">
-            Pre-Publish Content Analyzer
-          </h1>
-          <p className="text-sm text-[#6B7280] mt-1 max-w-2xl">
-            Analyze your planned photo, multi-slide carousel, or Reel video along with caption, audio, and publishing context before publishing to Instagram.
-          </p>
-        </div>
-
-        <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface border border-border text-xs text-[#6B7280] self-start md:self-auto">
-          <ShieldCheck className="w-4 h-4 text-[#0F766E] shrink-0" />
-          <span>Multimodal Diagnostics · Model Leakage Safe</span>
-        </div>
-      </div>
-
       {/* Untrained Model Notice */}
       {!isTrained && (
-        <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-sm flex items-start gap-3">
+        <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] text-sm flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-[#B45309] shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-amber-300">Model Status Notice</p>
-            <p className="text-xs text-amber-200/80 mt-0.5">
-              The model artifact is not detected. Full visual, sequence, and audio signal analysis is active; train the baseline model to enable real-time predictions.
+            <p className="font-bold text-[#B45309]">The prediction model is not ready yet</p>
+            <p className="text-xs text-[#6B7280] mt-0.5">
+              You can still review the post, but a trained model is needed before engagement can be estimated.
             </p>
           </div>
         </div>
@@ -462,11 +440,11 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
 
       {/* Error Banner */}
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-sm flex items-start gap-3">
+        <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] text-sm flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-[#BE123C] shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-rose-300">Validation Notice</p>
-            <p className="text-xs text-rose-200/90 mt-0.5">{error}</p>
+            <p className="font-bold text-[#BE123C]">Something needs a fix</p>
+            <p className="text-xs text-[#3D4852] mt-0.5">{error}</p>
           </div>
         </div>
       )}
@@ -476,6 +454,29 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
         {/* Left Column: Post Creator Form */}
         <div className="lg:col-span-6 space-y-6">
           <form onSubmit={handleAnalyze} className="glass-card p-6 sm:p-7 rounded-3xl space-y-6 border-border/80">
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs pointer-events-none select-none">
+              {[
+                { label: "1. Add media", active: !formValidation.valid, done: formValidation.valid },
+                { label: "2. Add caption", active: formValidation.valid && caption.trim().length === 0, done: caption.trim().length > 0 },
+                { label: "3. Predict", active: formValidation.valid, done: false },
+              ].map((step, index) => (
+                <span key={step.label} className="inline-flex items-center gap-2">
+                  {index > 0 && <span className="text-[#A3B1C6]" aria-hidden="true">/</span>}
+                  <span
+                    className={
+                      step.done
+                        ? "font-semibold text-[#0F766E]"
+                        : step.active
+                        ? "font-semibold text-[#6C63FF]"
+                        : "font-medium text-[#6B7280]"
+                    }
+                  >
+                    {step.label}
+                  </span>
+                </span>
+              ))}
+            </p>
+
             {/* Section 2: Media Format Selector */}
             <div>
               <label className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-2 flex items-center justify-between">
@@ -483,7 +484,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   <Film className="w-3.5 h-3.5 text-[#6C63FF]" />
                   Content Format
                 </span>
-                <span className="text-[11px] font-mono text-[#6B7280]">Select Post Type</span>
+                <span className="text-[11px] font-medium text-[#6B7280] normal-case tracking-normal">Required</span>
               </label>
 
               <div className="grid grid-cols-3 gap-2 p-1.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border">
@@ -535,6 +536,11 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   <span>Reel / Video</span>
                 </button>
               </div>
+              <p className="mt-2 text-xs text-[#6B7280] leading-relaxed">
+                {contentFormat === "photo" && "One image. JPG, PNG, or WEBP."}
+                {contentFormat === "carousel" && "2 to 10 images. The first image is the cover people see first."}
+                {contentFormat === "reel" && "One short video. You can also say which audio you plan to use."}
+              </p>
             </div>
 
             {/* Section 3: PHOTO MODE */}
@@ -679,7 +685,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                 </div>
 
                 {carouselWarning && (
-                  <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+                  <div className="p-2.5 rounded-xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.55),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-[#B45309] text-xs flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 shrink-0" />
                     <span>{carouselWarning}</span>
                   </div>
@@ -724,8 +730,9 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                             <button
                               type="button"
                               onClick={() => handleRemoveCarouselSlide(idx)}
-                              className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/80 hover:bg-rose-600 text-[#6B7280] hover:text-[#3D4852] flex items-center justify-center transition-colors"
+                              className="absolute top-1.5 right-1.5 w-8 h-8 rounded-full bg-[#E0E5EC] text-[#3D4852] hover:text-[#BE123C] flex items-center justify-center shadow-[3px_3px_6px_rgb(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]"
                               title="Remove slide"
+                              aria-label={`Remove slide ${idx + 1}`}
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -794,8 +801,8 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   </div>
                 )}
 
-                <p className="text-[10.5px] text-[#6B7280] font-mono">
-                  Slide order 1 → {carouselSlides.length || 2} is analyzed as a structured sequence. Cover slide has greatest initial feed weight.
+                <p className="text-xs text-[#6B7280] leading-relaxed">
+                  Put the cover first. Use Earlier and Later to change the order people will swipe through.
                 </p>
               </div>
             )}
@@ -1101,7 +1108,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   <FileText className="w-3.5 h-3.5 text-[#6C63FF]" />
                   Planned Caption
                 </label>
-                <span className="text-[11px] font-mono text-[#6B7280]">{wordCount} words</span>
+                <span className="text-[11px] font-medium text-[#6B7280] normal-case tracking-normal">Optional</span>
               </div>
 
               <textarea
@@ -1109,58 +1116,45 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                 rows={5}
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                placeholder="Write or paste your planned caption here (including hashtags, mentions, and call-to-actions)..."
+                placeholder="Write the caption you plan to publish. Hashtags and a question are useful if you will use them."
                 className="w-full rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border focus:border-transparent focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#E0E5EC] focus:ring-[#6C63FF] p-3.5 text-sm text-[#3D4852] placeholder-[#A0AEC0] transition-all resize-y leading-relaxed font-sans"
               />
 
-              {/* Real-time Caption Statistics Bar */}
-              <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 mt-2 text-[10.5px] font-mono text-[#6B7280]">
-                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
-                  <span className="text-[#3D4852] font-bold block">{charCount}</span>
-                  <span className="text-[9.5px]">Chars</span>
-                </div>
-                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
-                  <span className="text-[#3D4852] font-bold block">{wordCount}</span>
-                  <span className="text-[9.5px]">Words</span>
-                </div>
-                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
-                  <span className={`font-bold block ${hashtagCount > 10 ? "text-[#B45309]" : "text-[#3D4852]"}`}>
-                    {hashtagCount}
+              {caption.trim() ? (
+                <div className="flex flex-wrap gap-2 mt-2 text-xs text-[#6B7280]">
+                  <span className="px-2.5 py-1 rounded-full bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">{wordCount} words</span>
+                  <span className="px-2.5 py-1 rounded-full bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">{charCount} characters</span>
+                  <span className={`px-2.5 py-1 rounded-full bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] ${hashtagCount > 10 ? "text-[#B45309]" : ""}`}>{hashtagCount} hashtags</span>
+                  <span className="px-2.5 py-1 rounded-full bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">{mentionCount} mentions</span>
+                  <span className="px-2.5 py-1 rounded-full bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">{emojiCount} emoji</span>
+                  <span className="px-2.5 py-1 rounded-full bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">{questionCount} questions</span>
+                  <span className={`px-2.5 py-1 rounded-full bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] ${hasCta ? "text-[#0F766E]" : ""}`}>
+                    {hasCta ? "Asks people to respond" : "No call to action"}
                   </span>
-                  <span className="text-[9.5px]">Hashtags</span>
                 </div>
-                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
-                  <span className="text-[#3D4852] font-bold block">{mentionCount}</span>
-                  <span className="text-[9.5px]">Mentions</span>
-                </div>
-                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
-                  <span className="text-[#3D4852] font-bold block">{emojiCount}</span>
-                  <span className="text-[9.5px]">Emojis</span>
-                </div>
-                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
-                  <span className="text-[#3D4852] font-bold block">{questionCount}</span>
-                  <span className="text-[9.5px]">Questions</span>
-                </div>
-                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center col-span-2 sm:col-span-1">
-                  <span className={`font-bold block ${hasCta ? "text-[#0F766E]" : "text-[#6B7280]"}`}>
-                    {hasCta ? "Yes" : "None"}
-                  </span>
-                  <span className="text-[9.5px]">CTA Prompt</span>
-                </div>
-              </div>
+              ) : (
+                <p className="mt-2 text-xs text-[#6B7280]">
+                  Optional. Add the caption if you already know it.
+                </p>
+              )}
             </div>
 
             {/* Section 15: Publishing Details */}
             <div className="space-y-4 pt-1 border-t border-transparent">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] block">
-                Publishing Context
-              </span>
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] block">
+                  When it will post
+                </span>
+                <p className="text-xs text-[#6B7280] mt-1">
+                  These details change the estimate. The time is read as UTC.
+                </p>
+              </div>
 
               {/* Followers */}
               <div>
                 <label htmlFor="follower-input" className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1.5">
                   <Users className="w-3.5 h-3.5 inline mr-1 text-[#6C63FF]" />
-                  Followers
+                  Account followers
                 </label>
                 <input
                   id="follower-input"
@@ -1170,6 +1164,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   onChange={(e) => setFollowers(Math.max(1, parseInt(e.target.value) || 1))}
                   className="w-full rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border focus:border-transparent focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#E0E5EC] focus:ring-[#6C63FF] p-2.5 text-xs sm:text-sm text-[#3D4852] transition-all font-sans"
                 />
+                <p className="mt-1.5 text-xs text-[#6B7280]">Follower count of the account that will publish this post.</p>
               </div>
 
               {/* Publication Date & Time */}
@@ -1177,7 +1172,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                 <div>
                   <label htmlFor="date-input" className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1.5">
                     <Calendar className="w-3.5 h-3.5 inline mr-1 text-[#6C63FF]" />
-                    Publication Date
+                    Posting date
                   </label>
                   <input
                     id="date-input"
@@ -1191,7 +1186,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                 <div>
                   <label htmlFor="time-input" className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1.5">
                     <Clock className="w-3.5 h-3.5 inline mr-1 text-[#6C63FF]" />
-                    Publication Time (UTC)
+                    Posting time (UTC)
                   </label>
                   <input
                     id="time-input"
@@ -1258,20 +1253,20 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2.5">
-                    <RefreshCw className="w-4 h-4 animate-spin text-[#3D4852]" />
+                    <RefreshCw className="w-4 h-4 animate-spin" />
                     <span>{loadingStep}</span>
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
                     <Sparkles className="w-4 h-4" />
-                    Analyze Post & Predict Performance →
+                    Predict engagement
                   </span>
                 )}
               </button>
 
               {!formValidation.valid && (
-                <p className="text-[11px] text-[#B45309]/90 text-center mt-2 font-mono">
-                  • {formValidation.reason}
+                <p className="text-xs text-[#B45309] text-center mt-2">
+                  {formValidation.reason}
                 </p>
               )}
             </div>
@@ -1313,8 +1308,8 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   </div>
                 </div>
 
-                <p className="text-[11px] text-[#6B7280]/80 max-w-sm mx-auto pt-1 leading-relaxed">
-                  Evaluated using trained regression weights on observable pre-publication parameters.
+                <p className="text-xs text-[#6B7280] max-w-sm mx-auto pt-1 leading-relaxed">
+                  An estimate from this post&apos;s caption, format, and posting time. It is not a guarantee.
                 </p>
               </div>
 
@@ -1607,16 +1602,18 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
             </div>
           ) : (
             /* Standby State */
-            <div className="glass-card p-8 sm:p-10 rounded-3xl border-border/80 text-center flex flex-col items-center justify-center min-h-[440px] space-y-4">
+              <div className="glass-card p-8 sm:p-10 rounded-3xl border-border/80 text-center flex flex-col items-center justify-center min-h-[440px] space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-primary-orange/10 border border-transparent flex items-center justify-center text-[#6C63FF]">
                 <Sparkles className="w-8 h-8" />
               </div>
               <h3 className="text-lg font-bold text-[#3D4852]">
-                Ready for Pre-Publish Analysis
+                Your result will appear here
               </h3>
-              <p className="text-xs text-[#6B7280] max-w-sm leading-relaxed">
-                Configure your planned Photo, multi-slide Carousel, or Reel video on the left, then click <strong className="text-[#3D4852]">Analyze Post & Predict Performance →</strong> to generate your comprehensive performance report.
-              </p>
+              <ol className="text-sm text-[#6B7280] max-w-sm leading-relaxed text-left space-y-2">
+                <li>1. Choose Photo, Carousel, or Reel.</li>
+                <li>2. Upload the file you plan to publish.</li>
+                <li>3. Add a caption and posting time, then choose Predict engagement.</li>
+              </ol>
             </div>
           )}
         </div>

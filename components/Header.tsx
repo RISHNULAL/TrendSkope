@@ -18,24 +18,24 @@ const tabTitles: Record<string, { title: string; subtitle: string }> = {
     subtitle: "AI-Powered Instagram Content Performance Intelligence",
   },
   "Predict Post": {
-    title: "Pre-Publish Content Analyzer",
-    subtitle: "Analyze your content, caption, publishing context, and media signals before you publish",
+    title: "Analyze Post",
+    subtitle: "Upload a photo, carousel, or Reel and see the expected engagement before it goes live.",
   },
   "What-If Analysis": {
-    title: "Pre-Publish Scenario Studio",
-    subtitle: "Compare complete content plans and evaluate how the trained model responds to different publishing scenarios",
+    title: "What-If Scenarios",
+    subtitle: "Compare two versions of a post and see which estimate is higher.",
   },
   "Model Insights": {
-    title: "Model & Validation Insights",
-    subtitle: "Transparent evaluation metrics, error rates, and candidate comparisons",
+    title: "Model Insights",
+    subtitle: "Model comparisons, validation scores, and limitations",
   },
   Dataset: {
-    title: "Dataset & Validation",
-    subtitle: "Upload, test CSV compliance, download templates, and view dataset cards",
+    title: "Dataset",
+    subtitle: "CSV validation, schema, and dataset provenance",
   },
   "About Project": {
-    title: "About TrendSkope",
-    subtitle: "Methodology, ML architecture, pre-publication constraints, and ethics",
+    title: "About & Methodology",
+    subtitle: "How the project and model work",
   },
 };
 

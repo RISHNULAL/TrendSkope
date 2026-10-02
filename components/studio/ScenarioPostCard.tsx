@@ -218,7 +218,7 @@ export default function ScenarioPostCard({
               <span>{title}</span>
             </h2>
             <p className="text-xs text-[#6B7280]">
-              {planId === "A" ? "Baseline planned Instagram post" : "Alternative scenario for model comparison"}
+              {planId === "A" ? "The version you start with" : "The version you want to compare"}
             </p>
           </div>
         </div>
@@ -228,10 +228,10 @@ export default function ScenarioPostCard({
             <button
               onClick={onCopyFromA}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-[#6B7280] hover:text-[#3D4852] hover:border-[#6C63FF] transition-colors"
-              title="Copy all settings from Plan A into Plan B"
+              title="Copy Option A into Option B"
             >
               <Copy className="w-3.5 h-3.5 text-[#6C63FF]" />
-              <span className="hidden sm:inline">Copy Plan A</span>
+              <span className="hidden sm:inline">Match option A</span>
             </button>
           )}
           <span
@@ -241,7 +241,7 @@ export default function ScenarioPostCard({
                 : "bg-primary-orange/15 text-[#6C63FF] border border-transparent"
             }`}
           >
-            {planId === "A" ? "PLAN A" : "PLAN B"}
+            {planId === "A" ? "A" : "B"}
           </span>
         </div>
       </div>
@@ -254,14 +254,14 @@ export default function ScenarioPostCard({
       >
         <div className="flex items-center justify-between mb-2">
           <label htmlFor={`media-type-${planId}`} className="font-bold text-[#6B7280] uppercase tracking-wider text-xs flex items-center gap-2">
-            <span>Media Type</span>
+            <span>Format</span>
             {isFieldChanged("media_type") && (
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
                 ● Changed
               </span>
             )}
           </label>
-          <span className="text-[11px] text-[#6B7280] font-mono">Format selection</span>
+          <span className="text-[11px] text-[#6B7280]">Photo, carousel, or Reel</span>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
@@ -281,8 +281,8 @@ export default function ScenarioPostCard({
                 : "bg-surface/50 border-border text-[#6B7280] hover:text-[#3D4852]"
             }`}
           >
-            <ImageIcon className="w-4 h-4 text-[#6C63FF] shrink-0" />
-            <span>Image</span>
+            <ImageIcon className="w-4 h-4 shrink-0" />
+            <span>Photo</span>
           </button>
 
           <button
@@ -299,7 +299,7 @@ export default function ScenarioPostCard({
                 : "bg-surface/50 border-border text-[#6B7280] hover:text-[#3D4852]"
             }`}
           >
-            <Layers className="w-4 h-4 text-[#6C63FF] shrink-0" />
+            <Layers className="w-4 h-4 shrink-0" />
             <span>Carousel</span>
           </button>
 
@@ -318,7 +318,7 @@ export default function ScenarioPostCard({
                 : "bg-surface/50 border-border text-[#6B7280] hover:text-[#3D4852]"
             }`}
           >
-            <Video className="w-4 h-4 text-[#6C63FF] shrink-0" />
+            <Video className="w-4 h-4 shrink-0" />
             <span>Reel</span>
           </button>
         </div>
@@ -333,7 +333,7 @@ export default function ScenarioPostCard({
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
-              Planned Content ({state.mediaType.toUpperCase()})
+              File <span className="normal-case tracking-normal font-medium text-[#6B7280]">optional</span>
             </span>
             {isFieldChanged("content") && (
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
@@ -408,19 +408,19 @@ export default function ScenarioPostCard({
             </div>
 
             <p className="text-sm font-bold text-[#3D4852] mb-1">
-              Upload planned {state.mediaType} for Plan {planId}
+              {state.mediaType === "carousel"
+                ? "Add carousel photos"
+                : state.mediaType === "reel"
+                ? "Add a Reel"
+                : "Add a photo"}
             </p>
             <p className="text-xs text-[#6B7280] mb-3">
-              {state.mediaType === "carousel"
-                ? "Drag & drop multiple image slides or browse"
-                : state.mediaType === "reel"
-                ? "Drag & drop Reel video (MP4, MOV, WEBM) or browse"
-                : "Drag & drop post image (JPG, PNG, WEBP) or browse"}
+              Optional. Drop a file here, or choose one. The estimate still uses the format you picked.
             </p>
 
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border text-xs font-semibold text-[#3D4852] hover:bg-[#E0E5EC] transition-colors">
               <Upload className="w-3.5 h-3.5 text-[#6C63FF]" />
-              Browse Device
+              Choose a file
             </span>
           </div>
         ) : (
@@ -793,7 +793,7 @@ export default function ScenarioPostCard({
             <span>Planned Audio:</span>
           </div>
           <span className="font-mono text-[#6B7280] text-[11px]">
-            Not applicable for {state.mediaType === "image" ? "Image" : "Carousel"} posts
+            Audio applies to Reels only
           </span>
         </div>
       )}
@@ -813,8 +813,8 @@ export default function ScenarioPostCard({
               </span>
             )}
           </label>
-          <span className="text-[11px] text-[#6B7280] font-mono">
-            {captionData.metrics.characters} chars · {captionData.metrics.words} words
+          <span className="text-[11px] text-[#6B7280]">
+            {captionData.metrics.words} words
           </span>
         </div>
 
@@ -823,34 +823,30 @@ export default function ScenarioPostCard({
           rows={4}
           value={state.caption}
           onChange={(e) => onChange((prev) => ({ ...prev, caption: e.target.value }))}
-          placeholder="Draft the planned caption for this scenario..."
+          placeholder="Write the caption for this version..."
           className="w-full rounded-xl bg-[#E0E5EC] border border-border p-3 text-[#3D4852] text-xs placeholder-[#A0AEC0] focus:border-transparent leading-relaxed"
         />
 
-        {/* Caption Signals Badge List */}
-        <div className="p-3 rounded-xl bg-surface/50 border border-transparent space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Caption Signals</span>
-            <span className="text-[10px] text-[#6B7280] font-mono">{captionData.structure.length_label}</span>
-          </div>
-
-          <div className="flex flex-wrap gap-1.5 text-[11px]">
-            <span className="px-2 py-0.5 rounded-2xl bg-surface border border-transparent text-[#3D4852]">
+        {state.caption.trim() ? (
+          <div className="flex flex-wrap gap-1.5 text-[11px] text-[#6B7280]">
+            <span className="px-2 py-0.5 rounded-full bg-[#E0E5EC] shadow-[inset_2px_2px_4px_rgb(163,177,198,0.45),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
               {captionData.metrics.hashtags} hashtags
             </span>
-            <span className="px-2 py-0.5 rounded-2xl bg-surface border border-transparent text-[#3D4852]">
-              {captionData.metrics.emojis} emojis
+            <span className="px-2 py-0.5 rounded-full bg-[#E0E5EC] shadow-[inset_2px_2px_4px_rgb(163,177,198,0.45),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
+              {captionData.metrics.emojis} emoji
             </span>
-            <span className="px-2 py-0.5 rounded-2xl bg-surface border border-transparent text-[#3D4852]">
+            <span className="px-2 py-0.5 rounded-full bg-[#E0E5EC] shadow-[inset_2px_2px_4px_rgb(163,177,198,0.45),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
               {captionData.metrics.questions} questions
             </span>
             {captionData.structure.has_cta && (
-              <span className="px-2 py-0.5 rounded-2xl bg-primary-orange/20 border border-transparent text-[#6C63FF] font-medium">
-                1+ CTA detected
+              <span className="px-2 py-0.5 rounded-full text-[#0F766E]">
+                Asks people to respond
               </span>
             )}
           </div>
-        </div>
+        ) : (
+          <p className="text-[11px] text-[#6B7280]">A caption is required before you can compare.</p>
+        )}
       </div>
 
       {/* SECTION: Publishing Details Grid */}
@@ -863,7 +859,7 @@ export default function ScenarioPostCard({
         >
           <div className="flex items-center justify-between mb-1.5">
             <label htmlFor={`followers-${planId}`} className="font-bold text-[#6B7280] uppercase tracking-wider text-[11px]">
-              Followers
+              Account followers
             </label>
             {isFieldChanged("followers") && (
               <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary-orange/20 text-[#6C63FF]">
@@ -896,7 +892,7 @@ export default function ScenarioPostCard({
         >
           <div className="flex items-center justify-between mb-1.5">
             <label className="font-bold text-[#6B7280] uppercase tracking-wider text-[11px]">
-              Posting Date & Time (UTC)
+              Posting date and time (UTC)
             </label>
             {(isFieldChanged("time") || isFieldChanged("date")) && (
               <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary-orange/20 text-[#6C63FF]">

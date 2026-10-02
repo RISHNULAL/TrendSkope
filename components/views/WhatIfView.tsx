@@ -9,8 +9,6 @@ import {
   AlertTriangle,
   Info,
   Sliders,
-  Sparkles,
-  Layers,
   Clock,
   Type,
   Video,
@@ -18,7 +16,6 @@ import {
   CheckCircle2,
   ShieldCheck,
   Zap,
-  Music,
   FileText,
   SlidersHorizontal,
 } from "lucide-react";
@@ -201,16 +198,16 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
   // Run Comparison Prediction
   const handleCompare = async () => {
     if (!isTrained) {
-      setError("The offline trained model is not available. Please train the model with a validated CSV dataset first.");
+      setError("The prediction model is not ready yet. Train it from the Dataset page first.");
       return;
     }
 
     if (!planA.caption.trim()) {
-      setError("Please provide a caption for Plan A before running scenario comparison.");
+      setError("Add a caption to Option A.");
       return;
     }
     if (!planB.caption.trim()) {
-      setError("Please provide a caption for Plan B before running scenario comparison.");
+      setError("Add a caption to Option B.");
       return;
     }
 
@@ -237,10 +234,10 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
         setResA(respA.result);
         setResB(respB.result);
       } else {
-        throw new Error("Failed to compute predictions for both scenarios.");
+        throw new Error("The comparison did not finish. Try again.");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to compare scenarios. Please try again.");
+      setError(err.message || "The comparison did not finish. Try again.");
     } finally {
       setLoading(false);
     }
@@ -254,113 +251,73 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
 
   return (
     <div className="space-y-8 animate-fade-in max-w-7xl mx-auto pb-12">
-      {/* Top Header & Page Purpose */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-primary-orange/15 border border-transparent text-[#6C63FF] text-[11px] font-bold tracking-wide">
-              Model-based scenario analysis
-            </span>
-            <span className="text-xs text-[#6B7280] font-mono">· What-If Scenario Comparison</span>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-black text-[#3D4852] tracking-tight">
-            Pre-Publish Scenario Studio
-          </h1>
-          <p className="text-sm text-[#6B7280] mt-1 max-w-3xl">
-            Compare complete content plans and evaluate how the trained model responds to different publishing scenarios.
+      <div className="glass-card p-5 sm:p-6 rounded-3xl space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <p className="text-sm text-[#6B7280] max-w-xl leading-relaxed">
+            {comparisonMode === "single"
+              ? "Change one detail in Option B, such as the time or the caption. That makes it easier to see what caused the difference."
+              : "Change as many details as you want. Option B is a full alternative to Option A."}
           </p>
+          <div className="bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] p-1 rounded-2xl flex items-center shrink-0 self-start">
+            <button
+              type="button"
+              onClick={() => setComparisonMode("single")}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all min-h-11 ${
+                comparisonMode === "single"
+                  ? "bg-[#E0E5EC] text-[#6C63FF] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
+                  : "text-[#6B7280] hover:text-[#3D4852]"
+              }`}
+            >
+              Change one thing
+            </button>
+            <button
+              type="button"
+              onClick={() => setComparisonMode("multiple")}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all min-h-11 ${
+                comparisonMode === "multiple"
+                  ? "bg-[#E0E5EC] text-[#6C63FF] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
+                  : "text-[#6B7280] hover:text-[#3D4852]"
+              }`}
+            >
+              Change several things
+            </button>
+          </div>
         </div>
-
-        {/* Comparison Mode Selector */}
-        <div className="bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] p-1 rounded-2xl border border-border flex items-center shrink-0 self-start md:self-auto">
-          <button
-            onClick={() => setComparisonMode("single")}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-              comparisonMode === "single"
-                ? "bg-[#E0E5EC] text-[#6C63FF] border-transparent shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
-                : "text-[#6B7280] hover:text-[#3D4852]"
-            }`}
-          >
-            <Sliders className="w-3.5 h-3.5 text-[#6C63FF]" />
-            <span>Single Variable (Recommended)</span>
+        {comparisonMode === "single" && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-[#6B7280]">Try an example:</span>
+          <button type="button" onClick={() => handleApplyPreset("time")} className="btn-secondary px-3 py-2 text-xs">
+            Posting time
           </button>
-          <button
-            onClick={() => setComparisonMode("multiple")}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-              comparisonMode === "multiple"
-                ? "bg-[#E0E5EC] text-[#6C63FF] border-transparent shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
-                : "text-[#6B7280] hover:text-[#3D4852]"
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5 text-[#6C63FF]" />
-            <span>Multiple Variables</span>
+          <button type="button" onClick={() => handleApplyPreset("caption")} className="btn-secondary px-3 py-2 text-xs">
+            Caption
           </button>
-        </div>
-      </div>
-
-      {/* Mode Guidance & Quick Test Presets */}
-      <div className="p-4 rounded-2xl bg-surface/50 border border-border flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-xs">
-        <div className="flex items-center gap-2.5 text-[#6B7280]">
-          <Info className="w-4 h-4 text-[#6C63FF] shrink-0" />
-          <span>
-            {comparisonMode === "single" ? (
-              <>
-                <strong>Single Variable Mode:</strong> Change one supported predictive input at a time to understand model sensitivity.
-              </>
-            ) : (
-              <>
-                <strong>Multiple Variables Mode:</strong> Compare two complete publishing plans with multiple differences.
-              </>
-            )}
-          </span>
-        </div>
-
-        {/* Test Preset Buttons */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[11px] text-[#6B7280] font-bold uppercase mr-1">Test Scenarios:</span>
-          <button
-            onClick={() => handleApplyPreset("time")}
-            className="px-2.5 py-1 rounded-2xl bg-surface border border-transparent hover:border-[#6C63FF] text-[#3D4852] hover:text-[#3D4852] transition-colors"
-          >
-            Test 1: Time Sensitivity
+          <button type="button" onClick={() => handleApplyPreset("mediaType")} className="btn-secondary px-3 py-2 text-xs">
+            Photo or Reel
           </button>
-          <button
-            onClick={() => handleApplyPreset("caption")}
-            className="px-2.5 py-1 rounded-2xl bg-surface border border-transparent hover:border-[#6C63FF] text-[#3D4852] hover:text-[#3D4852] transition-colors"
-          >
-            Test 2: Caption Sensitivity
-          </button>
-          <button
-            onClick={() => handleApplyPreset("mediaType")}
-            className="px-2.5 py-1 rounded-2xl bg-surface border border-transparent hover:border-[#6C63FF] text-[#3D4852] hover:text-[#3D4852] transition-colors"
-          >
-            Test 3: Media Type
-          </button>
-          <button
-            onClick={() => handleApplyPreset("reelAudio")}
-            className="px-2.5 py-1 rounded-2xl bg-surface border border-transparent hover:border-[#6C63FF] text-[#3D4852] hover:text-[#3D4852] transition-colors"
-          >
-            Test 4: Reel Audio
+          <button type="button" onClick={() => handleApplyPreset("reelAudio")} className="btn-secondary px-3 py-2 text-xs">
+            Reel audio
           </button>
         </div>
+        )}
       </div>
 
       {/* Untrained Model Warning */}
       {!isTrained && (
-        <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-3">
+        <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] text-xs flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-[#B45309] shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-amber-300 text-sm">Offline Trained Model Required</p>
-            <p className="mt-0.5 text-amber-200/90 leading-relaxed">
-              Pre-publish scenario comparisons require a trained regression model. Please navigate to the <strong>Dataset</strong> tab to validate and train a model.
+            <p className="font-bold text-[#B45309] text-sm">The prediction model is not ready yet</p>
+            <p className="mt-0.5 text-[#6B7280] leading-relaxed">
+              Train it from the Dataset page before comparing two options.
             </p>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-3">
-          <AlertTriangle className="w-4 h-4 text-[#BE123C] shrink-0" />
+        <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] text-xs text-[#BE123C] flex items-center gap-3">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -369,7 +326,7 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <ScenarioPostCard
           planId="A"
-          title="Plan A (Current Scenario)"
+          title="Option A"
           state={planA}
           onChange={setPlanA}
           changedFields={changedFieldsSet}
@@ -378,7 +335,7 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
 
         <ScenarioPostCard
           planId="B"
-          title="Plan B (Alternative Scenario)"
+          title="Option B"
           state={planB}
           onChange={setPlanB}
           changedFields={changedFieldsSet}
@@ -397,18 +354,18 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           {loading ? (
             <span className="flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin" />
-              Evaluating Model Estimates...
+              Comparing the two options...
             </span>
           ) : (
             <span className="flex items-center gap-2.5">
-              <GitCompare className="w-5 h-5 text-[#3D4852]" />
-              Compare Scenarios →
+              <GitCompare className="w-5 h-5" />
+              Compare options
             </span>
           )}
         </button>
 
-        <p className="text-[11px] text-[#6B7280] font-mono text-center">
-          Evaluates learned model associations for both publishing plans.
+        <p className="text-xs text-[#6B7280] text-center">
+          Both options need a caption. A file is optional.
         </p>
       </div>
 
@@ -419,18 +376,18 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-primary-orange" />
-              <h2 className="text-sm font-bold text-[#3D4852] uppercase tracking-wider">What Changed?</h2>
+              <h2 className="text-sm font-bold text-[#3D4852]">What is different</h2>
             </div>
-            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-primary-orange/20 text-[#6C63FF] border border-transparent">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary-orange/20 text-[#6C63FF]">
               {differences.changed.length === 0
-                ? "No scenario differences detected"
-                : `${differences.changed.length} parameter${differences.changed.length > 1 ? "s" : ""} modified`}
+                ? "Nothing yet"
+                : `${differences.changed.length} change${differences.changed.length > 1 ? "s" : ""}`}
             </span>
           </div>
 
           {differences.changed.length === 0 ? (
-            <p className="text-xs text-[#6B7280] italic py-2">
-              Plan A and Plan B currently have identical inputs. Modify a field in Plan B to compare scenarios.
+            <p className="text-xs text-[#6B7280] py-2">
+              Option A and Option B match. Change something in Option B, then compare.
             </p>
           ) : (
             <div className="space-y-3">
@@ -438,7 +395,7 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
                 <div key={param.field} className="p-3 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-bold text-[#3D4852]">{param.label}</span>
-                    <span className="text-[10px] text-[#6C63FF] font-mono">Modified</span>
+                    <span className="text-[10px] text-[#6C63FF]">Different</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-[#6B7280]">
                     <span className="px-2 py-0.5 rounded bg-surface border border-transparent text-[#6B7280] font-mono truncate max-w-[140px]">
@@ -463,10 +420,10 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-[#0F766E]" />
-              <h2 className="text-sm font-bold text-[#3D4852] uppercase tracking-wider">Unchanged Parameters</h2>
+              <h2 className="text-sm font-bold text-[#3D4852]">What stays the same</h2>
             </div>
-            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-[#0F766E] border border-emerald-500/30">
-              {differences.unchanged.length} constant
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#E0E5EC] text-[#0F766E] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.55),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
+              {differences.unchanged.length} matching
             </span>
           </div>
 
@@ -479,8 +436,8 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
             ))}
           </div>
 
-          <p className="text-[11px] text-[#6B7280] italic pt-1">
-            Controlled factors ensure model predictions evaluate the intended parameter modifications.
+          <p className="text-xs text-[#6B7280] pt-1">
+            These details match, so the comparison is only about what you changed.
           </p>
         </div>
       </div>
@@ -492,18 +449,18 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
             <div className="flex items-center gap-2.5">
               <ImageIcon className="w-5 h-5 text-[#6C63FF]" />
               <div>
-                <h2 className="text-base font-bold text-[#3D4852]">Content Comparison</h2>
-                <p className="text-xs text-[#6B7280]">Side-by-side technical media profile</p>
+                <h2 className="text-base font-bold text-[#3D4852]">The files</h2>
+                <p className="text-xs text-[#6B7280]">Details from the files you uploaded</p>
               </div>
             </div>
-            <span className="text-[11px] text-[#6B7280] font-mono">Uploaded files</span>
+            <span className="text-xs text-[#6B7280]">Uploaded files</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Plan A Media Profile */}
             <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-3">
               <span className="text-xs font-bold text-[#6B7280] block pb-1 border-b border-transparent">
-                Plan A Content
+                Option A file
               </span>
               {planA.media ? (
                 <div className="space-y-2 text-xs">
@@ -533,14 +490,14 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-[#6B7280] italic">No media file uploaded for Plan A.</p>
+                <p className="text-xs text-[#6B7280]">No file added for Option A.</p>
               )}
             </div>
 
             {/* Plan B Media Profile */}
             <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-3">
               <span className="text-xs font-bold text-[#6B7280] block pb-1 border-b border-transparent">
-                Plan B Content
+                Option B file
               </span>
               {planB.media ? (
                 <div className="space-y-2 text-xs">
@@ -570,13 +527,13 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-[#6B7280] italic">No media file uploaded for Plan B.</p>
+                <p className="text-xs text-[#6B7280]">No file added for Option B.</p>
               )}
             </div>
           </div>
 
-          <p className="text-[11px] text-[#6B7280] italic">
-            Media characteristics are shown from the uploaded files.
+          <p className="text-xs text-[#6B7280]">
+            These file details are shown for context. The estimate uses the format, caption, time, and follower count.
           </p>
         </div>
       )}
@@ -586,8 +543,8 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
         <div className="glass-card-accent p-6 md:p-10 rounded-3xl animate-fade-in space-y-8">
           {/* Main Delta Result Header */}
           <div className="text-center space-y-3">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-[#6B7280]">
-              Model-Estimated Engagement Difference
+            <span className="text-xs font-bold uppercase tracking-widest text-[#6B7280]">
+              How the estimate changes
             </span>
 
             <div className="flex items-center justify-center gap-3">
@@ -610,28 +567,29 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
                   delta > 0 ? "text-[#0F766E]" : delta < 0 ? "text-[#BE123C]" : "text-[#6B7280]"
                 }`}
               >
-                {delta > 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)} pp
+                {delta > 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)}
               </div>
             </div>
 
             <p className="text-sm text-[#6B7280] font-medium">
-              Current (Plan A): <strong className="text-[#3D4852]">{resA.prediction.toFixed(2)}%</strong> → Alternative (Plan B):{" "}
-              <strong className="text-[#3D4852]">{resB.prediction.toFixed(2)}%</strong>
+              Option A: <strong className="text-[#3D4852]">{resA.prediction.toFixed(2)}%</strong>
+              {" · "}
+              Option B: <strong className="text-[#3D4852]">{resB.prediction.toFixed(2)}%</strong>
             </p>
 
             <p className="text-xs text-[#6B7280] max-w-xl mx-auto">
               {delta > 0
-                ? `Plan B is estimated at ${delta.toFixed(2)} percentage points higher by the current model.`
+                ? `Option B is about ${delta.toFixed(2)} percentage points higher. This is an estimate, not a guarantee.`
                 : delta < 0
-                ? `Plan B is estimated at ${Math.abs(delta).toFixed(2)} percentage points lower by the current model.`
-                : "The model estimate is identical between Plan A and Plan B under current inputs."}
+                ? `Option B is about ${Math.abs(delta).toFixed(2)} percentage points lower. This is an estimate, not a guarantee.`
+                : "Both options get the same estimate."}
             </p>
           </div>
 
           {/* Uncertainty Intervals */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-transparent text-xs">
             <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent text-center space-y-1">
-              <span className="text-[#6B7280] block font-medium">Plan A Uncertainty Interval</span>
+              <span className="text-[#6B7280] block font-medium">Option A likely range</span>
               <strong className="text-[#3D4852] font-mono text-base block">
                 {resA.lower.toFixed(2)}% — {resA.upper.toFixed(2)}%
               </strong>
@@ -639,7 +597,7 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
             </div>
 
             <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent text-center space-y-1">
-              <span className="text-[#6B7280] block font-medium">Plan B Uncertainty Interval</span>
+              <span className="text-[#6B7280] block font-medium">Option B likely range</span>
               <strong className="text-[#3D4852] font-mono text-base block">
                 {resB.lower.toFixed(2)}% — {resB.upper.toFixed(2)}%
               </strong>
@@ -650,10 +608,10 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           {/* Overlap Caution & Disclaimer */}
           <div className="space-y-2">
             {intervalsOverlap && (
-              <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-xs flex items-center justify-center gap-2 text-center">
-                <AlertTriangle className="w-4 h-4 text-[#B45309] shrink-0" />
+              <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.55),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-[#B45309] text-xs flex items-center justify-center gap-2 text-center">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>
-                  The scenario intervals overlap; the estimated difference should therefore be interpreted cautiously.
+                  The two ranges overlap, so the difference is small enough that either option could land in the same place.
                 </span>
               </div>
             )}
@@ -661,7 +619,7 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
             <div className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-center text-xs text-[#6B7280] flex items-center justify-center gap-2">
               <Info className="w-4 h-4 text-[#6C63FF] shrink-0" />
               <span>
-                The intervals represent model uncertainty and are not guarantees of future performance.
+                The ranges show uncertainty. They are not a promise of future likes or comments.
               </span>
             </div>
           </div>
@@ -671,9 +629,9 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
             <div className="flex items-center justify-between pb-2 border-b border-transparent">
               <span className="font-bold text-[#3D4852] uppercase tracking-wider flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-[#6C63FF]" />
-                Layer Separation: Signals vs Model Inputs vs Estimate
+                How this result was built
               </span>
-              <span className="text-[10px] text-[#6B7280] font-mono">Scientific distinction</span>
+              <span className="text-[11px] text-[#6B7280]">Three parts</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -681,21 +639,21 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
               <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2">
                 <div className="flex items-center gap-1.5 text-[#6C63FF] font-bold uppercase text-[11px]">
                   <Video className="w-3.5 h-3.5" />
-                  <span>1. Media Signals (Extracted)</span>
+                  <span>1. The files</span>
                 </div>
                 <ul className="text-[#6B7280] text-[11px] space-y-1 list-disc list-inside">
-                  <li>Plan A: {planA.media ? `${planA.media.aspectRatio}, ${planA.media.width}×${planA.media.height}` : "No file (Text only)"}</li>
-                  <li>Plan B: {planB.media ? `${planB.media.aspectRatio}, ${planB.media.width}×${planB.media.height}` : "No file (Text only)"}</li>
+                  <li>Option A: {planA.media ? `${planA.media.aspectRatio}, ${planA.media.width}×${planA.media.height}` : "No file"}</li>
+                  <li>Option B: {planB.media ? `${planB.media.aspectRatio}, ${planB.media.width}×${planB.media.height}` : "No file"}</li>
                   <li>Audio: {planA.mediaType === "reel" ? planA.audioName || planA.audioType : "Not applicable"} → {planB.mediaType === "reel" ? planB.audioName || planB.audioType : "Not applicable"}</li>
                 </ul>
-                <p className="text-[10px] text-[#6B7280] italic pt-1">Extracted for pre-publication validation.</p>
+                <p className="text-[11px] text-[#6B7280] pt-1">Shown for context. Not all of this is used in the estimate.</p>
               </div>
 
               {/* Tier 2: Model Inputs */}
               <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2">
                 <div className="flex items-center gap-1.5 text-[#6C63FF] font-bold uppercase text-[11px]">
                   <FileText className="w-3.5 h-3.5" />
-                  <span>2. Model Inputs (Trained)</span>
+                  <span>2. What the estimate uses</span>
                 </div>
                 <ul className="text-[#6B7280] text-[11px] space-y-1 list-disc list-inside">
                   <li>Media Type: {planA.mediaType.toUpperCase()} → {planB.mediaType.toUpperCase()}</li>
@@ -703,21 +661,21 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
                   <li>Posting Hour: {planA.time} → {planB.time} UTC</li>
                   <li>Followers: {planA.followers.toLocaleString()} → {planB.followers.toLocaleString()}</li>
                 </ul>
-                <p className="text-[10px] text-[#6B7280] italic pt-1">Used by trained regression model.</p>
+                <p className="text-[11px] text-[#6B7280] pt-1">Format, caption, posting time, and followers.</p>
               </div>
 
               {/* Tier 3: Model Estimate */}
               <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2">
                 <div className="flex items-center gap-1.5 text-[#0F766E] font-bold uppercase text-[11px]">
                   <Zap className="w-3.5 h-3.5" />
-                  <span>3. Model Estimate (Output)</span>
+                  <span>3. The result</span>
                 </div>
                 <ul className="text-[#6B7280] text-[11px] space-y-1 list-disc list-inside">
-                  <li>Plan A Rate: {resA.prediction.toFixed(2)}%</li>
-                  <li>Plan B Rate: {resB.prediction.toFixed(2)}%</li>
-                  <li>Delta: {delta >= 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)} pp</li>
+                  <li>Option A: {resA.prediction.toFixed(2)}%</li>
+                  <li>Option B: {resB.prediction.toFixed(2)}%</li>
+                  <li>Difference: {delta >= 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)} points</li>
                 </ul>
-                <p className="text-[10px] text-[#6B7280] italic pt-1">Observational prediction from trained data.</p>
+                <p className="text-[11px] text-[#6B7280] pt-1">An estimate from similar posts, not a guarantee.</p>
               </div>
             </div>
           </div>
@@ -727,21 +685,21 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
             <div className="flex items-center justify-between">
               <span className="font-bold text-[#3D4852] uppercase tracking-wider flex items-center gap-2">
                 <Zap className="w-4 h-4 text-[#6C63FF]" />
-                Scenario Sensitivity
+                What moved the estimate
               </span>
-              <span className="text-[11px] text-[#6B7280] font-mono">Input impact</span>
+              <span className="text-[11px] text-[#6B7280]">From your changes</span>
             </div>
 
             <p className="text-[#6B7280]">
-              The model estimate changed by{" "}
+              The estimate changed by{" "}
               <strong className={delta >= 0 ? "text-[#0F766E]" : "text-[#BE123C]"}>
                 {delta >= 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)} percentage points
               </strong>{" "}
-              after the selected scenario changes.
+              after the changes below.
             </p>
 
             <div className="space-y-1.5 pt-1">
-              <span className="text-[#6B7280] text-[11px] block font-semibold">Changed inputs:</span>
+              <span className="text-[#6B7280] text-[11px] block font-semibold">What you changed:</span>
               <ul className="list-disc list-inside space-y-1 text-[#6B7280] pl-1">
                 {differences.changed.map((param) => (
                   <li key={param.field}>
@@ -756,43 +714,46 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           <div className="p-5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2 text-xs">
             <div className="flex items-center gap-2 text-[#6B7280] font-bold uppercase tracking-wider">
               <ShieldCheck className="w-4 h-4 text-[#6C63FF]" />
-              <span>Model Limitation & Scientific Integrity</span>
+              <span>What this estimate includes</span>
             </div>
             <p className="text-[#6B7280] leading-relaxed">
-              <strong>Prediction status:</strong> The current model prediction reflects the trained structured and text features available to it (caption properties, media type, timing, followers). Uploaded visual and audio characteristics are analyzed separately for content verification and are not treated as predictive inputs unless the model was trained on those features.
+              The estimate uses the caption, format, posting time, and follower count. File details and audio are shown so you can compare them, and they are not part of the number unless the model was trained on them.
             </p>
           </div>
 
           {/* SECTION: Interpretation / What You Could Test Next */}
           <div className="p-5 rounded-2xl bg-surface/50 border border-transparent space-y-3 text-xs">
-            <span className="font-bold text-[#3D4852] uppercase tracking-wider block">What You Could Test Next</span>
+            <span className="font-bold text-[#3D4852] block">Try another comparison</span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div
+              <button
+                type="button"
                 onClick={() => handleApplyPreset("time")}
-                className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent hover:border-[#6C63FF] cursor-pointer transition-colors"
+                className="p-3 rounded-2xl bg-[#E0E5EC] text-left shadow-[5px_5px_10px_rgb(163,177,198,0.55),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:shadow-[inset_4px_4px_8px_rgb(163,177,198,0.55),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-shadow"
               >
                 <Clock className="w-4 h-4 text-[#6C63FF] mb-1.5" />
-                <strong className="text-[#3D4852] block mb-1">Posting Time</strong>
-                <p className="text-[11px] text-[#6B7280]">Test publishing during peak evening hours (19:00 UTC).</p>
-              </div>
+                <strong className="text-[#3D4852] block mb-1">Posting time</strong>
+                <p className="text-[11px] text-[#6B7280]">Morning at 10:30 UTC versus evening at 19:00 UTC.</p>
+              </button>
 
-              <div
+              <button
+                type="button"
                 onClick={() => handleApplyPreset("caption")}
-                className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent hover:border-[#6C63FF] cursor-pointer transition-colors"
+                className="p-3 rounded-2xl bg-[#E0E5EC] text-left shadow-[5px_5px_10px_rgb(163,177,198,0.55),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:shadow-[inset_4px_4px_8px_rgb(163,177,198,0.55),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-shadow"
               >
                 <Type className="w-4 h-4 text-[#6C63FF] mb-1.5" />
-                <strong className="text-[#3D4852] block mb-1">Caption Structure</strong>
-                <p className="text-[11px] text-[#6B7280]">Test adding an interactive question or concise call-to-action.</p>
-              </div>
+                <strong className="text-[#3D4852] block mb-1">Caption</strong>
+                <p className="text-[11px] text-[#6B7280]">A short note versus a longer caption with a question.</p>
+              </button>
 
-              <div
+              <button
+                type="button"
                 onClick={() => handleApplyPreset("mediaType")}
-                className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent hover:border-[#6C63FF] cursor-pointer transition-colors"
+                className="p-3 rounded-2xl bg-[#E0E5EC] text-left shadow-[5px_5px_10px_rgb(163,177,198,0.55),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:shadow-[inset_4px_4px_8px_rgb(163,177,198,0.55),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-shadow"
               >
                 <Video className="w-4 h-4 text-[#6C63FF] mb-1.5" />
-                <strong className="text-[#3D4852] block mb-1">Media Format</strong>
-                <p className="text-[11px] text-[#6B7280]">Test format sensitivity by switching between Image and Reel.</p>
-              </div>
+                <strong className="text-[#3D4852] block mb-1">Photo or Reel</strong>
+                <p className="text-[11px] text-[#6B7280]">Keep the caption and switch the format.</p>
+              </button>
             </div>
           </div>
         </div>
