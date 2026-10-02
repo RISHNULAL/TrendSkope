@@ -201,7 +201,7 @@ export default function ScenarioPostCard({
     <div
       className={`glass-card p-6 md:p-8 rounded-3xl space-y-6 transition-all duration-300 relative border ${
         planId === "B" && changedFields.size > 0
-          ? "border-primary-orange/40 shadow-[0_0_25px_rgba(255,110,64,0.08)]"
+          ? "border-transparent "
           : "border-border/80"
       }`}
     >
@@ -210,14 +210,14 @@ export default function ScenarioPostCard({
         <div className="flex items-center gap-3">
           <span
             className={`w-3 h-3 rounded-full ${
-              planId === "A" ? "bg-slate-400" : "bg-primary-orange animate-pulse"
+              planId === "A" ? "bg-[#A3B1C6]" : "bg-[#6C63FF] animate-pulse"
             }`}
           />
           <div>
-            <h2 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-extrabold text-[#3D4852] flex items-center gap-2">
               <span>{title}</span>
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#6B7280]">
               {planId === "A" ? "Baseline planned Instagram post" : "Alternative scenario for model comparison"}
             </p>
           </div>
@@ -227,18 +227,18 @@ export default function ScenarioPostCard({
           {planId === "B" && onCopyFromA && (
             <button
               onClick={onCopyFromA}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-slate-300 hover:text-white hover:border-primary-orange/50 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-[#6B7280] hover:text-[#3D4852] hover:border-[#6C63FF] transition-colors"
               title="Copy all settings from Plan A into Plan B"
             >
-              <Copy className="w-3.5 h-3.5 text-primary-orange" />
+              <Copy className="w-3.5 h-3.5 text-[#6C63FF]" />
               <span className="hidden sm:inline">Copy Plan A</span>
             </button>
           )}
           <span
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold ${
+            className={`px-2.5 py-1 rounded-2xl text-xs font-mono font-bold ${
               planId === "A"
-                ? "bg-slate-800 text-slate-300 border border-slate-700"
-                : "bg-primary-orange/15 text-primary-orange border border-primary-orange/30"
+                ? "bg-[#E0E5EC] text-[#3D4852] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]"
+                : "bg-primary-orange/15 text-[#6C63FF] border border-transparent"
             }`}
           >
             {planId === "A" ? "PLAN A" : "PLAN B"}
@@ -248,20 +248,20 @@ export default function ScenarioPostCard({
 
       {/* SECTION: Media Type Selector (Controls UI Structure) */}
       <div
-        className={`p-4 rounded-2xl bg-[#040810]/70 border transition-all ${
-          isFieldChanged("media_type") ? "border-primary-orange shadow-[0_0_12px_rgba(255,110,64,0.2)]" : "border-border/80"
+        className={`p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
+          isFieldChanged("media_type") ? "border-primary-orange " : "border-border/80"
         }`}
       >
         <div className="flex items-center justify-between mb-2">
-          <label htmlFor={`media-type-${planId}`} className="font-bold text-slate-300 uppercase tracking-wider text-xs flex items-center gap-2">
+          <label htmlFor={`media-type-${planId}`} className="font-bold text-[#6B7280] uppercase tracking-wider text-xs flex items-center gap-2">
             <span>Media Type</span>
             {isFieldChanged("media_type") && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-primary-orange border border-primary-orange/40 animate-pulse">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
                 ● Changed
               </span>
             )}
           </label>
-          <span className="text-[11px] text-slate-400 font-mono">Format selection</span>
+          <span className="text-[11px] text-[#6B7280] font-mono">Format selection</span>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
@@ -277,11 +277,11 @@ export default function ScenarioPostCard({
             }
             className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all ${
               state.mediaType === "image"
-                ? "bg-primary-orange/20 border-primary-orange text-white shadow-sm"
-                : "bg-surface/50 border-border text-slate-400 hover:text-white"
+                ? "bg-[#6C63FF] border-transparent text-white shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                : "bg-surface/50 border-border text-[#6B7280] hover:text-[#3D4852]"
             }`}
           >
-            <ImageIcon className="w-4 h-4 text-primary-orange shrink-0" />
+            <ImageIcon className="w-4 h-4 text-[#6C63FF] shrink-0" />
             <span>Image</span>
           </button>
 
@@ -295,11 +295,11 @@ export default function ScenarioPostCard({
             }
             className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all ${
               state.mediaType === "carousel"
-                ? "bg-primary-coral/20 border-primary-coral text-white shadow-sm"
-                : "bg-surface/50 border-border text-slate-400 hover:text-white"
+                ? "bg-[#6C63FF] border-transparent text-white shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                : "bg-surface/50 border-border text-[#6B7280] hover:text-[#3D4852]"
             }`}
           >
-            <Layers className="w-4 h-4 text-primary-coral shrink-0" />
+            <Layers className="w-4 h-4 text-[#6C63FF] shrink-0" />
             <span>Carousel</span>
           </button>
 
@@ -314,11 +314,11 @@ export default function ScenarioPostCard({
             }
             className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all ${
               state.mediaType === "reel"
-                ? "bg-primary-pink/20 border-primary-pink text-white shadow-sm"
-                : "bg-surface/50 border-border text-slate-400 hover:text-white"
+                ? "bg-[#6C63FF] border-transparent text-white shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                : "bg-surface/50 border-border text-[#6B7280] hover:text-[#3D4852]"
             }`}
           >
-            <Video className="w-4 h-4 text-primary-pink shrink-0" />
+            <Video className="w-4 h-4 text-[#6C63FF] shrink-0" />
             <span>Reel</span>
           </button>
         </div>
@@ -326,22 +326,22 @@ export default function ScenarioPostCard({
 
       {/* SECTION: Planned Content Upload & Preview */}
       <div
-        className={`p-5 rounded-2xl bg-[#040810]/70 border transition-all ${
-          isFieldChanged("content") ? "border-primary-orange shadow-[0_0_12px_rgba(255,110,64,0.2)]" : "border-border/80"
+        className={`p-5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
+          isFieldChanged("content") ? "border-primary-orange " : "border-border/80"
         }`}
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
               Planned Content ({state.mediaType.toUpperCase()})
             </span>
             {isFieldChanged("content") && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-primary-orange border border-primary-orange/40 animate-pulse">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
                 ● Changed
               </span>
             )}
           </div>
-          <span className="text-[11px] text-slate-400 font-medium">
+          <span className="text-[11px] text-[#6B7280] font-medium">
             {state.mediaType === "image"
               ? "JPG, PNG, WEBP"
               : state.mediaType === "carousel"
@@ -394,23 +394,23 @@ export default function ScenarioPostCard({
             className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all ${
               dragActive
                 ? "border-primary-orange bg-primary-orange/10 scale-[0.99]"
-                : "border-slate-700/80 hover:border-slate-500 bg-surface/40 hover:bg-surface/70"
+                : "border-[#A3B1C6] bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
             }`}
           >
-            <div className="w-12 h-12 rounded-2xl bg-surface border border-white/10 flex items-center justify-center mx-auto mb-3 text-slate-300">
+            <div className="w-12 h-12 rounded-2xl bg-surface border border-transparent flex items-center justify-center mx-auto mb-3 text-[#6B7280]">
               {state.mediaType === "reel" ? (
-                <Video className="w-6 h-6 text-primary-pink" />
+                <Video className="w-6 h-6 text-[#6C63FF]" />
               ) : state.mediaType === "carousel" ? (
-                <Layers className="w-6 h-6 text-primary-coral" />
+                <Layers className="w-6 h-6 text-[#6C63FF]" />
               ) : (
-                <Upload className="w-6 h-6 text-primary-orange" />
+                <Upload className="w-6 h-6 text-[#6C63FF]" />
               )}
             </div>
 
-            <p className="text-sm font-bold text-white mb-1">
+            <p className="text-sm font-bold text-[#3D4852] mb-1">
               Upload planned {state.mediaType} for Plan {planId}
             </p>
-            <p className="text-xs text-slate-400 mb-3">
+            <p className="text-xs text-[#6B7280] mb-3">
               {state.mediaType === "carousel"
                 ? "Drag & drop multiple image slides or browse"
                 : state.mediaType === "reel"
@@ -418,8 +418,8 @@ export default function ScenarioPostCard({
                 : "Drag & drop post image (JPG, PNG, WEBP) or browse"}
             </p>
 
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border text-xs font-semibold text-white hover:bg-white/10 transition-colors">
-              <Upload className="w-3.5 h-3.5 text-primary-orange" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border text-xs font-semibold text-[#3D4852] hover:bg-[#E0E5EC] transition-colors">
+              <Upload className="w-3.5 h-3.5 text-[#6C63FF]" />
               Browse Device
             </span>
           </div>
@@ -428,7 +428,7 @@ export default function ScenarioPostCard({
           <div className="space-y-4">
             {/* Reel Video Player Preview */}
             {state.mediaType === "reel" && state.media && (
-              <div className="relative rounded-2xl overflow-hidden border border-border/80 bg-black/70 aspect-video flex items-center justify-center group">
+              <div className="relative rounded-2xl overflow-hidden border border-border/80 bg-[#3D4852]/30 aspect-video flex items-center justify-center group">
                 <video
                   src={state.media.url}
                   controls
@@ -436,11 +436,11 @@ export default function ScenarioPostCard({
                   playsInline
                 />
                 <div className="absolute top-2.5 left-2.5 flex items-center gap-2 pointer-events-none">
-                  <span className="px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md text-[10px] font-mono text-white border border-white/20">
+                  <span className="px-2 py-0.5 rounded-2xl bg-[#3D4852]/30 backdrop-blur-md text-[10px] font-mono text-[#3D4852] border border-transparent">
                     {state.media.aspectRatio || "9:16 (Story / Reel)"}
                   </span>
                   {state.media.durationSec && (
-                    <span className="px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md text-[10px] font-mono text-primary-orange border border-white/20">
+                    <span className="px-2 py-0.5 rounded-2xl bg-[#3D4852]/30 backdrop-blur-md text-[10px] font-mono text-[#6C63FF] border border-transparent">
                       {state.media.durationSec}s
                     </span>
                   )}
@@ -450,14 +450,14 @@ export default function ScenarioPostCard({
 
             {/* Single Image Preview */}
             {state.mediaType === "image" && state.media && (
-              <div className="relative rounded-2xl overflow-hidden border border-border/80 bg-black/70 aspect-video flex items-center justify-center">
+              <div className="relative rounded-2xl overflow-hidden border border-border/80 bg-[#3D4852]/30 aspect-video flex items-center justify-center">
                 <img
                   src={state.media.url}
                   alt={state.media.name}
                   className="w-full h-full object-contain max-h-64"
                 />
                 <div className="absolute top-2.5 left-2.5 flex items-center gap-2 pointer-events-none">
-                  <span className="px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md text-[10px] font-mono text-white border border-white/20">
+                  <span className="px-2 py-0.5 rounded-2xl bg-[#3D4852]/30 backdrop-blur-md text-[10px] font-mono text-[#3D4852] border border-transparent">
                     {state.media.aspectRatio || "Image"}
                   </span>
                 </div>
@@ -468,14 +468,14 @@ export default function ScenarioPostCard({
             {state.mediaType === "carousel" && (
               <div className="space-y-3">
                 {state.media && (
-                  <div className="relative rounded-2xl overflow-hidden border border-border/80 bg-black/70 aspect-video flex items-center justify-center">
+                  <div className="relative rounded-2xl overflow-hidden border border-border/80 bg-[#3D4852]/30 aspect-video flex items-center justify-center">
                     <img
                       src={state.media.url}
                       alt={state.media.name}
                       className="w-full h-full object-contain max-h-64"
                     />
                     <div className="absolute top-2.5 left-2.5 flex items-center gap-2 pointer-events-none">
-                      <span className="px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md text-[10px] font-mono text-white border border-white/20">
+                      <span className="px-2 py-0.5 rounded-2xl bg-[#3D4852]/30 backdrop-blur-md text-[10px] font-mono text-[#3D4852] border border-transparent">
                         Slide Preview ({state.carouselItems.findIndex((i) => i.url === state.media?.url) + 1}/{state.carouselItems.length})
                       </span>
                     </div>
@@ -499,13 +499,13 @@ export default function ScenarioPostCard({
                         onClick={() => onChange((prev) => ({ ...prev, media: item }))}
                         className="w-full h-full object-cover cursor-pointer"
                       />
-                      <span className="absolute bottom-0.5 right-0.5 px-1 rounded bg-black/80 text-[8px] font-mono text-white pointer-events-none">
+                      <span className="absolute bottom-0.5 right-0.5 px-1 rounded bg-black/80 text-[8px] font-mono text-[#3D4852] pointer-events-none">
                         #{idx + 1}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleRemoveCarouselItem(idx)}
-                        className="absolute top-0.5 right-0.5 p-0.5 rounded bg-rose-950/90 text-rose-300 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-0.5 right-0.5 p-0.5 rounded bg-rose-950/90 text-rose-300 hover:text-[#3D4852] opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Remove slide"
                       >
                         <Trash2 className="w-2.5 h-2.5" />
@@ -516,10 +516,10 @@ export default function ScenarioPostCard({
                   <button
                     type="button"
                     onClick={() => carouselInputRef.current?.click()}
-                    className="w-16 h-16 shrink-0 rounded-xl border-2 border-dashed border-slate-700 hover:border-slate-500 bg-surface/40 flex flex-col items-center justify-center text-slate-400 hover:text-white transition-colors"
+                    className="w-16 h-16 shrink-0 rounded-2xl border-2 border-dashed border-[#A3B1C6] bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] flex flex-col items-center justify-center text-[#6B7280] hover:text-[#6C63FF] transition-colors"
                     title="Add slide"
                   >
-                    <Plus className="w-4 h-4 text-primary-orange" />
+                    <Plus className="w-4 h-4 text-[#6C63FF]" />
                     <span className="text-[9px] font-bold mt-0.5">Add</span>
                   </button>
                 </div>
@@ -530,14 +530,14 @@ export default function ScenarioPostCard({
             {state.media && (
               <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-surface/60 border border-border text-xs">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="p-1.5 rounded-lg bg-surface border border-white/10 text-primary-orange shrink-0">
+                  <div className="p-1.5 rounded-2xl bg-surface border border-transparent text-[#6C63FF] shrink-0">
                     {state.mediaType === "reel" ? <Video className="w-4 h-4" /> : <ImageIcon className="w-4 h-4" />}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-semibold text-white truncate max-w-[180px]" title={state.media.name}>
+                    <p className="font-semibold text-[#3D4852] truncate max-w-[180px]" title={state.media.name}>
                       {state.media.name}
                     </p>
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-[#6B7280]">
                       {state.media.sizeKb} KB · {state.media.width}×{state.media.height}px · {state.media.format || "MEDIA"}
                     </p>
                   </div>
@@ -553,15 +553,15 @@ export default function ScenarioPostCard({
                         fileInputRef.current?.click();
                       }
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-surface border border-border text-slate-300 hover:text-white text-xs inline-flex items-center gap-1.5 transition-colors"
+                    className="px-2.5 py-1 rounded-2xl bg-surface border border-border text-[#6B7280] hover:text-[#3D4852] text-xs inline-flex items-center gap-1.5 transition-colors"
                   >
-                    <RefreshCw className="w-3 h-3 text-primary-orange" />
+                    <RefreshCw className="w-3 h-3 text-[#6C63FF]" />
                     Replace
                   </button>
                   <button
                     type="button"
                     onClick={handleRemoveMedia}
-                    className="p-1.5 rounded-lg bg-rose-950/40 border border-rose-500/30 text-rose-300 hover:text-rose-100 transition-colors"
+                    className="p-1.5 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-rose-300 hover:text-rose-100 transition-colors"
                     title="Remove media"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -572,35 +572,35 @@ export default function ScenarioPostCard({
 
             {/* Visual Signals Card (Image / Carousel) */}
             {state.media?.visualMetrics && state.mediaType !== "reel" && (
-              <div className="p-4 rounded-xl bg-surface/40 border border-white/10 space-y-3">
+              <div className="p-4 rounded-xl bg-surface/40 border border-transparent space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300 uppercase tracking-wider">
-                    <Sliders className="w-3.5 h-3.5 text-primary-orange" />
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#6B7280] uppercase tracking-wider">
+                    <Sliders className="w-3.5 h-3.5 text-[#6C63FF]" />
                     <span>Visual Signals (Plan {planId})</span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-mono">Calculated properties</span>
+                  <span className="text-[10px] text-[#6B7280] font-mono">Calculated properties</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div className="p-2.5 rounded-lg bg-[#040810]/60 border border-white/5">
-                    <span className="text-slate-400 text-[10px] block mb-0.5">Aspect Ratio</span>
-                    <strong className="text-white font-medium text-xs">{state.media.aspectRatio}</strong>
+                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
+                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Aspect Ratio</span>
+                    <strong className="text-[#3D4852] font-medium text-xs">{state.media.aspectRatio}</strong>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#040810]/60 border border-white/5">
-                    <span className="text-slate-400 text-[10px] block mb-0.5">Brightness</span>
-                    <strong className="text-white font-medium text-xs">
+                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
+                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Brightness</span>
+                    <strong className="text-[#3D4852] font-medium text-xs">
                       {state.media.visualMetrics.brightness_label} ({state.media.visualMetrics.brightness_pct}%)
                     </strong>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#040810]/60 border border-white/5">
-                    <span className="text-slate-400 text-[10px] block mb-0.5">Contrast</span>
-                    <strong className="text-white font-medium text-xs">
+                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
+                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Contrast</span>
+                    <strong className="text-[#3D4852] font-medium text-xs">
                       {state.media.visualMetrics.contrast_label}
                     </strong>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#040810]/60 border border-white/5">
-                    <span className="text-slate-400 text-[10px] block mb-0.5">Text Pattern</span>
-                    <strong className="text-white font-medium text-xs">
+                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
+                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Text Pattern</span>
+                    <strong className="text-[#3D4852] font-medium text-xs">
                       {state.media.visualMetrics.text_presence}
                     </strong>
                   </div>
@@ -610,29 +610,29 @@ export default function ScenarioPostCard({
 
             {/* Reel Signals Card (Reel) */}
             {state.mediaType === "reel" && state.media && (
-              <div className="p-4 rounded-xl bg-surface/40 border border-white/10 space-y-3">
+              <div className="p-4 rounded-xl bg-surface/40 border border-transparent space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300 uppercase tracking-wider">
-                    <Video className="w-3.5 h-3.5 text-primary-pink" />
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#6B7280] uppercase tracking-wider">
+                    <Video className="w-3.5 h-3.5 text-[#6C63FF]" />
                     <span>Reel Signals (Plan {planId})</span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-mono">Detected media signals</span>
+                  <span className="text-[10px] text-[#6B7280] font-mono">Detected media signals</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                  <div className="p-2.5 rounded-lg bg-[#040810]/60 border border-white/5">
-                    <span className="text-slate-400 text-[10px] block mb-0.5">Duration</span>
-                    <strong className="text-white font-medium text-xs">{state.media.durationSec || 15} sec</strong>
+                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
+                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Duration</span>
+                    <strong className="text-[#3D4852] font-medium text-xs">{state.media.durationSec || 15} sec</strong>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#040810]/60 border border-white/5">
-                    <span className="text-slate-400 text-[10px] block mb-0.5">Resolution</span>
-                    <strong className="text-white font-medium text-xs">
+                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
+                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Resolution</span>
+                    <strong className="text-[#3D4852] font-medium text-xs">
                       {state.media.width} × {state.media.height}
                     </strong>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#040810]/60 border border-white/5">
-                    <span className="text-slate-400 text-[10px] block mb-0.5">Audio Stream</span>
-                    <strong className="text-white font-medium text-xs">
+                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
+                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Audio Stream</span>
+                    <strong className="text-[#3D4852] font-medium text-xs">
                       {state.media.audioDetected ? "Detected in Video" : "No Audio Track"}
                     </strong>
                   </div>
@@ -644,7 +644,7 @@ export default function ScenarioPostCard({
 
         {uploadError && (
           <div className="mt-3 p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <AlertCircle className="w-4 h-4 text-[#BE123C] shrink-0" />
             <span>{uploadError}</span>
           </div>
         )}
@@ -653,21 +653,21 @@ export default function ScenarioPostCard({
       {/* SECTION: Planned Audio (CONDITIONAL: ONLY FOR REELS!) */}
       {state.mediaType === "reel" ? (
         <div
-          className={`p-4 rounded-2xl bg-[#040810]/70 border transition-all space-y-3 ${
-            isFieldChanged("audio") ? "border-primary-orange shadow-[0_0_12px_rgba(255,110,64,0.2)]" : "border-border/80"
+          className={`p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all space-y-3 ${
+            isFieldChanged("audio") ? "border-primary-orange " : "border-border/80"
           }`}
         >
           <div className="flex items-center justify-between">
-            <label className="font-bold text-slate-300 uppercase tracking-wider text-xs flex items-center gap-1.5">
-              <Music className="w-3.5 h-3.5 text-primary-coral" />
+            <label className="font-bold text-[#6B7280] uppercase tracking-wider text-xs flex items-center gap-1.5">
+              <Music className="w-3.5 h-3.5 text-[#6C63FF]" />
               <span>Planned Audio</span>
               {isFieldChanged("audio") && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-primary-orange border border-primary-orange/40 animate-pulse">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
                   ● Changed
                 </span>
               )}
             </label>
-            <span className="text-[11px] text-slate-400 font-mono">Reel sound configuration</span>
+            <span className="text-[11px] text-[#6B7280] font-mono">Reel sound configuration</span>
           </div>
 
           {/* Audio Source Options */}
@@ -683,8 +683,8 @@ export default function ScenarioPostCard({
               }
               className={`p-2.5 rounded-xl border text-center transition-all ${
                 state.audioType === "original"
-                  ? "bg-primary-orange/20 border-primary-orange text-white font-bold"
-                  : "bg-surface/40 border-border text-slate-400 hover:text-white"
+                  ? "bg-[#6C63FF] border-transparent text-white font-bold shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                  : "bg-surface/40 border-border text-[#6B7280] hover:text-[#3D4852]"
               }`}
             >
               Original Audio
@@ -701,8 +701,8 @@ export default function ScenarioPostCard({
               }
               className={`p-2.5 rounded-xl border text-center transition-all ${
                 state.audioType === "custom"
-                  ? "bg-primary-coral/20 border-primary-coral text-white font-bold"
-                  : "bg-surface/40 border-border text-slate-400 hover:text-white"
+                  ? "bg-[#6C63FF] border-transparent text-white font-bold shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                  : "bg-surface/40 border-border text-[#6B7280] hover:text-[#3D4852]"
               }`}
             >
               Instagram Audio
@@ -719,8 +719,8 @@ export default function ScenarioPostCard({
               }
               className={`p-2.5 rounded-xl border text-center transition-all ${
                 state.audioType === "uploaded"
-                  ? "bg-primary-pink/20 border-primary-pink text-white font-bold"
-                  : "bg-surface/40 border-border text-slate-400 hover:text-white"
+                  ? "bg-[#6C63FF] border-transparent text-white font-bold shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                  : "bg-surface/40 border-border text-[#6B7280] hover:text-[#3D4852]"
               }`}
             >
               Uploaded Audio
@@ -737,8 +737,8 @@ export default function ScenarioPostCard({
               }
               className={`p-2.5 rounded-xl border text-center transition-all ${
                 state.audioType === "none"
-                  ? "bg-slate-700/50 border-slate-500 text-white font-bold"
-                  : "bg-surface/40 border-border text-slate-400 hover:text-white"
+                  ? "bg-[#E0E5EC] border-transparent text-[#3D4852] font-bold shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]"
+                  : "bg-surface/40 border-border text-[#6B7280] hover:text-[#3D4852]"
               }`}
             >
               No Audio
@@ -749,7 +749,7 @@ export default function ScenarioPostCard({
           {state.audioType !== "none" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                <label className="text-[10px] uppercase font-bold text-[#6B7280] block mb-1">
                   Audio Track Name
                 </label>
                 <input
@@ -757,12 +757,12 @@ export default function ScenarioPostCard({
                   placeholder="e.g. CyberPulse Intro / Track Name"
                   value={state.audioName}
                   onChange={(e) => onChange((prev) => ({ ...prev, audioName: e.target.value }))}
-                  className="w-full rounded-xl bg-[#030712] border border-border px-3 py-2 text-white text-xs placeholder-slate-500 focus:border-primary-orange"
+                  className="w-full rounded-xl bg-[#E0E5EC] border border-border px-3 py-2 text-[#3D4852] text-xs placeholder-[#A0AEC0] focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                <label className="text-[10px] uppercase font-bold text-[#6B7280] block mb-1">
                   Audio ID / Reference (Optional)
                 </label>
                 <input
@@ -770,29 +770,29 @@ export default function ScenarioPostCard({
                   placeholder="e.g. audio_18293740"
                   value={state.audioId}
                   onChange={(e) => onChange((prev) => ({ ...prev, audioId: e.target.value }))}
-                  className="w-full rounded-xl bg-[#030712] border border-border px-3 py-2 text-white text-xs placeholder-slate-500 focus:border-primary-orange"
+                  className="w-full rounded-xl bg-[#E0E5EC] border border-border px-3 py-2 text-[#3D4852] text-xs placeholder-[#A0AEC0] focus:border-transparent"
                 />
               </div>
             </div>
           ) : (
-            <div className="p-2.5 rounded-xl bg-surface/30 border border-white/5 text-xs text-slate-400 flex items-center gap-2">
-              <VolumeX className="w-4 h-4 text-slate-500 shrink-0" />
+            <div className="p-2.5 rounded-xl bg-surface/30 border border-transparent text-xs text-[#6B7280] flex items-center gap-2">
+              <VolumeX className="w-4 h-4 text-[#6B7280] shrink-0" />
               <span>No audio stream selected (silent Reel).</span>
             </div>
           )}
 
-          <p className="text-[10px] text-slate-400 font-mono">
+          <p className="text-[10px] text-[#6B7280] font-mono">
             Trend status: Unknown / Telemetry not indexed · Analyzed for creative planning
           </p>
         </div>
       ) : (
         /* Subtle informational note for Image & Carousel */
-        <div className="p-3 rounded-xl bg-surface/30 border border-white/5 flex items-center justify-between text-xs text-slate-400">
+        <div className="p-3 rounded-xl bg-surface/30 border border-transparent flex items-center justify-between text-xs text-[#6B7280]">
           <div className="flex items-center gap-2">
-            <Volume2 className="w-3.5 h-3.5 text-slate-500" />
+            <Volume2 className="w-3.5 h-3.5 text-[#6B7280]" />
             <span>Planned Audio:</span>
           </div>
-          <span className="font-mono text-slate-400 text-[11px]">
+          <span className="font-mono text-[#6B7280] text-[11px]">
             Not applicable for {state.mediaType === "image" ? "Image" : "Carousel"} posts
           </span>
         </div>
@@ -800,20 +800,20 @@ export default function ScenarioPostCard({
 
       {/* SECTION: Caption */}
       <div
-        className={`space-y-2 p-4 rounded-2xl bg-[#040810]/70 border transition-all ${
-          isFieldChanged("caption") ? "border-primary-orange shadow-[0_0_12px_rgba(255,110,64,0.2)]" : "border-border/80"
+        className={`space-y-2 p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
+          isFieldChanged("caption") ? "border-primary-orange " : "border-border/80"
         }`}
       >
         <div className="flex items-center justify-between">
-          <label htmlFor={`caption-${planId}`} className="flex items-center gap-2 font-bold text-slate-300 uppercase tracking-wider text-xs">
+          <label htmlFor={`caption-${planId}`} className="flex items-center gap-2 font-bold text-[#6B7280] uppercase tracking-wider text-xs">
             <span>Caption</span>
             {isFieldChanged("caption") && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-primary-orange border border-primary-orange/40 animate-pulse">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
                 ● Changed
               </span>
             )}
           </label>
-          <span className="text-[11px] text-slate-400 font-mono">
+          <span className="text-[11px] text-[#6B7280] font-mono">
             {captionData.metrics.characters} chars · {captionData.metrics.words} words
           </span>
         </div>
@@ -824,28 +824,28 @@ export default function ScenarioPostCard({
           value={state.caption}
           onChange={(e) => onChange((prev) => ({ ...prev, caption: e.target.value }))}
           placeholder="Draft the planned caption for this scenario..."
-          className="w-full rounded-xl bg-[#030712] border border-border p-3 text-white text-xs placeholder-slate-500 focus:border-primary-orange leading-relaxed"
+          className="w-full rounded-xl bg-[#E0E5EC] border border-border p-3 text-[#3D4852] text-xs placeholder-[#A0AEC0] focus:border-transparent leading-relaxed"
         />
 
         {/* Caption Signals Badge List */}
-        <div className="p-3 rounded-xl bg-surface/50 border border-white/5 space-y-2">
+        <div className="p-3 rounded-xl bg-surface/50 border border-transparent space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Caption Signals</span>
-            <span className="text-[10px] text-slate-400 font-mono">{captionData.structure.length_label}</span>
+            <span className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Caption Signals</span>
+            <span className="text-[10px] text-[#6B7280] font-mono">{captionData.structure.length_label}</span>
           </div>
 
           <div className="flex flex-wrap gap-1.5 text-[11px]">
-            <span className="px-2 py-0.5 rounded-lg bg-surface border border-white/10 text-slate-200">
+            <span className="px-2 py-0.5 rounded-2xl bg-surface border border-transparent text-[#3D4852]">
               {captionData.metrics.hashtags} hashtags
             </span>
-            <span className="px-2 py-0.5 rounded-lg bg-surface border border-white/10 text-slate-200">
+            <span className="px-2 py-0.5 rounded-2xl bg-surface border border-transparent text-[#3D4852]">
               {captionData.metrics.emojis} emojis
             </span>
-            <span className="px-2 py-0.5 rounded-lg bg-surface border border-white/10 text-slate-200">
+            <span className="px-2 py-0.5 rounded-2xl bg-surface border border-transparent text-[#3D4852]">
               {captionData.metrics.questions} questions
             </span>
             {captionData.structure.has_cta && (
-              <span className="px-2 py-0.5 rounded-lg bg-primary-orange/20 border border-primary-orange/30 text-primary-orange font-medium">
+              <span className="px-2 py-0.5 rounded-2xl bg-primary-orange/20 border border-transparent text-[#6C63FF] font-medium">
                 1+ CTA detected
               </span>
             )}
@@ -857,16 +857,16 @@ export default function ScenarioPostCard({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
         {/* Followers */}
         <div
-          className={`p-3.5 rounded-xl bg-[#040810]/70 border transition-all ${
-            isFieldChanged("followers") ? "border-primary-orange shadow-[0_0_12px_rgba(255,110,64,0.2)]" : "border-border/80"
+          className={`p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
+            isFieldChanged("followers") ? "border-primary-orange " : "border-border/80"
           }`}
         >
           <div className="flex items-center justify-between mb-1.5">
-            <label htmlFor={`followers-${planId}`} className="font-bold text-slate-300 uppercase tracking-wider text-[11px]">
+            <label htmlFor={`followers-${planId}`} className="font-bold text-[#6B7280] uppercase tracking-wider text-[11px]">
               Followers
             </label>
             {isFieldChanged("followers") && (
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary-orange/20 text-primary-orange">
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary-orange/20 text-[#6C63FF]">
                 ● Changed
               </span>
             )}
@@ -882,24 +882,24 @@ export default function ScenarioPostCard({
                 followers: Math.max(1, parseInt(e.target.value) || 1),
               }))
             }
-            className="w-full rounded-xl bg-[#030712] border border-border p-2.5 text-white focus:border-primary-orange"
+            className="w-full rounded-xl bg-[#E0E5EC] border border-border p-2.5 text-[#3D4852] focus:border-transparent"
           />
         </div>
 
         {/* Date & Time */}
         <div
-          className={`p-3.5 rounded-xl bg-[#040810]/70 border transition-all ${
+          className={`p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
             isFieldChanged("time") || isFieldChanged("date")
-              ? "border-primary-orange shadow-[0_0_12px_rgba(255,110,64,0.2)]"
+              ? "border-primary-orange "
               : "border-border/80"
           }`}
         >
           <div className="flex items-center justify-between mb-1.5">
-            <label className="font-bold text-slate-300 uppercase tracking-wider text-[11px]">
+            <label className="font-bold text-[#6B7280] uppercase tracking-wider text-[11px]">
               Posting Date & Time (UTC)
             </label>
             {(isFieldChanged("time") || isFieldChanged("date")) && (
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary-orange/20 text-primary-orange">
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary-orange/20 text-[#6C63FF]">
                 ● Changed
               </span>
             )}
@@ -909,13 +909,13 @@ export default function ScenarioPostCard({
               type="date"
               value={state.date}
               onChange={(e) => onChange((prev) => ({ ...prev, date: e.target.value }))}
-              className="w-full rounded-xl bg-[#030712] border border-border p-2 text-white text-xs focus:border-primary-orange"
+              className="w-full rounded-xl bg-[#E0E5EC] border border-border p-2 text-[#3D4852] text-xs focus:border-transparent"
             />
             <input
               type="time"
               value={state.time}
               onChange={(e) => onChange((prev) => ({ ...prev, time: e.target.value }))}
-              className="w-full rounded-xl bg-[#030712] border border-border p-2 text-white text-xs focus:border-primary-orange"
+              className="w-full rounded-xl bg-[#E0E5EC] border border-border p-2 text-[#3D4852] text-xs focus:border-transparent"
             />
           </div>
         </div>

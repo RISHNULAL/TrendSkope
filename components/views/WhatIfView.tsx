@@ -258,41 +258,41 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-primary-orange/15 border border-primary-orange/30 text-primary-orange text-[11px] font-bold tracking-wide">
+            <span className="px-2.5 py-0.5 rounded-full bg-primary-orange/15 border border-transparent text-[#6C63FF] text-[11px] font-bold tracking-wide">
               Model-based scenario analysis
             </span>
-            <span className="text-xs text-slate-400 font-mono">· What-If Scenario Comparison</span>
+            <span className="text-xs text-[#6B7280] font-mono">· What-If Scenario Comparison</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-black text-[#3D4852] tracking-tight">
             Pre-Publish Scenario Studio
           </h1>
-          <p className="text-sm text-slate-400 mt-1 max-w-3xl">
+          <p className="text-sm text-[#6B7280] mt-1 max-w-3xl">
             Compare complete content plans and evaluate how the trained model responds to different publishing scenarios.
           </p>
         </div>
 
         {/* Comparison Mode Selector */}
-        <div className="bg-[#040810]/80 p-1 rounded-2xl border border-border flex items-center shrink-0 self-start md:self-auto">
+        <div className="bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] p-1 rounded-2xl border border-border flex items-center shrink-0 self-start md:self-auto">
           <button
             onClick={() => setComparisonMode("single")}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               comparisonMode === "single"
-                ? "bg-gradient-to-r from-primary-coral/30 to-primary-pink/20 text-white border border-primary-coral/40 shadow-sm"
-                : "text-slate-400 hover:text-white"
+                ? "bg-[#E0E5EC] text-[#6C63FF] border-transparent shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
+                : "text-[#6B7280] hover:text-[#3D4852]"
             }`}
           >
-            <Sliders className="w-3.5 h-3.5 text-primary-orange" />
+            <Sliders className="w-3.5 h-3.5 text-[#6C63FF]" />
             <span>Single Variable (Recommended)</span>
           </button>
           <button
             onClick={() => setComparisonMode("multiple")}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               comparisonMode === "multiple"
-                ? "bg-gradient-to-r from-primary-coral/30 to-primary-pink/20 text-white border border-primary-coral/40 shadow-sm"
-                : "text-slate-400 hover:text-white"
+                ? "bg-[#E0E5EC] text-[#6C63FF] border-transparent shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
+                : "text-[#6B7280] hover:text-[#3D4852]"
             }`}
           >
-            <Layers className="w-3.5 h-3.5 text-primary-coral" />
+            <Layers className="w-3.5 h-3.5 text-[#6C63FF]" />
             <span>Multiple Variables</span>
           </button>
         </div>
@@ -300,8 +300,8 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
 
       {/* Mode Guidance & Quick Test Presets */}
       <div className="p-4 rounded-2xl bg-surface/50 border border-border flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-xs">
-        <div className="flex items-center gap-2.5 text-slate-300">
-          <Info className="w-4 h-4 text-primary-orange shrink-0" />
+        <div className="flex items-center gap-2.5 text-[#6B7280]">
+          <Info className="w-4 h-4 text-[#6C63FF] shrink-0" />
           <span>
             {comparisonMode === "single" ? (
               <>
@@ -317,28 +317,28 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
 
         {/* Test Preset Buttons */}
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[11px] text-slate-400 font-bold uppercase mr-1">Test Scenarios:</span>
+          <span className="text-[11px] text-[#6B7280] font-bold uppercase mr-1">Test Scenarios:</span>
           <button
             onClick={() => handleApplyPreset("time")}
-            className="px-2.5 py-1 rounded-lg bg-surface border border-white/10 hover:border-primary-orange/40 text-slate-200 hover:text-white transition-colors"
+            className="px-2.5 py-1 rounded-2xl bg-surface border border-transparent hover:border-[#6C63FF] text-[#3D4852] hover:text-[#3D4852] transition-colors"
           >
             Test 1: Time Sensitivity
           </button>
           <button
             onClick={() => handleApplyPreset("caption")}
-            className="px-2.5 py-1 rounded-lg bg-surface border border-white/10 hover:border-primary-orange/40 text-slate-200 hover:text-white transition-colors"
+            className="px-2.5 py-1 rounded-2xl bg-surface border border-transparent hover:border-[#6C63FF] text-[#3D4852] hover:text-[#3D4852] transition-colors"
           >
             Test 2: Caption Sensitivity
           </button>
           <button
             onClick={() => handleApplyPreset("mediaType")}
-            className="px-2.5 py-1 rounded-lg bg-surface border border-white/10 hover:border-primary-orange/40 text-slate-200 hover:text-white transition-colors"
+            className="px-2.5 py-1 rounded-2xl bg-surface border border-transparent hover:border-[#6C63FF] text-[#3D4852] hover:text-[#3D4852] transition-colors"
           >
             Test 3: Media Type
           </button>
           <button
             onClick={() => handleApplyPreset("reelAudio")}
-            className="px-2.5 py-1 rounded-lg bg-surface border border-white/10 hover:border-primary-orange/40 text-slate-200 hover:text-white transition-colors"
+            className="px-2.5 py-1 rounded-2xl bg-surface border border-transparent hover:border-[#6C63FF] text-[#3D4852] hover:text-[#3D4852] transition-colors"
           >
             Test 4: Reel Audio
           </button>
@@ -348,7 +348,7 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
       {/* Untrained Model Warning */}
       {!isTrained && (
         <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          <AlertTriangle className="w-5 h-5 text-[#B45309] shrink-0 mt-0.5" />
           <div>
             <p className="font-bold text-amber-300 text-sm">Offline Trained Model Required</p>
             <p className="mt-0.5 text-amber-200/90 leading-relaxed">
@@ -360,7 +360,7 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
 
       {error && (
         <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-3">
-          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+          <AlertTriangle className="w-4 h-4 text-[#BE123C] shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -392,22 +392,22 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
         <button
           onClick={handleCompare}
           disabled={loading || !isTrained}
-          className="btn-primary px-10 py-4 text-base font-bold shadow-lg disabled:opacity-50 transition-transform active:scale-95"
+          className="btn-primary px-10 py-4 text-base font-bold shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] disabled:opacity-50 transition-transform active:scale-95"
         >
           {loading ? (
             <span className="flex items-center gap-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin" />
               Evaluating Model Estimates...
             </span>
           ) : (
             <span className="flex items-center gap-2.5">
-              <GitCompare className="w-5 h-5 text-white" />
+              <GitCompare className="w-5 h-5 text-[#3D4852]" />
               Compare Scenarios →
             </span>
           )}
         </button>
 
-        <p className="text-[11px] text-slate-400 font-mono text-center">
+        <p className="text-[11px] text-[#6B7280] font-mono text-center">
           Evaluates learned model associations for both publishing plans.
         </p>
       </div>
@@ -419,9 +419,9 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-primary-orange" />
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">What Changed?</h2>
+              <h2 className="text-sm font-bold text-[#3D4852] uppercase tracking-wider">What Changed?</h2>
             </div>
-            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-primary-orange/20 text-primary-orange border border-primary-orange/30">
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-primary-orange/20 text-[#6C63FF] border border-transparent">
               {differences.changed.length === 0
                 ? "No scenario differences detected"
                 : `${differences.changed.length} parameter${differences.changed.length > 1 ? "s" : ""} modified`}
@@ -429,28 +429,28 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           </div>
 
           {differences.changed.length === 0 ? (
-            <p className="text-xs text-slate-400 italic py-2">
+            <p className="text-xs text-[#6B7280] italic py-2">
               Plan A and Plan B currently have identical inputs. Modify a field in Plan B to compare scenarios.
             </p>
           ) : (
             <div className="space-y-3">
               {differences.changed.map((param) => (
-                <div key={param.field} className="p-3 rounded-2xl bg-[#040810]/70 border border-white/5 space-y-1">
+                <div key={param.field} className="p-3 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-200">{param.label}</span>
-                    <span className="text-[10px] text-primary-orange font-mono">Modified</span>
+                    <span className="font-bold text-[#3D4852]">{param.label}</span>
+                    <span className="text-[10px] text-[#6C63FF] font-mono">Modified</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-300">
-                    <span className="px-2 py-0.5 rounded bg-surface border border-white/10 text-slate-400 font-mono truncate max-w-[140px]">
+                  <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+                    <span className="px-2 py-0.5 rounded bg-surface border border-transparent text-[#6B7280] font-mono truncate max-w-[140px]">
                       {param.value_a}
                     </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                    <span className="px-2 py-0.5 rounded bg-primary-orange/20 border border-primary-orange/30 text-primary-orange font-mono truncate max-w-[140px]">
+                    <ArrowRight className="w-3.5 h-3.5 text-[#6B7280] shrink-0" />
+                    <span className="px-2 py-0.5 rounded bg-primary-orange/20 border border-transparent text-[#6C63FF] font-mono truncate max-w-[140px]">
                       {param.value_b}
                     </span>
                   </div>
                   {param.impact_note && (
-                    <p className="text-[11px] text-slate-400 mt-1">{param.impact_note}</p>
+                    <p className="text-[11px] text-[#6B7280] mt-1">{param.impact_note}</p>
                   )}
                 </div>
               ))}
@@ -462,24 +462,24 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
         <div className="glass-card p-6 rounded-3xl border border-border/80 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Unchanged Parameters</h2>
+              <CheckCircle2 className="w-4 h-4 text-[#0F766E]" />
+              <h2 className="text-sm font-bold text-[#3D4852] uppercase tracking-wider">Unchanged Parameters</h2>
             </div>
-            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-[#0F766E] border border-emerald-500/30">
               {differences.unchanged.length} constant
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             {differences.unchanged.map((item) => (
-              <div key={item.field} className="p-2.5 rounded-xl bg-[#040810]/60 border border-white/5">
-                <span className="text-slate-400 text-[10px] block">{item.label}</span>
-                <span className="font-mono text-slate-200 truncate block mt-0.5">{item.value}</span>
+              <div key={item.field} className="p-2.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
+                <span className="text-[#6B7280] text-[10px] block">{item.label}</span>
+                <span className="font-mono text-[#3D4852] truncate block mt-0.5">{item.value}</span>
               </div>
             ))}
           </div>
 
-          <p className="text-[11px] text-slate-400 italic pt-1">
+          <p className="text-[11px] text-[#6B7280] italic pt-1">
             Controlled factors ensure model predictions evaluate the intended parameter modifications.
           </p>
         </div>
@@ -490,92 +490,92 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
         <div className="glass-card p-6 md:p-8 rounded-3xl border border-border/80 space-y-5">
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2.5">
-              <ImageIcon className="w-5 h-5 text-primary-orange" />
+              <ImageIcon className="w-5 h-5 text-[#6C63FF]" />
               <div>
-                <h2 className="text-base font-bold text-white">Content Comparison</h2>
-                <p className="text-xs text-slate-400">Side-by-side technical media profile</p>
+                <h2 className="text-base font-bold text-[#3D4852]">Content Comparison</h2>
+                <p className="text-xs text-[#6B7280]">Side-by-side technical media profile</p>
               </div>
             </div>
-            <span className="text-[11px] text-slate-400 font-mono">Uploaded files</span>
+            <span className="text-[11px] text-[#6B7280] font-mono">Uploaded files</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Plan A Media Profile */}
-            <div className="p-4 rounded-2xl bg-[#040810]/70 border border-white/10 space-y-3">
-              <span className="text-xs font-bold text-slate-300 block pb-1 border-b border-white/5">
+            <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-3">
+              <span className="text-xs font-bold text-[#6B7280] block pb-1 border-b border-transparent">
                 Plan A Content
               </span>
               {planA.media ? (
                 <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">Format & Type</span>
-                    <span className="text-white font-mono">{planA.media.format} ({planA.mediaType.toUpperCase()})</span>
+                  <div className="flex justify-between py-1 border-b border-transparent">
+                    <span className="text-[#6B7280]">Format & Type</span>
+                    <span className="text-[#3D4852] font-mono">{planA.media.format} ({planA.mediaType.toUpperCase()})</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">Aspect Ratio</span>
-                    <span className="text-white font-mono">{planA.media.aspectRatio}</span>
+                  <div className="flex justify-between py-1 border-b border-transparent">
+                    <span className="text-[#6B7280]">Aspect Ratio</span>
+                    <span className="text-[#3D4852] font-mono">{planA.media.aspectRatio}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">Dimensions</span>
-                    <span className="text-white font-mono">{planA.media.width} × {planA.media.height} px</span>
+                  <div className="flex justify-between py-1 border-b border-transparent">
+                    <span className="text-[#6B7280]">Dimensions</span>
+                    <span className="text-[#3D4852] font-mono">{planA.media.width} × {planA.media.height} px</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">Playback Duration</span>
-                    <span className="text-white font-mono">
+                  <div className="flex justify-between py-1 border-b border-transparent">
+                    <span className="text-[#6B7280]">Playback Duration</span>
+                    <span className="text-[#3D4852] font-mono">
                       {planA.media.durationSec ? `${planA.media.durationSec}s` : "Static (Image)"}
                     </span>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span className="text-slate-400">Audio Stream</span>
-                    <span className="text-white font-mono">
+                    <span className="text-[#6B7280]">Audio Stream</span>
+                    <span className="text-[#3D4852] font-mono">
                       {planA.mediaType === "reel" ? (planA.media.audioDetected ? "Detected in Video" : "No Audio Track") : "Not applicable (Image)"}
                     </span>
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-slate-500 italic">No media file uploaded for Plan A.</p>
+                <p className="text-xs text-[#6B7280] italic">No media file uploaded for Plan A.</p>
               )}
             </div>
 
             {/* Plan B Media Profile */}
-            <div className="p-4 rounded-2xl bg-[#040810]/70 border border-white/10 space-y-3">
-              <span className="text-xs font-bold text-slate-300 block pb-1 border-b border-white/5">
+            <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-3">
+              <span className="text-xs font-bold text-[#6B7280] block pb-1 border-b border-transparent">
                 Plan B Content
               </span>
               {planB.media ? (
                 <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">Format & Type</span>
-                    <span className="text-white font-mono">{planB.media.format} ({planB.mediaType.toUpperCase()})</span>
+                  <div className="flex justify-between py-1 border-b border-transparent">
+                    <span className="text-[#6B7280]">Format & Type</span>
+                    <span className="text-[#3D4852] font-mono">{planB.media.format} ({planB.mediaType.toUpperCase()})</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">Aspect Ratio</span>
-                    <span className="text-white font-mono">{planB.media.aspectRatio}</span>
+                  <div className="flex justify-between py-1 border-b border-transparent">
+                    <span className="text-[#6B7280]">Aspect Ratio</span>
+                    <span className="text-[#3D4852] font-mono">{planB.media.aspectRatio}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">Dimensions</span>
-                    <span className="text-white font-mono">{planB.media.width} × {planB.media.height} px</span>
+                  <div className="flex justify-between py-1 border-b border-transparent">
+                    <span className="text-[#6B7280]">Dimensions</span>
+                    <span className="text-[#3D4852] font-mono">{planB.media.width} × {planB.media.height} px</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">Playback Duration</span>
-                    <span className="text-white font-mono">
+                  <div className="flex justify-between py-1 border-b border-transparent">
+                    <span className="text-[#6B7280]">Playback Duration</span>
+                    <span className="text-[#3D4852] font-mono">
                       {planB.media.durationSec ? `${planB.media.durationSec}s` : "Static (Image)"}
                     </span>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span className="text-slate-400">Audio Stream</span>
-                    <span className="text-white font-mono">
+                    <span className="text-[#6B7280]">Audio Stream</span>
+                    <span className="text-[#3D4852] font-mono">
                       {planB.mediaType === "reel" ? (planB.media.audioDetected ? "Detected in Video" : "No Audio Track") : "Not applicable (Image)"}
                     </span>
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-slate-500 italic">No media file uploaded for Plan B.</p>
+                <p className="text-xs text-[#6B7280] italic">No media file uploaded for Plan B.</p>
               )}
             </div>
           </div>
 
-          <p className="text-[11px] text-slate-400 italic">
+          <p className="text-[11px] text-[#6B7280] italic">
             Media characteristics are shown from the uploaded files.
           </p>
         </div>
@@ -586,40 +586,40 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
         <div className="glass-card-accent p-6 md:p-10 rounded-3xl animate-fade-in space-y-8">
           {/* Main Delta Result Header */}
           <div className="text-center space-y-3">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-slate-300">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#6B7280]">
               Model-Estimated Engagement Difference
             </span>
 
             <div className="flex items-center justify-center gap-3">
               {delta > 0 ? (
-                <div className="p-2 rounded-2xl bg-emerald-500/20 text-emerald-400">
+                <div className="p-2 rounded-2xl bg-emerald-500/20 text-[#0F766E]">
                   <TrendingUp className="w-8 h-8" />
                 </div>
               ) : delta < 0 ? (
-                <div className="p-2 rounded-2xl bg-rose-500/20 text-rose-400">
+                <div className="p-2 rounded-2xl bg-rose-500/20 text-[#BE123C]">
                   <TrendingDown className="w-8 h-8" />
                 </div>
               ) : (
-                <div className="p-2 rounded-2xl bg-slate-500/20 text-slate-300">
+                <div className="p-2 rounded-2xl bg-[#E0E5EC] text-[#6B7280] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
                   <Sliders className="w-8 h-8" />
                 </div>
               )}
 
               <div
                 className={`text-4xl sm:text-6xl font-black font-mono ${
-                  delta > 0 ? "text-emerald-400" : delta < 0 ? "text-rose-400" : "text-slate-300"
+                  delta > 0 ? "text-[#0F766E]" : delta < 0 ? "text-[#BE123C]" : "text-[#6B7280]"
                 }`}
               >
                 {delta > 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)} pp
               </div>
             </div>
 
-            <p className="text-sm text-slate-300 font-medium">
-              Current (Plan A): <strong className="text-white">{resA.prediction.toFixed(2)}%</strong> → Alternative (Plan B):{" "}
-              <strong className="text-white">{resB.prediction.toFixed(2)}%</strong>
+            <p className="text-sm text-[#6B7280] font-medium">
+              Current (Plan A): <strong className="text-[#3D4852]">{resA.prediction.toFixed(2)}%</strong> → Alternative (Plan B):{" "}
+              <strong className="text-[#3D4852]">{resB.prediction.toFixed(2)}%</strong>
             </p>
 
-            <p className="text-xs text-slate-400 max-w-xl mx-auto">
+            <p className="text-xs text-[#6B7280] max-w-xl mx-auto">
               {delta > 0
                 ? `Plan B is estimated at ${delta.toFixed(2)} percentage points higher by the current model.`
                 : delta < 0
@@ -629,21 +629,21 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           </div>
 
           {/* Uncertainty Intervals */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/10 text-xs">
-            <div className="p-4 rounded-2xl bg-black/40 border border-white/10 text-center space-y-1">
-              <span className="text-slate-400 block font-medium">Plan A Uncertainty Interval</span>
-              <strong className="text-white font-mono text-base block">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-transparent text-xs">
+            <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent text-center space-y-1">
+              <span className="text-[#6B7280] block font-medium">Plan A Uncertainty Interval</span>
+              <strong className="text-[#3D4852] font-mono text-base block">
                 {resA.lower.toFixed(2)}% — {resA.upper.toFixed(2)}%
               </strong>
-              <span className="text-[11px] text-slate-400">Band: {resA.band}</span>
+              <span className="text-[11px] text-[#6B7280]">Band: {resA.band}</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-black/40 border border-white/10 text-center space-y-1">
-              <span className="text-slate-400 block font-medium">Plan B Uncertainty Interval</span>
-              <strong className="text-white font-mono text-base block">
+            <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent text-center space-y-1">
+              <span className="text-[#6B7280] block font-medium">Plan B Uncertainty Interval</span>
+              <strong className="text-[#3D4852] font-mono text-base block">
                 {resB.lower.toFixed(2)}% — {resB.upper.toFixed(2)}%
               </strong>
-              <span className="text-[11px] text-slate-400">Band: {resB.band}</span>
+              <span className="text-[11px] text-[#6B7280]">Band: {resB.band}</span>
             </div>
           </div>
 
@@ -651,15 +651,15 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           <div className="space-y-2">
             {intervalsOverlap && (
               <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-xs flex items-center justify-center gap-2 text-center">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                <AlertTriangle className="w-4 h-4 text-[#B45309] shrink-0" />
                 <span>
                   The scenario intervals overlap; the estimated difference should therefore be interpreted cautiously.
                 </span>
               </div>
             )}
 
-            <div className="p-3 rounded-xl bg-[#040810]/70 border border-white/10 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-              <Info className="w-4 h-4 text-primary-orange shrink-0" />
+            <div className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-center text-xs text-[#6B7280] flex items-center justify-center gap-2">
+              <Info className="w-4 h-4 text-[#6C63FF] shrink-0" />
               <span>
                 The intervals represent model uncertainty and are not guarantees of future performance.
               </span>
@@ -667,82 +667,82 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           </div>
 
           {/* THREE-TIER SEPARATION: Extracted Signals vs Model Inputs vs Model Estimate */}
-          <div className="p-6 rounded-2xl bg-black/40 border border-white/10 space-y-4 text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <span className="font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-primary-orange" />
+          <div className="p-6 rounded-2xl bg-[#E0E5EC] border border-transparent space-y-4 text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-transparent">
+              <span className="font-bold text-[#3D4852] uppercase tracking-wider flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-[#6C63FF]" />
                 Layer Separation: Signals vs Model Inputs vs Estimate
               </span>
-              <span className="text-[10px] text-slate-400 font-mono">Scientific distinction</span>
+              <span className="text-[10px] text-[#6B7280] font-mono">Scientific distinction</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Tier 1: Extracted Media Signals */}
-              <div className="p-3.5 rounded-xl bg-[#040810]/60 border border-white/5 space-y-2">
-                <div className="flex items-center gap-1.5 text-primary-orange font-bold uppercase text-[11px]">
+              <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2">
+                <div className="flex items-center gap-1.5 text-[#6C63FF] font-bold uppercase text-[11px]">
                   <Video className="w-3.5 h-3.5" />
                   <span>1. Media Signals (Extracted)</span>
                 </div>
-                <ul className="text-slate-300 text-[11px] space-y-1 list-disc list-inside">
+                <ul className="text-[#6B7280] text-[11px] space-y-1 list-disc list-inside">
                   <li>Plan A: {planA.media ? `${planA.media.aspectRatio}, ${planA.media.width}×${planA.media.height}` : "No file (Text only)"}</li>
                   <li>Plan B: {planB.media ? `${planB.media.aspectRatio}, ${planB.media.width}×${planB.media.height}` : "No file (Text only)"}</li>
                   <li>Audio: {planA.mediaType === "reel" ? planA.audioName || planA.audioType : "Not applicable"} → {planB.mediaType === "reel" ? planB.audioName || planB.audioType : "Not applicable"}</li>
                 </ul>
-                <p className="text-[10px] text-slate-500 italic pt-1">Extracted for pre-publication validation.</p>
+                <p className="text-[10px] text-[#6B7280] italic pt-1">Extracted for pre-publication validation.</p>
               </div>
 
               {/* Tier 2: Model Inputs */}
-              <div className="p-3.5 rounded-xl bg-[#040810]/60 border border-white/5 space-y-2">
-                <div className="flex items-center gap-1.5 text-primary-coral font-bold uppercase text-[11px]">
+              <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2">
+                <div className="flex items-center gap-1.5 text-[#6C63FF] font-bold uppercase text-[11px]">
                   <FileText className="w-3.5 h-3.5" />
                   <span>2. Model Inputs (Trained)</span>
                 </div>
-                <ul className="text-slate-300 text-[11px] space-y-1 list-disc list-inside">
+                <ul className="text-[#6B7280] text-[11px] space-y-1 list-disc list-inside">
                   <li>Media Type: {planA.mediaType.toUpperCase()} → {planB.mediaType.toUpperCase()}</li>
                   <li>Caption Length: {planA.caption.length} → {planB.caption.length} chars</li>
                   <li>Posting Hour: {planA.time} → {planB.time} UTC</li>
                   <li>Followers: {planA.followers.toLocaleString()} → {planB.followers.toLocaleString()}</li>
                 </ul>
-                <p className="text-[10px] text-slate-500 italic pt-1">Used by trained regression model.</p>
+                <p className="text-[10px] text-[#6B7280] italic pt-1">Used by trained regression model.</p>
               </div>
 
               {/* Tier 3: Model Estimate */}
-              <div className="p-3.5 rounded-xl bg-[#040810]/60 border border-white/5 space-y-2">
-                <div className="flex items-center gap-1.5 text-emerald-400 font-bold uppercase text-[11px]">
+              <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2">
+                <div className="flex items-center gap-1.5 text-[#0F766E] font-bold uppercase text-[11px]">
                   <Zap className="w-3.5 h-3.5" />
                   <span>3. Model Estimate (Output)</span>
                 </div>
-                <ul className="text-slate-300 text-[11px] space-y-1 list-disc list-inside">
+                <ul className="text-[#6B7280] text-[11px] space-y-1 list-disc list-inside">
                   <li>Plan A Rate: {resA.prediction.toFixed(2)}%</li>
                   <li>Plan B Rate: {resB.prediction.toFixed(2)}%</li>
                   <li>Delta: {delta >= 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)} pp</li>
                 </ul>
-                <p className="text-[10px] text-slate-500 italic pt-1">Observational prediction from trained data.</p>
+                <p className="text-[10px] text-[#6B7280] italic pt-1">Observational prediction from trained data.</p>
               </div>
             </div>
           </div>
 
           {/* SECTION: Model Sensitivity Analysis */}
-          <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3 text-xs">
+          <div className="p-5 rounded-2xl bg-[#E0E5EC] border border-transparent space-y-3 text-xs">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                <Zap className="w-4 h-4 text-primary-orange" />
+              <span className="font-bold text-[#3D4852] uppercase tracking-wider flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#6C63FF]" />
                 Scenario Sensitivity
               </span>
-              <span className="text-[11px] text-slate-400 font-mono">Input impact</span>
+              <span className="text-[11px] text-[#6B7280] font-mono">Input impact</span>
             </div>
 
-            <p className="text-slate-300">
+            <p className="text-[#6B7280]">
               The model estimate changed by{" "}
-              <strong className={delta >= 0 ? "text-emerald-400" : "text-rose-400"}>
+              <strong className={delta >= 0 ? "text-[#0F766E]" : "text-[#BE123C]"}>
                 {delta >= 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)} percentage points
               </strong>{" "}
               after the selected scenario changes.
             </p>
 
             <div className="space-y-1.5 pt-1">
-              <span className="text-slate-400 text-[11px] block font-semibold">Changed inputs:</span>
-              <ul className="list-disc list-inside space-y-1 text-slate-300 pl-1">
+              <span className="text-[#6B7280] text-[11px] block font-semibold">Changed inputs:</span>
+              <ul className="list-disc list-inside space-y-1 text-[#6B7280] pl-1">
                 {differences.changed.map((param) => (
                   <li key={param.field}>
                     <strong>{param.label}:</strong> {param.value_a} → {param.value_b}
@@ -753,45 +753,45 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
           </div>
 
           {/* SECTION: Model Capability & Scientific Integrity */}
-          <div className="p-5 rounded-2xl bg-[#040810]/80 border border-white/10 space-y-2 text-xs">
-            <div className="flex items-center gap-2 text-slate-300 font-bold uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-primary-coral" />
+          <div className="p-5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2 text-xs">
+            <div className="flex items-center gap-2 text-[#6B7280] font-bold uppercase tracking-wider">
+              <ShieldCheck className="w-4 h-4 text-[#6C63FF]" />
               <span>Model Limitation & Scientific Integrity</span>
             </div>
-            <p className="text-slate-400 leading-relaxed">
+            <p className="text-[#6B7280] leading-relaxed">
               <strong>Prediction status:</strong> The current model prediction reflects the trained structured and text features available to it (caption properties, media type, timing, followers). Uploaded visual and audio characteristics are analyzed separately for content verification and are not treated as predictive inputs unless the model was trained on those features.
             </p>
           </div>
 
           {/* SECTION: Interpretation / What You Could Test Next */}
-          <div className="p-5 rounded-2xl bg-surface/50 border border-white/10 space-y-3 text-xs">
-            <span className="font-bold text-white uppercase tracking-wider block">What You Could Test Next</span>
+          <div className="p-5 rounded-2xl bg-surface/50 border border-transparent space-y-3 text-xs">
+            <span className="font-bold text-[#3D4852] uppercase tracking-wider block">What You Could Test Next</span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div
                 onClick={() => handleApplyPreset("time")}
-                className="p-3 rounded-xl bg-[#040810]/60 border border-white/10 hover:border-primary-orange/50 cursor-pointer transition-colors"
+                className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent hover:border-[#6C63FF] cursor-pointer transition-colors"
               >
-                <Clock className="w-4 h-4 text-primary-orange mb-1.5" />
-                <strong className="text-white block mb-1">Posting Time</strong>
-                <p className="text-[11px] text-slate-400">Test publishing during peak evening hours (19:00 UTC).</p>
+                <Clock className="w-4 h-4 text-[#6C63FF] mb-1.5" />
+                <strong className="text-[#3D4852] block mb-1">Posting Time</strong>
+                <p className="text-[11px] text-[#6B7280]">Test publishing during peak evening hours (19:00 UTC).</p>
               </div>
 
               <div
                 onClick={() => handleApplyPreset("caption")}
-                className="p-3 rounded-xl bg-[#040810]/60 border border-white/10 hover:border-primary-orange/50 cursor-pointer transition-colors"
+                className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent hover:border-[#6C63FF] cursor-pointer transition-colors"
               >
-                <Type className="w-4 h-4 text-primary-coral mb-1.5" />
-                <strong className="text-white block mb-1">Caption Structure</strong>
-                <p className="text-[11px] text-slate-400">Test adding an interactive question or concise call-to-action.</p>
+                <Type className="w-4 h-4 text-[#6C63FF] mb-1.5" />
+                <strong className="text-[#3D4852] block mb-1">Caption Structure</strong>
+                <p className="text-[11px] text-[#6B7280]">Test adding an interactive question or concise call-to-action.</p>
               </div>
 
               <div
                 onClick={() => handleApplyPreset("mediaType")}
-                className="p-3 rounded-xl bg-[#040810]/60 border border-white/10 hover:border-primary-orange/50 cursor-pointer transition-colors"
+                className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent hover:border-[#6C63FF] cursor-pointer transition-colors"
               >
-                <Video className="w-4 h-4 text-primary-pink mb-1.5" />
-                <strong className="text-white block mb-1">Media Format</strong>
-                <p className="text-[11px] text-slate-400">Test format sensitivity by switching between Image and Reel.</p>
+                <Video className="w-4 h-4 text-[#6C63FF] mb-1.5" />
+                <strong className="text-[#3D4852] block mb-1">Media Format</strong>
+                <p className="text-[11px] text-[#6B7280]">Test format sensitivity by switching between Image and Reel.</p>
               </div>
             </div>
           </div>
@@ -799,7 +799,7 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
       )}
 
       {/* Privacy Notice */}
-      <div className="text-center text-xs text-slate-400 pt-4">
+      <div className="text-center text-xs text-[#6B7280] pt-4">
         <p>Uploaded media is used for scenario analysis and is not automatically added to model training data.</p>
       </div>
     </div>

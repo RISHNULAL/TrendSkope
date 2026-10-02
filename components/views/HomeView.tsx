@@ -78,21 +78,21 @@ export default function HomeView({
       {/* 1. Hero Section with Decision Intelligence Preview */}
       <section className="relative overflow-hidden rounded-3xl p-7 sm:p-9 md:p-10 lg:p-12 glass-card border-border/80">
         {/* Subtle Background Lighting */}
-        <div className="absolute top-0 right-0 w-[460px] h-[400px] bg-[radial-gradient(circle,rgba(255,112,72,0.1)_0%,rgba(255,64,95,0.02)_60%,transparent_80%)] blur-2xl pointer-events-none" />
+        <div className="absolute -top-16 -right-10 w-72 h-72 rounded-full pointer-events-none animate-float shadow-[12px_12px_20px_rgb(163,177,198,0.45),-12px_-12px_20px_rgba(255,255,255,0.7)] bg-[#E0E5EC]" />
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Left Column: Brand Hero Text & Primary CTA */}
           <div className="lg:col-span-7 space-y-4 text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-orange/10 border border-primary-orange/30 text-primary-orange text-xs font-bold uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-orange/10 border border-transparent text-[#6C63FF] text-xs font-bold uppercase tracking-widest">
               <Sparkles className="w-3.5 h-3.5" />
               <span>AI-Powered Content Performance Intelligence</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-[1.15]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#3D4852] leading-[1.15]">
               Welcome to <span className="gradient-text">TrendSkope</span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl font-normal">
+            <p className="text-base sm:text-lg text-[#6B7280] leading-relaxed max-w-xl font-normal">
               Predict your post&apos;s engagement rate before you publish and make
               smarter content decisions with a transparent, research-first ML workflow.
             </p>
@@ -100,7 +100,7 @@ export default function HomeView({
             <div className="pt-3 flex flex-wrap items-center gap-3">
               <button
                 onClick={onNavigateToPredict}
-                className="btn-primary group shadow-[0_6px_20px_rgba(255,112,72,0.28)] hover:shadow-[0_8px_25px_rgba(255,112,72,0.4)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                className="btn-primary group"
               >
                 <span>Analyze Your Post</span>
                 <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1.5" />
@@ -109,7 +109,7 @@ export default function HomeView({
               {onNavigateToWhatIf && (
                 <button
                   onClick={onNavigateToWhatIf}
-                  className="btn-secondary text-xs sm:text-sm hover:bg-white/10 transition-colors"
+                  className="btn-secondary text-xs sm:text-sm hover:bg-[#E0E5EC] transition-colors"
                 >
                   <span>Explore What-If Scenarios</span>
                 </button>
@@ -127,10 +127,10 @@ export default function HomeView({
       {/* 2. How TrendSkope Works (Workflow Pipeline Section) */}
       <section className="glass-card p-7 sm:p-9 md:p-10 rounded-3xl border-border/80 relative overflow-hidden">
         <div className="max-w-3xl mb-8">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#3D4852] tracking-tight">
             How <span className="gradient-accent">TrendSkope</span> Works
           </h2>
-          <p className="text-sm text-slate-400 mt-1.5 leading-relaxed">
+          <p className="text-sm text-[#6B7280] mt-1.5 leading-relaxed">
             A research-first machine learning workflow designed to estimate engagement before publication.
           </p>
         </div>
@@ -142,30 +142,30 @@ export default function HomeView({
             return (
               <div
                 key={step.num}
-                className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-primary-orange/40 hover:bg-white/[0.035] hover:-translate-y-1 transition-all duration-200 relative group flex flex-col justify-between"
+                className="p-5 sm:p-6 rounded-[32px] bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] transition-all duration-300 relative group flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-mono font-bold tracking-widest text-primary-orange/70 group-hover:text-primary-orange transition-colors">
+                    <span className="text-xs font-mono font-bold tracking-widest text-[#6C63FF]/70 group-hover:text-[#6C63FF] transition-colors">
                       {step.num} · {step.title}
                     </span>
-                    <div className="p-2.5 rounded-xl bg-primary-orange/10 border border-primary-orange/20 text-primary-orange">
+                    <div className="p-2.5 rounded-2xl bg-[#E0E5EC] text-[#6C63FF] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]">
                       <Icon className="w-4 h-4" />
                     </div>
                   </div>
 
-                  <h3 className="text-sm font-bold text-white mb-2 tracking-tight">
+                  <h3 className="text-sm font-bold text-[#3D4852] mb-2 tracking-tight">
                     {step.heading}
                   </h3>
 
-                  <p className="text-xs text-slate-400 leading-relaxed font-normal">
+                  <p className="text-xs text-[#6B7280] leading-relaxed font-normal">
                     {step.desc}
                   </p>
                 </div>
 
                 {/* Step Connector Indicator for Large Viewports */}
                 {idx < workflowSteps.length - 1 && (
-                  <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 z-20 text-slate-600">
+                  <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 z-20 text-[#6B7280]">
                     <ArrowRight className="w-3.5 h-3.5" />
                   </div>
                 )}
@@ -175,14 +175,14 @@ export default function HomeView({
         </div>
 
         {/* Research-First Methodology Banner */}
-        <div className="mt-7 pt-5 border-t border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
+        <div className="mt-7 pt-5 border-t border-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#6B7280]">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span className="font-medium text-slate-300">
+            <ShieldCheck className="w-4 h-4 text-[#0F766E] shrink-0" />
+            <span className="font-medium text-[#6B7280]">
               Predictions use information available strictly before publication.
             </span>
           </div>
-          <span className="text-[11px] font-mono text-slate-500 bg-white/[0.03] px-2.5 py-1 rounded-md border border-white/[0.05]">
+          <span className="text-[11px] font-mono text-[#6B7280] bg-[#E0E5EC] px-2.5 py-1 rounded-xl border border-transparent">
             Pre-publication signals only · Zero target leakage
           </span>
         </div>
@@ -198,19 +198,19 @@ export default function HomeView({
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+            <h3 className="text-sm font-bold text-[#6B7280] uppercase tracking-wider">
               Key Performance Metrics
             </h3>
             <div className="relative group inline-flex items-center">
-              <Info className="w-3.5 h-3.5 text-slate-500 hover:text-slate-300 cursor-help transition-colors" />
-              <div className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-30 w-64 p-2.5 rounded-lg bg-[#0c1626] border border-white/10 text-[11px] font-normal leading-normal text-slate-300 shadow-xl pointer-events-none">
+              <Info className="w-3.5 h-3.5 text-[#6B7280] hover:text-[#6B7280] cursor-help transition-colors" />
+              <div className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-30 w-64 p-2.5 rounded-2xl bg-[#E0E5EC] border border-transparent text-[11px] font-normal leading-normal text-[#6B7280] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] pointer-events-none">
                 Metrics are calculated on the held-out test partition and are intended to provide an honest evaluation of model performance.
-                <div className="absolute top-full left-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0c1626]" />
+                <div className="absolute top-full left-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#E0E5EC]" />
               </div>
             </div>
           </div>
 
-          <span className="text-xs text-slate-400 font-medium">
+          <span className="text-xs text-[#6B7280] font-medium">
             {isTrained ? "Validated test partition evaluation" : "Awaiting training artifacts"}
           </span>
         </div>
@@ -252,45 +252,45 @@ export default function HomeView({
       {/* 5. Model Configuration / Research Context */}
       <section className="glass-card p-6 sm:p-7 rounded-2xl border-border/80">
         <div className="flex items-center gap-2 mb-4">
-          <Layers className="w-4 h-4 text-primary-orange" />
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+          <Layers className="w-4 h-4 text-[#6C63FF]" />
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
             Model Configuration
           </h4>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-            <span className="text-[11px] font-mono text-slate-500 uppercase block mb-1">
+          <div className="p-3.5 rounded-xl bg-[#E0E5EC] border border-transparent">
+            <span className="text-[11px] font-mono text-[#6B7280] uppercase block mb-1">
               Model Architecture
             </span>
-            <span className="text-sm font-semibold text-white">
+            <span className="text-sm font-semibold text-[#3D4852]">
               {isTrained ? selectedModelName : "Random Forest Regressor"}
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-            <span className="text-[11px] font-mono text-slate-500 uppercase block mb-1">
+          <div className="p-3.5 rounded-xl bg-[#E0E5EC] border border-transparent">
+            <span className="text-[11px] font-mono text-[#6B7280] uppercase block mb-1">
               Target Metric
             </span>
-            <span className="text-sm font-semibold text-white">
+            <span className="text-sm font-semibold text-[#3D4852]">
               Engagement Rate (%)
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-            <span className="text-[11px] font-mono text-slate-500 uppercase block mb-1">
+          <div className="p-3.5 rounded-xl bg-[#E0E5EC] border border-transparent">
+            <span className="text-[11px] font-mono text-[#6B7280] uppercase block mb-1">
               Validation Strategy
             </span>
-            <span className="text-sm font-semibold text-white">
+            <span className="text-sm font-semibold text-[#3D4852]">
               Chronological hold-out (80/20)
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-            <span className="text-[11px] font-mono text-slate-500 uppercase block mb-1">
+          <div className="p-3.5 rounded-xl bg-[#E0E5EC] border border-transparent">
+            <span className="text-[11px] font-mono text-[#6B7280] uppercase block mb-1">
               Prediction Type
             </span>
-            <span className="text-sm font-semibold text-emerald-400 flex items-center gap-1.5">
+            <span className="text-sm font-semibold text-[#0F766E] flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5" />
               Pre-publication only
             </span>

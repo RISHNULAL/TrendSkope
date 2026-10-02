@@ -57,7 +57,7 @@ export default function App() {
       )}
 
       <div
-        className={`min-h-screen flex bg-[#050b15] text-slate-100 selection:bg-primary-orange/30 selection:text-white transition-opacity duration-500 ease-out ${
+        className={`min-h-screen flex bg-[#E0E5EC] text-[#3D4852] selection:bg-primary-orange/30 selection:text-white transition-opacity duration-500 ease-out ${
           loadingComplete ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
@@ -77,6 +77,7 @@ export default function App() {
             activeTab={activeTab}
             modelStatus={modelStatus}
             apiHealthy={apiHealthy}
+            mobileOpen={mobileOpen}
             onMobileMenuToggle={() => setMobileOpen(!mobileOpen)}
           />
 
@@ -102,7 +103,7 @@ export default function App() {
           </main>
 
           {/* Minimal Footer */}
-          <footer className="px-8 py-6 border-t border-border/40 text-center text-xs text-slate-400">
+          <footer className="px-8 py-6 text-center text-xs text-[#6B7280]">
             <p>
               TrendSkope · AI-Powered Instagram Content Performance Intelligence · Academic Machine Learning Research
             </p>

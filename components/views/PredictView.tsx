@@ -415,7 +415,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
   const getBandBadge = (band: string) => {
     switch (band) {
       case "High":
-        return "bg-emerald-950/60 text-emerald-300 border-emerald-500/40 shadow-[0_0_12px_rgba(52,211,153,0.2)]";
+        return "bg-emerald-950/60 text-[#0F766E] border-emerald-500/40 shadow-[0_0_12px_rgba(52,211,153,0.2)]";
       case "Medium":
         return "bg-amber-950/60 text-amber-300 border-amber-500/40 shadow-[0_0_12px_rgba(251,191,36,0.2)]";
       case "Low":
@@ -429,20 +429,20 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
       {/* 1. Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-orange/10 border border-primary-orange/30 text-primary-orange text-xs font-bold uppercase tracking-widest mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-orange/10 border border-transparent text-[#6C63FF] text-xs font-bold uppercase tracking-widest mb-2">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Pre-Publish Content Intelligence</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#3D4852] tracking-tight">
             Pre-Publish Content Analyzer
           </h1>
-          <p className="text-sm text-slate-400 mt-1 max-w-2xl">
+          <p className="text-sm text-[#6B7280] mt-1 max-w-2xl">
             Analyze your planned photo, multi-slide carousel, or Reel video along with caption, audio, and publishing context before publishing to Instagram.
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface border border-border text-xs text-slate-300 self-start md:self-auto">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface border border-border text-xs text-[#6B7280] self-start md:self-auto">
+          <ShieldCheck className="w-4 h-4 text-[#0F766E] shrink-0" />
           <span>Multimodal Diagnostics · Model Leakage Safe</span>
         </div>
       </div>
@@ -450,7 +450,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
       {/* Untrained Model Notice */}
       {!isTrained && (
         <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-sm flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          <AlertTriangle className="w-5 h-5 text-[#B45309] shrink-0 mt-0.5" />
           <div>
             <p className="font-bold text-amber-300">Model Status Notice</p>
             <p className="text-xs text-amber-200/80 mt-0.5">
@@ -463,7 +463,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
       {/* Error Banner */}
       {error && (
         <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-sm flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+          <AlertCircle className="w-5 h-5 text-[#BE123C] shrink-0 mt-0.5" />
           <div>
             <p className="font-bold text-rose-300">Validation Notice</p>
             <p className="text-xs text-rose-200/90 mt-0.5">{error}</p>
@@ -478,15 +478,15 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
           <form onSubmit={handleAnalyze} className="glass-card p-6 sm:p-7 rounded-3xl space-y-6 border-border/80">
             {/* Section 2: Media Format Selector */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <label className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-2 flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
-                  <Film className="w-3.5 h-3.5 text-primary-orange" />
+                  <Film className="w-3.5 h-3.5 text-[#6C63FF]" />
                   Content Format
                 </span>
-                <span className="text-[11px] font-mono text-slate-400">Select Post Type</span>
+                <span className="text-[11px] font-mono text-[#6B7280]">Select Post Type</span>
               </label>
 
-              <div className="grid grid-cols-3 gap-2 p-1.5 rounded-2xl bg-[#040810]/70 border border-border">
+              <div className="grid grid-cols-3 gap-2 p-1.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border">
                 <button
                   type="button"
                   onClick={() => {
@@ -495,8 +495,8 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   }}
                   className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 ${
                     contentFormat === "photo"
-                      ? "bg-primary-orange text-white shadow-[0_2px_12px_rgba(255,112,72,0.35)]"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      ? "bg-primary-orange text-white "
+                      : "text-[#6B7280] hover:text-[#3D4852] hover:bg-[#E0E5EC]"
                   }`}
                 >
                   <ImageIcon className="w-3.5 h-3.5" />
@@ -511,8 +511,8 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   }}
                   className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 ${
                     contentFormat === "carousel"
-                      ? "bg-primary-orange text-white shadow-[0_2px_12px_rgba(255,112,72,0.35)]"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      ? "bg-primary-orange text-white "
+                      : "text-[#6B7280] hover:text-[#3D4852] hover:bg-[#E0E5EC]"
                   }`}
                 >
                   <Layers className="w-3.5 h-3.5" />
@@ -527,8 +527,8 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   }}
                   className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 ${
                     contentFormat === "reel"
-                      ? "bg-primary-orange text-white shadow-[0_2px_12px_rgba(255,112,72,0.35)]"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      ? "bg-primary-orange text-white "
+                      : "text-[#6B7280] hover:text-[#3D4852] hover:bg-[#E0E5EC]"
                   }`}
                 >
                   <Video className="w-3.5 h-3.5" />
@@ -541,11 +541,11 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
             {contentFormat === "photo" && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <ImageIcon className="w-3.5 h-3.5 text-primary-orange" />
+                  <label className="text-xs font-bold text-[#6B7280] uppercase tracking-wider flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-[#6C63FF]" />
                     Planned Photo
                   </label>
-                  <span className="text-[11px] font-mono text-slate-400">Single Image (JPG, PNG, WEBP)</span>
+                  <span className="text-[11px] font-mono text-[#6B7280]">Single Image (JPG, PNG, WEBP)</span>
                 </div>
 
                 {!photoFile ? (
@@ -566,7 +566,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                     className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 ${
                       isDragging
                         ? "border-primary-orange bg-primary-orange/10 scale-[0.99]"
-                        : "border-border hover:border-slate-400 bg-[#040810]/50 hover:bg-[#040810]/80"
+                        : "border-border hover:border-transparent bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] hover:bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
                     }`}
                   >
                     <input
@@ -581,25 +581,25 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                       }}
                     />
 
-                    <div className="w-12 h-12 rounded-2xl bg-primary-orange/10 border border-primary-orange/20 text-primary-orange flex items-center justify-center mx-auto mb-3">
+                    <div className="w-12 h-12 rounded-2xl bg-primary-orange/10 border border-transparent text-[#6C63FF] flex items-center justify-center mx-auto mb-3">
                       <Upload className="w-6 h-6" />
                     </div>
 
-                    <p className="text-sm font-bold text-white mb-1">
+                    <p className="text-sm font-bold text-[#3D4852] mb-1">
                       Upload Planned Photo
                     </p>
-                    <p className="text-xs text-slate-400 mb-2">
-                      Drag & drop image or <span className="text-primary-orange underline font-semibold">browse file</span>
+                    <p className="text-xs text-[#6B7280] mb-2">
+                      Drag & drop image or <span className="text-[#6C63FF] underline font-semibold">browse file</span>
                     </p>
-                    <p className="text-[10.5px] font-mono text-slate-500 uppercase tracking-wider">
+                    <p className="text-[10.5px] font-mono text-[#6B7280] uppercase tracking-wider">
                       JPG · PNG · WEBP (Max 60MB)
                     </p>
                   </div>
                 ) : (
                   /* Photo Preview Card */
-                  <div className="rounded-2xl bg-[#040810]/80 border border-white/10 p-4 space-y-3">
+                  <div className="rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent p-4 space-y-3">
                     <div className="flex items-start gap-3.5">
-                      <div className="w-24 h-28 rounded-xl bg-black/60 border border-white/10 overflow-hidden flex items-center justify-center shrink-0 relative">
+                      <div className="w-24 h-28 rounded-xl bg-black/60 border border-transparent overflow-hidden flex items-center justify-center shrink-0 relative">
                         {photoPreview && (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img
@@ -612,20 +612,20 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
 
                       <div className="flex-1 min-w-0 text-xs space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-white truncate block pr-2">
+                          <span className="font-bold text-[#3D4852] truncate block pr-2">
                             {photoFile.name}
                           </span>
                           <button
                             type="button"
                             onClick={handleRemovePhoto}
-                            className="p-1 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors"
+                            className="p-1 rounded-2xl text-[#6B7280] hover:text-[#BE123C] hover:bg-[#E0E5EC] transition-colors"
                             title="Remove Photo"
                           >
                             <X className="w-4 h-4" />
                           </button>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-1.5 pt-1 text-[11px] font-mono text-slate-300">
+                        <div className="grid grid-cols-2 gap-1.5 pt-1 text-[11px] font-mono text-[#6B7280]">
                           <span className="px-2 py-0.5 rounded bg-surface border border-border">
                             {photoMeta.width && photoMeta.height ? `${photoMeta.width} × ${photoMeta.height}` : "Loading dims..."}
                           </span>
@@ -635,7 +635,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                           <span className="px-2 py-0.5 rounded bg-surface border border-border">
                             {photoMeta.sizeMb || `${(photoFile.size / 1024 / 1024).toFixed(2)} MB`}
                           </span>
-                          <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                          <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-[#0F766E] border border-emerald-500/20">
                             1 / 1 Image
                           </span>
                         </div>
@@ -644,7 +644,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                           <button
                             type="button"
                             onClick={() => photoInputRef.current?.click()}
-                            className="text-[11px] font-semibold text-primary-orange hover:underline flex items-center gap-1"
+                            className="text-[11px] font-semibold text-[#6C63FF] hover:underline flex items-center gap-1"
                           >
                             <Upload className="w-3 h-3" />
                             Replace
@@ -652,7 +652,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                           <button
                             type="button"
                             onClick={handleRemovePhoto}
-                            className="text-[11px] font-semibold text-rose-400 hover:underline flex items-center gap-1"
+                            className="text-[11px] font-semibold text-[#BE123C] hover:underline flex items-center gap-1"
                           >
                             <X className="w-3 h-3" />
                             Remove
@@ -669,11 +669,11 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
             {contentFormat === "carousel" && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <Layers className="w-3.5 h-3.5 text-primary-orange" />
+                  <label className="text-xs font-bold text-[#6B7280] uppercase tracking-wider flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-[#6C63FF]" />
                     Carousel Content
                   </label>
-                  <span className={`text-[11px] font-mono ${carouselSlides.length >= 2 ? "text-emerald-400" : "text-amber-400"}`}>
+                  <span className={`text-[11px] font-mono ${carouselSlides.length >= 2 ? "text-[#0F766E]" : "text-[#B45309]"}`}>
                     {carouselSlides.length} / 10 Slides {carouselSlides.length < 2 && "(Min 2 required)"}
                   </span>
                 </div>
@@ -692,14 +692,14 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                       {carouselSlides.map((slide, idx) => (
                         <div
                           key={slide.id}
-                          className={`rounded-xl bg-[#040810]/80 border p-2 relative flex flex-col justify-between group transition-all duration-200 ${
+                          className={`rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border p-2 relative flex flex-col justify-between group transition-all duration-200 ${
                             idx === 0
-                              ? "border-primary-orange/50 shadow-[0_0_12px_rgba(255,112,72,0.15)]"
-                              : "border-white/10"
+                              ? "border-transparent "
+                              : "border-transparent"
                           }`}
                         >
                           {/* Slide Thumbnail & Badges */}
-                          <div className="w-full h-28 rounded-lg bg-black/60 overflow-hidden relative mb-2">
+                          <div className="w-full h-28 rounded-2xl bg-black/60 overflow-hidden relative mb-2">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={slide.previewUrl}
@@ -710,11 +710,11 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                             {/* FIRST Badge or Slide Number */}
                             <div className="absolute top-1.5 left-1.5">
                               {idx === 0 ? (
-                                <span className="px-1.5 py-0.5 rounded text-[9.5px] font-mono font-black bg-primary-orange text-white shadow-sm">
+                                <span className="px-1.5 py-0.5 rounded-xl text-[9.5px] font-mono font-black bg-[#6C63FF] text-white">
                                   1 FIRST
                                 </span>
                               ) : (
-                                <span className="px-1.5 py-0.5 rounded text-[9.5px] font-mono font-bold bg-black/70 text-slate-200 border border-white/10">
+                                <span className="px-1.5 py-0.5 rounded text-[9.5px] font-mono font-bold bg-[#3D4852]/30 text-[#3D4852] border border-transparent">
                                   {idx + 1}
                                 </span>
                               )}
@@ -724,7 +724,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                             <button
                               type="button"
                               onClick={() => handleRemoveCarouselSlide(idx)}
-                              className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/80 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
+                              className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/80 hover:bg-rose-600 text-[#6B7280] hover:text-[#3D4852] flex items-center justify-center transition-colors"
                               title="Remove slide"
                             >
                               <X className="w-3 h-3" />
@@ -733,20 +733,20 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
 
                           {/* Slide Info & Reorder Controls */}
                           <div className="space-y-1.5 text-[10.5px]">
-                            <div className="flex items-center justify-between text-slate-400 font-mono">
-                              <span className="truncate max-w-[80px] text-slate-300">
+                            <div className="flex items-center justify-between text-[#6B7280] font-mono">
+                              <span className="truncate max-w-[80px] text-[#6B7280]">
                                 {slide.file.name}
                               </span>
                               <span>{slide.aspectRatio?.split(" ")[0] || "4:5"}</span>
                             </div>
 
                             {/* Slide Reorder Buttons */}
-                            <div className="flex items-center justify-between gap-1 pt-1 border-t border-white/5">
+                            <div className="flex items-center justify-between gap-1 pt-1 border-t border-transparent">
                               <button
                                 type="button"
                                 disabled={idx === 0}
                                 onClick={() => handleMoveCarouselSlide(idx, "left")}
-                                className="flex-1 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 text-slate-300 hover:text-white text-[10px] font-mono text-center transition-colors"
+                                className="flex-1 py-1 rounded bg-[#E0E5EC] hover:bg-[#E0E5EC] disabled:opacity-30 text-[#6B7280] hover:text-[#3D4852] text-[10px] font-mono text-center transition-colors"
                                 title="Move slide left / up in sequence"
                               >
                                 ← Earlier
@@ -755,7 +755,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                                 type="button"
                                 disabled={idx === carouselSlides.length - 1}
                                 onClick={() => handleMoveCarouselSlide(idx, "right")}
-                                className="flex-1 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 text-slate-300 hover:text-white text-[10px] font-mono text-center transition-colors"
+                                className="flex-1 py-1 rounded bg-[#E0E5EC] hover:bg-[#E0E5EC] disabled:opacity-30 text-[#6B7280] hover:text-[#3D4852] text-[10px] font-mono text-center transition-colors"
                                 title="Move slide right / down in sequence"
                               >
                                 Later →
@@ -786,15 +786,15 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                     <button
                       type="button"
                       onClick={() => carouselInputRef.current?.click()}
-                      className="w-full py-3 px-4 rounded-2xl border-2 border-dashed border-border hover:border-primary-orange bg-[#040810]/40 hover:bg-primary-orange/5 text-slate-300 hover:text-white flex items-center justify-center gap-2 text-xs font-bold transition-all"
+                      className="w-full py-3 px-4 rounded-2xl border-2 border-dashed border-border hover:border-[#6C63FF] bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] hover:bg-primary-orange/5 text-[#6B7280] hover:text-[#6C63FF] flex items-center justify-center gap-2 text-xs font-bold transition-all"
                     >
-                      <Plus className="w-4 h-4 text-primary-orange" />
+                      <Plus className="w-4 h-4 text-[#6C63FF]" />
                       <span>+ Add Photo to Carousel ({carouselSlides.length}/10)</span>
                     </button>
                   </div>
                 )}
 
-                <p className="text-[10.5px] text-slate-500 font-mono">
+                <p className="text-[10.5px] text-[#6B7280] font-mono">
                   Slide order 1 → {carouselSlides.length || 2} is analyzed as a structured sequence. Cover slide has greatest initial feed weight.
                 </p>
               </div>
@@ -805,11 +805,11 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
               <div className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <Video className="w-3.5 h-3.5 text-primary-orange" />
+                    <label className="text-xs font-bold text-[#6B7280] uppercase tracking-wider flex items-center gap-1.5">
+                      <Video className="w-3.5 h-3.5 text-[#6C63FF]" />
                       Planned Reel Video
                     </label>
-                    <span className="text-[11px] font-mono text-slate-400">MP4, MOV, WEBM</span>
+                    <span className="text-[11px] font-mono text-[#6B7280]">MP4, MOV, WEBM</span>
                   </div>
 
                   {!reelFile ? (
@@ -830,7 +830,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                       className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 ${
                         isDragging
                           ? "border-primary-orange bg-primary-orange/10 scale-[0.99]"
-                          : "border-border hover:border-slate-400 bg-[#040810]/50 hover:bg-[#040810]/80"
+                          : "border-border hover:border-transparent bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] hover:bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
                       }`}
                     >
                       <input
@@ -845,25 +845,25 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                         }}
                       />
 
-                      <div className="w-12 h-12 rounded-2xl bg-primary-orange/10 border border-primary-orange/20 text-primary-orange flex items-center justify-center mx-auto mb-3">
+                      <div className="w-12 h-12 rounded-2xl bg-primary-orange/10 border border-transparent text-[#6C63FF] flex items-center justify-center mx-auto mb-3">
                         <Video className="w-6 h-6" />
                       </div>
 
-                      <p className="text-sm font-bold text-white mb-1">
+                      <p className="text-sm font-bold text-[#3D4852] mb-1">
                         Upload Reel Video
                       </p>
-                      <p className="text-xs text-slate-400 mb-2">
-                        Drag & drop video or <span className="text-primary-orange underline font-semibold">browse file</span>
+                      <p className="text-xs text-[#6B7280] mb-2">
+                        Drag & drop video or <span className="text-[#6C63FF] underline font-semibold">browse file</span>
                       </p>
-                      <p className="text-[10.5px] font-mono text-slate-500 uppercase tracking-wider">
+                      <p className="text-[10.5px] font-mono text-[#6B7280] uppercase tracking-wider">
                         MP4 · MOV · WEBM (Up to 60MB)
                       </p>
                     </div>
                   ) : (
                     /* Reel Video Preview Card */
-                    <div className="rounded-2xl bg-[#040810]/80 border border-white/10 p-4 space-y-3">
+                    <div className="rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent p-4 space-y-3">
                       <div className="flex items-start gap-3.5">
-                        <div className="w-24 h-32 rounded-xl bg-black/80 border border-white/10 overflow-hidden flex items-center justify-center shrink-0 relative">
+                        <div className="w-24 h-32 rounded-xl bg-black/80 border border-transparent overflow-hidden flex items-center justify-center shrink-0 relative">
                           {reelPreview && (
                             <video
                               src={reelPreview}
@@ -875,20 +875,20 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
 
                         <div className="flex-1 min-w-0 text-xs space-y-1.5">
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-white truncate block pr-2">
+                            <span className="font-bold text-[#3D4852] truncate block pr-2">
                               {reelFile.name}
                             </span>
                             <button
                               type="button"
                               onClick={handleRemoveReel}
-                              className="p-1 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors"
+                              className="p-1 rounded-2xl text-[#6B7280] hover:text-[#BE123C] hover:bg-[#E0E5EC] transition-colors"
                               title="Remove Video"
                             >
                               <X className="w-4 h-4" />
                             </button>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-1.5 text-[11px] font-mono text-slate-300">
+                          <div className="grid grid-cols-2 gap-1.5 text-[11px] font-mono text-[#6B7280]">
                             <span className="px-2 py-0.5 rounded bg-surface border border-border">
                               {reelMeta.duration || "18.4 seconds"}
                             </span>
@@ -904,7 +904,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                           </div>
 
                           <div className="flex items-center gap-2 pt-1">
-                            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center gap-1">
+                            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-[#0F766E] border border-emerald-500/20 flex items-center gap-1">
                               <Volume2 className="w-3 h-3" />
                               Audio Track Detected in File
                             </span>
@@ -914,7 +914,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                             <button
                               type="button"
                               onClick={() => reelInputRef.current?.click()}
-                              className="text-[11px] font-semibold text-primary-orange hover:underline flex items-center gap-1"
+                              className="text-[11px] font-semibold text-[#6C63FF] hover:underline flex items-center gap-1"
                             >
                               <Upload className="w-3 h-3" />
                               Replace Video
@@ -922,7 +922,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                             <button
                               type="button"
                               onClick={handleRemoveReel}
-                              className="text-[11px] font-semibold text-rose-400 hover:underline flex items-center gap-1"
+                              className="text-[11px] font-semibold text-[#BE123C] hover:underline flex items-center gap-1"
                             >
                               <X className="w-3 h-3" />
                               Remove Video
@@ -935,16 +935,16 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                 </div>
 
                 {/* Section 9–13: PLANNED AUDIO (Strictly for Reel / Video) */}
-                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-3.5">
+                <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent space-y-3.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                      <Music className="w-3.5 h-3.5 text-primary-orange" />
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
+                      <Music className="w-3.5 h-3.5 text-[#6C63FF]" />
                       Planned Audio
                     </label>
-                    <span className="text-[10.5px] font-mono text-slate-400">Reel Audio Strategy</span>
+                    <span className="text-[10.5px] font-mono text-[#6B7280]">Reel Audio Strategy</span>
                   </div>
 
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-[#6B7280]">
                     The audio track that will actually be used when publishing this Reel to Instagram.
                   </p>
 
@@ -962,8 +962,8 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                         onClick={() => setAudioSource(item.id as AudioSourceType)}
                         className={`p-2 rounded-xl text-xs font-semibold border text-center transition-all ${
                           audioSource === item.id
-                            ? "bg-primary-orange/15 text-primary-orange border-primary-orange/50 shadow-sm"
-                            : "bg-[#040810]/60 text-slate-400 border-border hover:text-slate-200"
+                            ? "bg-[#E0E5EC] text-[#6C63FF] border-transparent shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]"
+                            : "bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] text-[#6B7280] border-border hover:text-[#3D4852]"
                         }`}
                       >
                         {item.label}
@@ -974,29 +974,29 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   {/* Contextual Audio Inputs */}
                   {audioSource === "original" && (
                     <div className="space-y-2 pt-1">
-                      <div className="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2">
+                      <div className="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-[#0F766E] text-xs flex items-center gap-2">
                         <Volume2 className="w-4 h-4 shrink-0" />
                         <span>Audio track detected in uploaded Reel. Using original voice/creator audio.</span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <div>
-                          <label className="text-[10.5px] font-mono text-slate-400 block mb-1">Audio Name (Optional)</label>
+                          <label className="text-[10.5px] font-mono text-[#6B7280] block mb-1">Audio Name (Optional)</label>
                           <input
                             type="text"
                             value={audioName}
                             onChange={(e) => setAudioName(e.target.value)}
                             placeholder="e.g. Original Audio - Creator"
-                            className="w-full rounded-lg bg-[#040810]/70 border border-border p-2 text-xs text-white placeholder-slate-500"
+                            className="w-full rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border p-2 text-xs text-[#3D4852] placeholder-[#A0AEC0]"
                           />
                         </div>
                         <div>
-                          <label className="text-[10.5px] font-mono text-slate-400 block mb-1">Audio Reference (Optional)</label>
+                          <label className="text-[10.5px] font-mono text-[#6B7280] block mb-1">Audio Reference (Optional)</label>
                           <input
                             type="text"
                             value={audioReference}
                             onChange={(e) => setAudioReference(e.target.value)}
                             placeholder="e.g. Mic / Studio feed"
-                            className="w-full rounded-lg bg-[#040810]/70 border border-border p-2 text-xs text-white placeholder-slate-500"
+                            className="w-full rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border p-2 text-xs text-[#3D4852] placeholder-[#A0AEC0]"
                           />
                         </div>
                       </div>
@@ -1007,31 +1007,31 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                     <div className="space-y-2 pt-1 text-xs">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                          <label className="text-[10.5px] font-mono text-slate-400 block mb-1">
-                            Audio Name <span className="text-primary-orange">*</span>
+                          <label className="text-[10.5px] font-mono text-[#6B7280] block mb-1">
+                            Audio Name <span className="text-[#6C63FF]">*</span>
                           </label>
                           <input
                             type="text"
                             value={audioName}
                             onChange={(e) => setAudioName(e.target.value)}
                             placeholder="e.g. Artist - Song Title"
-                            className="w-full rounded-lg bg-[#040810]/70 border border-border p-2 text-xs text-white placeholder-slate-500"
+                            className="w-full rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border p-2 text-xs text-[#3D4852] placeholder-[#A0AEC0]"
                           />
                         </div>
                         <div>
-                          <label className="text-[10.5px] font-mono text-slate-400 block mb-1">Audio ID / Reference (Optional)</label>
+                          <label className="text-[10.5px] font-mono text-[#6B7280] block mb-1">Audio ID / Reference (Optional)</label>
                           <input
                             type="text"
                             value={audioReference}
                             onChange={(e) => setAudioReference(e.target.value)}
                             placeholder="e.g. 17992834019283"
-                            className="w-full rounded-lg bg-[#040810]/70 border border-border p-2 text-xs text-white placeholder-slate-500"
+                            className="w-full rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border p-2 text-xs text-[#3D4852] placeholder-[#A0AEC0]"
                           />
                         </div>
                       </div>
-                      <div className="p-2 rounded-lg bg-[#040810]/80 border border-white/5 text-[11px] text-slate-400 flex items-center justify-between">
-                        <span>Trend Status: <strong className="text-slate-300">Unknown / Not available</strong></span>
-                        <span className="text-[10px] text-slate-500">Only verified external data sources used</span>
+                      <div className="p-2 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-[11px] text-[#6B7280] flex items-center justify-between">
+                        <span>Trend Status: <strong className="text-[#6B7280]">Unknown / Not available</strong></span>
+                        <span className="text-[10px] text-[#6B7280]">Only verified external data sources used</span>
                       </div>
                     </div>
                   )}
@@ -1053,18 +1053,18 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                         <button
                           type="button"
                           onClick={() => audioInputRef.current?.click()}
-                          className="w-full py-2.5 px-3 rounded-xl border border-dashed border-border hover:border-primary-orange bg-[#040810]/60 text-slate-300 hover:text-white flex items-center justify-center gap-2 text-xs font-semibold"
+                          className="w-full py-2.5 px-3 rounded-xl border border-dashed border-border hover:border-[#6C63FF] bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] text-[#6B7280] hover:text-[#3D4852] flex items-center justify-center gap-2 text-xs font-semibold"
                         >
-                          <FileAudio className="w-4 h-4 text-primary-orange" />
+                          <FileAudio className="w-4 h-4 text-[#6C63FF]" />
                           <span>Upload Audio Track (MP3, WAV, M4A, AAC)</span>
                         </button>
                       ) : (
-                        <div className="p-2.5 rounded-xl bg-[#040810]/80 border border-white/10 flex items-center justify-between">
+                        <div className="p-2.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <FileAudio className="w-4 h-4 text-primary-orange" />
+                            <FileAudio className="w-4 h-4 text-[#6C63FF]" />
                             <div>
-                              <span className="font-bold text-white block text-xs">{uploadedAudioMeta.name}</span>
-                              <span className="text-[10.5px] font-mono text-slate-400">
+                              <span className="font-bold text-[#3D4852] block text-xs">{uploadedAudioMeta.name}</span>
+                              <span className="text-[10.5px] font-mono text-[#6B7280]">
                                 {uploadedAudioMeta.sizeKb} KB · Audio Detected: Yes
                               </span>
                             </div>
@@ -1075,7 +1075,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                               setUploadedAudioFile(null);
                               setUploadedAudioMeta({});
                             }}
-                            className="p-1 rounded text-slate-400 hover:text-rose-400"
+                            className="p-1 rounded text-[#6B7280] hover:text-[#BE123C]"
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -1085,8 +1085,8 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   )}
 
                   {audioSource === "none" && (
-                    <div className="p-2.5 rounded-xl bg-surface border border-border text-slate-400 text-xs flex items-center gap-2">
-                      <VolumeX className="w-4 h-4 text-slate-500" />
+                    <div className="p-2.5 rounded-xl bg-surface border border-border text-[#6B7280] text-xs flex items-center gap-2">
+                      <VolumeX className="w-4 h-4 text-[#6B7280]" />
                       <span>No audio selected for this Reel (will publish muted or dialogue-only).</span>
                     </div>
                   )}
@@ -1097,11 +1097,11 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
             {/* Section 14: Planned Caption Input */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="caption-input" className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-primary-orange" />
+                <label htmlFor="caption-input" className="text-xs font-bold text-[#6B7280] uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-[#6C63FF]" />
                   Planned Caption
                 </label>
-                <span className="text-[11px] font-mono text-slate-400">{wordCount} words</span>
+                <span className="text-[11px] font-mono text-[#6B7280]">{wordCount} words</span>
               </div>
 
               <textarea
@@ -1110,39 +1110,39 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 placeholder="Write or paste your planned caption here (including hashtags, mentions, and call-to-actions)..."
-                className="w-full rounded-2xl bg-[#040810]/70 border border-border focus:border-primary-orange focus:ring-1 focus:ring-primary-orange p-3.5 text-sm text-white placeholder-slate-500 transition-all resize-y leading-relaxed font-sans"
+                className="w-full rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border focus:border-transparent focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#E0E5EC] focus:ring-[#6C63FF] p-3.5 text-sm text-[#3D4852] placeholder-[#A0AEC0] transition-all resize-y leading-relaxed font-sans"
               />
 
               {/* Real-time Caption Statistics Bar */}
-              <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 mt-2 text-[10.5px] font-mono text-slate-400">
-                <div className="p-1.5 rounded-lg bg-surface border border-border text-center">
-                  <span className="text-slate-200 font-bold block">{charCount}</span>
+              <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 mt-2 text-[10.5px] font-mono text-[#6B7280]">
+                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
+                  <span className="text-[#3D4852] font-bold block">{charCount}</span>
                   <span className="text-[9.5px]">Chars</span>
                 </div>
-                <div className="p-1.5 rounded-lg bg-surface border border-border text-center">
-                  <span className="text-slate-200 font-bold block">{wordCount}</span>
+                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
+                  <span className="text-[#3D4852] font-bold block">{wordCount}</span>
                   <span className="text-[9.5px]">Words</span>
                 </div>
-                <div className="p-1.5 rounded-lg bg-surface border border-border text-center">
-                  <span className={`font-bold block ${hashtagCount > 10 ? "text-amber-400" : "text-slate-200"}`}>
+                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
+                  <span className={`font-bold block ${hashtagCount > 10 ? "text-[#B45309]" : "text-[#3D4852]"}`}>
                     {hashtagCount}
                   </span>
                   <span className="text-[9.5px]">Hashtags</span>
                 </div>
-                <div className="p-1.5 rounded-lg bg-surface border border-border text-center">
-                  <span className="text-slate-200 font-bold block">{mentionCount}</span>
+                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
+                  <span className="text-[#3D4852] font-bold block">{mentionCount}</span>
                   <span className="text-[9.5px]">Mentions</span>
                 </div>
-                <div className="p-1.5 rounded-lg bg-surface border border-border text-center">
-                  <span className="text-slate-200 font-bold block">{emojiCount}</span>
+                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
+                  <span className="text-[#3D4852] font-bold block">{emojiCount}</span>
                   <span className="text-[9.5px]">Emojis</span>
                 </div>
-                <div className="p-1.5 rounded-lg bg-surface border border-border text-center">
-                  <span className="text-slate-200 font-bold block">{questionCount}</span>
+                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center">
+                  <span className="text-[#3D4852] font-bold block">{questionCount}</span>
                   <span className="text-[9.5px]">Questions</span>
                 </div>
-                <div className="p-1.5 rounded-lg bg-surface border border-border text-center col-span-2 sm:col-span-1">
-                  <span className={`font-bold block ${hasCta ? "text-emerald-400" : "text-slate-400"}`}>
+                <div className="p-1.5 rounded-2xl bg-surface border border-border text-center col-span-2 sm:col-span-1">
+                  <span className={`font-bold block ${hasCta ? "text-[#0F766E]" : "text-[#6B7280]"}`}>
                     {hasCta ? "Yes" : "None"}
                   </span>
                   <span className="text-[9.5px]">CTA Prompt</span>
@@ -1151,15 +1151,15 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
             </div>
 
             {/* Section 15: Publishing Details */}
-            <div className="space-y-4 pt-1 border-t border-white/5">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+            <div className="space-y-4 pt-1 border-t border-transparent">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] block">
                 Publishing Context
               </span>
 
               {/* Followers */}
               <div>
-                <label htmlFor="follower-input" className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                  <Users className="w-3.5 h-3.5 inline mr-1 text-primary-orange" />
+                <label htmlFor="follower-input" className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1.5">
+                  <Users className="w-3.5 h-3.5 inline mr-1 text-[#6C63FF]" />
                   Followers
                 </label>
                 <input
@@ -1168,15 +1168,15 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   min={1}
                   value={followers}
                   onChange={(e) => setFollowers(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full rounded-xl bg-[#040810]/70 border border-border focus:border-primary-orange focus:ring-1 focus:ring-primary-orange p-2.5 text-xs sm:text-sm text-white transition-all font-sans"
+                  className="w-full rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border focus:border-transparent focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#E0E5EC] focus:ring-[#6C63FF] p-2.5 text-xs sm:text-sm text-[#3D4852] transition-all font-sans"
                 />
               </div>
 
               {/* Publication Date & Time */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="date-input" className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    <Calendar className="w-3.5 h-3.5 inline mr-1 text-primary-orange" />
+                  <label htmlFor="date-input" className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1.5">
+                    <Calendar className="w-3.5 h-3.5 inline mr-1 text-[#6C63FF]" />
                     Publication Date
                   </label>
                   <input
@@ -1184,13 +1184,13 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full rounded-xl bg-[#040810]/70 border border-border focus:border-primary-orange focus:ring-1 focus:ring-primary-orange p-2.5 text-xs sm:text-sm text-white transition-all font-sans"
+                    className="w-full rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border focus:border-transparent focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#E0E5EC] focus:ring-[#6C63FF] p-2.5 text-xs sm:text-sm text-[#3D4852] transition-all font-sans"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="time-input" className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    <Clock className="w-3.5 h-3.5 inline mr-1 text-primary-orange" />
+                  <label htmlFor="time-input" className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1.5">
+                    <Clock className="w-3.5 h-3.5 inline mr-1 text-[#6C63FF]" />
                     Publication Time (UTC)
                   </label>
                   <input
@@ -1198,7 +1198,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                     type="time"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    className="w-full rounded-xl bg-[#040810]/70 border border-border focus:border-primary-orange focus:ring-1 focus:ring-primary-orange p-2.5 text-xs sm:text-sm text-white transition-all font-sans"
+                    className="w-full rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border focus:border-transparent focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#E0E5EC] focus:ring-[#6C63FF] p-2.5 text-xs sm:text-sm text-[#3D4852] transition-all font-sans"
                   />
                 </div>
               </div>
@@ -1206,15 +1206,15 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
               {/* Category & Content Goal */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="category-select" className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    <Tag className="w-3.5 h-3.5 inline mr-1 text-primary-orange" />
+                  <label htmlFor="category-select" className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1.5">
+                    <Tag className="w-3.5 h-3.5 inline mr-1 text-[#6C63FF]" />
                     Content Category
                   </label>
                   <select
                     id="category-select"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full rounded-xl bg-[#040810]/70 border border-border focus:border-primary-orange focus:ring-1 focus:ring-primary-orange p-2.5 text-xs sm:text-sm text-white transition-all font-sans"
+                    className="w-full rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border focus:border-transparent focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#E0E5EC] focus:ring-[#6C63FF] p-2.5 text-xs sm:text-sm text-[#3D4852] transition-all font-sans"
                   >
                     <option value="Technology & AI">Technology & AI</option>
                     <option value="Education & How-To">Education & How-To</option>
@@ -1228,15 +1228,15 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                 </div>
 
                 <div>
-                  <label htmlFor="goal-select" className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    <Target className="w-3.5 h-3.5 inline mr-1 text-primary-orange" />
+                  <label htmlFor="goal-select" className="block text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1.5">
+                    <Target className="w-3.5 h-3.5 inline mr-1 text-[#6C63FF]" />
                     Primary Content Goal
                   </label>
                   <select
                     id="goal-select"
                     value={goal}
                     onChange={(e) => setGoal(e.target.value)}
-                    className="w-full rounded-xl bg-[#040810]/70 border border-border focus:border-primary-orange focus:ring-1 focus:ring-primary-orange p-2.5 text-xs sm:text-sm text-white transition-all font-sans"
+                    className="w-full rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-border focus:border-transparent focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#E0E5EC] focus:ring-[#6C63FF] p-2.5 text-xs sm:text-sm text-[#3D4852] transition-all font-sans"
                   >
                     <option value="Engagement & Comments">Engagement & Comments</option>
                     <option value="Reach & Broad Awareness">Reach & Broad Awareness</option>
@@ -1254,11 +1254,11 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
               <button
                 type="submit"
                 disabled={loading || !formValidation.valid}
-                className="w-full btn-primary py-3.5 text-sm sm:text-base font-bold disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_6px_22px_rgba(255,112,72,0.32)]"
+                className="w-full btn-primary py-3.5 text-sm sm:text-base font-bold disabled:opacity-40 disabled:cursor-not-allowed "
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2.5">
-                    <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                    <RefreshCw className="w-4 h-4 animate-spin text-[#3D4852]" />
                     <span>{loadingStep}</span>
                   </span>
                 ) : (
@@ -1270,7 +1270,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
               </button>
 
               {!formValidation.valid && (
-                <p className="text-[11px] text-amber-400/90 text-center mt-2 font-mono">
+                <p className="text-[11px] text-[#B45309]/90 text-center mt-2 font-mono">
                   • {formValidation.reason}
                 </p>
               )}
@@ -1283,26 +1283,26 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
           {analysisReport ? (
             <div className="space-y-6 animate-fade-in">
               {/* 22. Prediction Score Card */}
-              <div className="glass-card-accent p-7 sm:p-8 text-center space-y-4 shadow-[0_12px_36px_rgba(0,0,0,0.5)]">
-                <span className="text-[11px] font-mono font-bold text-slate-300 uppercase tracking-widest block">
+              <div className="glass-card-accent p-7 sm:p-8 text-center space-y-4 ">
+                <span className="text-[11px] font-mono font-bold text-[#6B7280] uppercase tracking-widest block">
                   Expected Engagement Rate
                 </span>
 
-                <div className="text-5xl sm:text-6xl font-black text-white tracking-tight">
+                <div className="text-5xl sm:text-6xl font-black text-[#3D4852] tracking-tight">
                   {analysisReport.prediction.expected_engagement_rate.toFixed(2)}%
                 </div>
 
                 {/* 90% Uncertainty Interval & Performance Band */}
                 <div className="pt-2 flex flex-col items-center gap-2">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold border border-white/10 bg-black/40 text-slate-200">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold border border-transparent bg-[#E0E5EC] text-[#3D4852]">
                     <span>90% Uncertainty Interval:</span>
-                    <strong className="text-white font-mono">
+                    <strong className="text-[#3D4852] font-mono">
                       {analysisReport.prediction.lower_bound.toFixed(2)}% — {analysisReport.prediction.upper_bound.toFixed(2)}%
                     </strong>
                   </div>
 
                   <div className="flex items-center gap-2 text-xs pt-1">
-                    <span className="text-slate-400">Performance Band:</span>
+                    <span className="text-[#6B7280]">Performance Band:</span>
                     <span
                       className={`px-3 py-0.5 rounded-full text-xs font-bold border ${getBandBadge(
                         analysisReport.prediction.performance_band
@@ -1313,25 +1313,25 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-300/80 max-w-sm mx-auto pt-1 leading-relaxed">
+                <p className="text-[11px] text-[#6B7280]/80 max-w-sm mx-auto pt-1 leading-relaxed">
                   Evaluated using trained regression weights on observable pre-publication parameters.
                 </p>
               </div>
 
               {/* 21. Content Analysis (Photo / Carousel / Reel) */}
               <div className="glass-card p-6 rounded-3xl border-border/80 space-y-4">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <div className="flex items-center justify-between border-b border-transparent pb-3">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
                     {contentFormat === "carousel" ? (
-                      <Layers className="w-4 h-4 text-primary-orange" />
+                      <Layers className="w-4 h-4 text-[#6C63FF]" />
                     ) : contentFormat === "reel" ? (
-                      <Video className="w-4 h-4 text-primary-orange" />
+                      <Video className="w-4 h-4 text-[#6C63FF]" />
                     ) : (
-                      <ImageIcon className="w-4 h-4 text-primary-orange" />
+                      <ImageIcon className="w-4 h-4 text-[#6C63FF]" />
                     )}
                     Content Analysis
                   </h3>
-                  <span className="text-[10.5px] font-mono text-slate-400 uppercase">
+                  <span className="text-[10.5px] font-mono text-[#6B7280] uppercase">
                     Format: {contentFormat.toUpperCase()}
                   </span>
                 </div>
@@ -1341,14 +1341,14 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   <div className="space-y-3 text-xs">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Aspect Ratio</span>
-                        <span className="font-semibold text-white text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Aspect Ratio</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
                           {analysisReport.media_analysis.dimensions?.aspect_ratio || photoMeta.aspectRatio || "4:5"}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Resolution</span>
-                        <span className="font-semibold text-white text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Resolution</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
                           {analysisReport.media_analysis.dimensions?.width
                             ? `${analysisReport.media_analysis.dimensions.width} × ${analysisReport.media_analysis.dimensions.height}`
                             : photoMeta.width
@@ -1357,14 +1357,14 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Illumination</span>
-                        <span className="font-semibold text-white text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Illumination</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
                           {analysisReport.media_analysis.visual_metrics?.brightness_label || "Balanced"}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Text Presence</span>
-                        <span className="font-semibold text-white text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Text Presence</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
                           {analysisReport.media_analysis.visual_metrics?.text_presence || "Evaluated"}
                         </span>
                       </div>
@@ -1377,20 +1377,20 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   <div className="space-y-3 text-xs">
                     <div className="grid grid-cols-3 gap-2">
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Total Slides</span>
-                        <span className="font-semibold text-white text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Total Slides</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
                           {analysisReport.media_analysis?.slide_count || carouselSlides.length} Slides
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Common Ratio</span>
-                        <span className="font-semibold text-white text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Common Ratio</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
                           {analysisReport.media_analysis?.common_aspect_ratio || "4:5 (Portrait Feed)"}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Text Detected</span>
-                        <span className="font-semibold text-white text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Text Detected</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
                           {analysisReport.media_analysis?.text_detected_slides ?? "Analyzed"} / {carouselSlides.length} slides
                         </span>
                       </div>
@@ -1399,26 +1399,26 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                     {/* Per-Slide Sequence Breakdown */}
                     {analysisReport.media_analysis?.slides && analysisReport.media_analysis.slides.length > 0 && (
                       <div className="space-y-1.5 pt-2">
-                        <span className="text-[10.5px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+                        <span className="text-[10.5px] font-mono font-bold text-[#6B7280] uppercase tracking-wider block">
                           Slide Sequence Breakdown
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
                           {analysisReport.media_analysis.slides.map((slide, sIdx) => (
                             <div
                               key={sIdx}
-                              className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between"
+                              className="p-2.5 rounded-xl bg-[#E0E5EC] border border-transparent flex items-center justify-between"
                             >
                               <div className="flex items-center gap-2">
                                 <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
-                                  slide.is_first_slide ? "bg-primary-orange text-white" : "bg-white/10 text-slate-300"
+                                  slide.is_first_slide ? "bg-primary-orange text-white" : "bg-[#E0E5EC] text-[#6B7280]"
                                 }`}>
                                   {slide.is_first_slide ? "1 FIRST" : `Slide ${slide.slide_index}`}
                                 </span>
-                                <span className="text-[11px] text-slate-300 truncate max-w-[100px]">
+                                <span className="text-[11px] text-[#6B7280] truncate max-w-[100px]">
                                   {slide.filename || `Slide ${slide.slide_index}`}
                                 </span>
                               </div>
-                              <span className="text-[10px] font-mono text-slate-400">
+                              <span className="text-[10px] font-mono text-[#6B7280]">
                                 {slide.dimensions?.aspect_ratio?.split(" ")[0] || "4:5"}
                               </span>
                             </div>
@@ -1434,26 +1434,26 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
                   <div className="space-y-3 text-xs">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Duration</span>
-                        <span className="font-semibold text-white text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Duration</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
                           {analysisReport.media_analysis?.duration?.label || reelMeta.duration || "18.4s"}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Framing</span>
-                        <span className="font-semibold text-white text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Framing</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
                           {analysisReport.media_analysis?.dimensions?.aspect_ratio || reelMeta.aspectRatio || "9:16"}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Audio Stream</span>
-                        <span className="font-semibold text-emerald-300 text-[11.5px]">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Audio Stream</span>
+                        <span className="font-semibold text-[#0F766E] text-[11.5px]">
                           {analysisReport.media_analysis?.audio?.audio_detected ? "Detected" : "Verified"}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-slate-400 block">Planned Audio</span>
-                        <span className="font-semibold text-white text-[11.5px] truncate block">
+                        <span className="text-[10px] font-mono text-[#6B7280] block">Planned Audio</span>
+                        <span className="font-semibold text-[#3D4852] text-[11.5px] truncate block">
                           {audioSource === "original" ? "Original Audio" : audioSource === "instagram" ? audioName || "Instagram Audio" : audioSource === "uploaded" ? "Custom Audio" : "None"}
                         </span>
                       </div>
@@ -1464,96 +1464,96 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
 
               {/* 23. Features Used by Prediction Model */}
               <div className="glass-card p-6 rounded-3xl border-border/80 space-y-3.5">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                    <Sliders className="w-4 h-4 text-primary-orange" />
+                <div className="flex items-center justify-between border-b border-transparent pb-3">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
+                    <Sliders className="w-4 h-4 text-[#6C63FF]" />
                     Features Used by Prediction Model
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-400">Offline Trained Inputs</span>
+                  <span className="text-[10px] font-mono text-[#6B7280]">Offline Trained Inputs</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                    <span className="text-[10px] font-mono text-slate-400 block">Media Type</span>
-                    <span className="font-semibold text-white uppercase text-[11px]">
+                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
+                    <span className="text-[10px] font-mono text-[#6B7280] block">Media Type</span>
+                    <span className="font-semibold text-[#3D4852] uppercase text-[11px]">
                       {contentFormat === "photo" ? "Photo" : contentFormat === "carousel" ? "Carousel" : "Reel"}
                     </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                    <span className="text-[10px] font-mono text-slate-400 block">Posting Hour</span>
-                    <span className="font-semibold text-white text-[11px]">
+                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
+                    <span className="text-[10px] font-mono text-[#6B7280] block">Posting Hour</span>
+                    <span className="font-semibold text-[#3D4852] text-[11px]">
                       {time} UTC
                     </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                    <span className="text-[10px] font-mono text-slate-400 block">Followers</span>
-                    <span className="font-semibold text-white text-[11px]">
+                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
+                    <span className="text-[10px] font-mono text-[#6B7280] block">Followers</span>
+                    <span className="font-semibold text-[#3D4852] text-[11px]">
                       {followers.toLocaleString()}
                     </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                    <span className="text-[10px] font-mono text-slate-400 block">Caption Length</span>
-                    <span className="font-semibold text-white text-[11px]">
+                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
+                    <span className="text-[10px] font-mono text-[#6B7280] block">Caption Length</span>
+                    <span className="font-semibold text-[#3D4852] text-[11px]">
                       {charCount} chars
                     </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                    <span className="text-[10px] font-mono text-slate-400 block">Word Count</span>
-                    <span className="font-semibold text-white text-[11px]">
+                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
+                    <span className="text-[10px] font-mono text-[#6B7280] block">Word Count</span>
+                    <span className="font-semibold text-[#3D4852] text-[11px]">
                       {wordCount} words
                     </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                    <span className="text-[10px] font-mono text-slate-400 block">Hashtags</span>
-                    <span className="font-semibold text-white text-[11px]">
+                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
+                    <span className="text-[10px] font-mono text-[#6B7280] block">Hashtags</span>
+                    <span className="font-semibold text-[#3D4852] text-[11px]">
                       {hashtagCount} tags
                     </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                    <span className="text-[10px] font-mono text-slate-400 block">Schedule Day</span>
-                    <span className="font-semibold text-white text-[11px]">
+                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
+                    <span className="text-[10px] font-mono text-[#6B7280] block">Schedule Day</span>
+                    <span className="font-semibold text-[#3D4852] text-[11px]">
                       {new Date(date).toLocaleDateString("en-US", { weekday: "short" })}
                     </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                    <span className="text-[10px] font-mono text-slate-400 block">Category</span>
-                    <span className="font-semibold text-white text-[11px] truncate block">
+                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
+                    <span className="text-[10px] font-mono text-[#6B7280] block">Category</span>
+                    <span className="font-semibold text-[#3D4852] text-[11px] truncate block">
                       {category}
                     </span>
                   </div>
                 </div>
 
-                <p className="text-[10.5px] text-slate-500 font-mono">
+                <p className="text-[10.5px] text-[#6B7280] font-mono">
                   * Note: The current regression model computes predictions based on tabular post structure, media format, and temporal features.
                 </p>
               </div>
 
               {/* 24. Media Signals (Separated from Model Inputs) */}
               <div className="glass-card p-6 rounded-3xl border-border/80 space-y-3.5">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                    <Maximize2 className="w-4 h-4 text-primary-orange" />
+                <div className="flex items-center justify-between border-b border-transparent pb-3">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
+                    <Maximize2 className="w-4 h-4 text-[#6C63FF]" />
                     Media Signals
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-400">Visual & Audio Diagnostics</span>
+                  <span className="text-[10px] font-mono text-[#6B7280]">Visual & Audio Diagnostics</span>
                 </div>
 
-                <div className="space-y-1.5 text-xs text-slate-300">
+                <div className="space-y-1.5 text-xs text-[#6B7280]">
                   {analysisReport.media_analysis?.signals && analysisReport.media_analysis.signals.length > 0 ? (
                     analysisReport.media_analysis.signals.map((sig, idx) => (
-                      <div key={idx} className="flex items-start gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                      <div key={idx} className="flex items-start gap-2 p-2 rounded-2xl bg-[#E0E5EC] border border-transparent">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#0F766E] shrink-0 mt-0.5" />
                         <span>{sig}</span>
                       </div>
                     ))
                   ) : (
-                    <div className="text-slate-400 text-xs">
+                    <div className="text-[#6B7280] text-xs">
                       Media analyzed successfully across aspect ratio, encoding framing, and presentation attributes.
                     </div>
                   )}
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#040810]/70 border border-white/5 text-[10.5px] text-slate-400 leading-relaxed">
+                <div className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-[10.5px] text-[#6B7280] leading-relaxed">
                   These media signals are analyzed separately for content presentation and are not predictive inputs unless supported by the trained model.
                 </div>
               </div>
@@ -1561,29 +1561,29 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
               {/* 25. Improve Before Publishing (Recommendations) */}
               {analysisReport.recommendations.length > 0 && (
                 <div className="glass-card p-6 rounded-3xl border-border/80 space-y-3.5">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5 border-b border-white/[0.06] pb-3">
-                    <TrendingUp className="w-4 h-4 text-primary-orange" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5 border-b border-transparent pb-3">
+                    <TrendingUp className="w-4 h-4 text-[#6C63FF]" />
                     Improve Before Publishing
                   </h3>
 
                   <div className="space-y-3">
                     {analysisReport.recommendations.map((rec, idx) => (
-                      <div key={idx} className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] space-y-1.5 text-xs">
+                      <div key={idx} className="p-3.5 rounded-2xl bg-[#E0E5EC] border border-transparent space-y-1.5 text-xs">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-white flex items-center gap-1.5">
+                          <span className="font-bold text-[#3D4852] flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-primary-orange" />
                             {rec.title}
                           </span>
-                          <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-primary-orange/10 text-primary-orange border border-primary-orange/20">
+                          <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-primary-orange/10 text-[#6C63FF] border border-transparent">
                             {rec.category}
                           </span>
                         </div>
 
-                        <p className="text-slate-200 leading-relaxed font-medium">
+                        <p className="text-[#3D4852] leading-relaxed font-medium">
                           {rec.suggestion}
                         </p>
 
-                        <p className="text-[11px] text-slate-400 leading-snug">
+                        <p className="text-[11px] text-[#6B7280] leading-snug">
                           {rec.reason}
                         </p>
                       </div>
@@ -1593,12 +1593,12 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
               )}
 
               {/* Model Limitations Disclaimer */}
-              <div className="p-4 rounded-2xl bg-[#040810]/70 border border-white/5 text-[11px] text-slate-400 leading-relaxed space-y-1">
-                <div className="flex items-center gap-1.5 font-bold text-slate-300 text-xs">
-                  <HelpCircle className="w-3.5 h-3.5 text-primary-orange" />
+              <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-[11px] text-[#6B7280] leading-relaxed space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-[#6B7280] text-xs">
+                  <HelpCircle className="w-3.5 h-3.5 text-[#6C63FF]" />
                   <span>Model Limitations & Methodology</span>
                 </div>
-                <ul className="list-disc list-inside space-y-0.5 text-slate-400">
+                <ul className="list-disc list-inside space-y-0.5 text-[#6B7280]">
                   {analysisReport.limitations.map((lim, idx) => (
                     <li key={idx}>{lim}</li>
                   ))}
@@ -1608,14 +1608,14 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
           ) : (
             /* Standby State */
             <div className="glass-card p-8 sm:p-10 rounded-3xl border-border/80 text-center flex flex-col items-center justify-center min-h-[440px] space-y-4">
-              <div className="w-16 h-16 rounded-2xl bg-primary-orange/10 border border-primary-orange/20 flex items-center justify-center text-primary-orange">
+              <div className="w-16 h-16 rounded-2xl bg-primary-orange/10 border border-transparent flex items-center justify-center text-[#6C63FF]">
                 <Sparkles className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-lg font-bold text-[#3D4852]">
                 Ready for Pre-Publish Analysis
               </h3>
-              <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-                Configure your planned Photo, multi-slide Carousel, or Reel video on the left, then click <strong className="text-white">Analyze Post & Predict Performance →</strong> to generate your comprehensive performance report.
+              <p className="text-xs text-[#6B7280] max-w-sm leading-relaxed">
+                Configure your planned Photo, multi-slide Carousel, or Reel video on the left, then click <strong className="text-[#3D4852]">Analyze Post & Predict Performance →</strong> to generate your comprehensive performance report.
               </p>
             </div>
           )}

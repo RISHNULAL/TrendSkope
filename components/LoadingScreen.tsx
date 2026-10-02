@@ -1,25 +1,12 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import Image from "next/image";
+import BrandLockup from "@/components/BrandLockup";
 
 interface LoadingScreenProps {
   onComplete?: () => void;
   durationMs?: number;
 }
-
-const BRAND_LETTERS = [
-  { char: "T", isAccent: false },
-  { char: "r", isAccent: false },
-  { char: "e", isAccent: false },
-  { char: "n", isAccent: false },
-  { char: "d", isAccent: false },
-  { char: "S", isAccent: true },
-  { char: "k", isAccent: true },
-  { char: "o", isAccent: true },
-  { char: "p", isAccent: true },
-  { char: "e", isAccent: true },
-];
 
 export default function LoadingScreen({
   onComplete,
@@ -115,7 +102,7 @@ export default function LoadingScreen({
         fadingOut ? "opacity-0 scale-[0.99] pointer-events-none" : "opacity-100 scale-100"
       }`}
       style={{
-        backgroundColor: "#050b15",
+        backgroundColor: "#E0E5EC",
       }}
     >
       {/* Deep Navy Radial Background Layer */}
@@ -123,8 +110,9 @@ export default function LoadingScreen({
         className="absolute inset-0 pointer-events-none animate-bg-gradient"
         style={{
           background: `
-            radial-gradient(circle at 50% 45%, rgba(20, 36, 62, 0.45) 0%, rgba(7, 14, 26, 0.85) 55%, #030712 100%),
-            radial-gradient(circle at 50% 45%, rgba(255, 112, 72, 0.04) 0%, transparent 65%)
+            radial-gradient(circle at 18% 8%, rgba(255,255,255,0.9) 0%, transparent 42%),
+            radial-gradient(circle at 88% 92%, rgba(163,177,198,0.45) 0%, transparent 40%),
+            #E0E5EC
           `,
         }}
       />
@@ -134,8 +122,8 @@ export default function LoadingScreen({
         className="absolute inset-0 opacity-[0.02] pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(255, 255, 255, 0.25) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 1px, transparent 1px)
+            linear-gradient(to right, rgba(163,177,198,0.45) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(163,177,198,0.45) 1px, transparent 1px)
           `,
           backgroundSize: "32px 32px",
         }}
@@ -145,7 +133,7 @@ export default function LoadingScreen({
       <div
         className="absolute inset-0 pointer-events-none opacity-40"
         style={{
-          background: "radial-gradient(circle at center, transparent 40%, rgba(2, 6, 12, 0.8) 100%)",
+          background: "radial-gradient(circle at center, transparent 40%, rgba(163,177,198,0.35) 100%)",
         }}
       />
 
@@ -155,78 +143,15 @@ export default function LoadingScreen({
       {/* Main Visual Center Stage */}
       <main className="relative z-10 flex flex-col items-center text-center max-w-md w-full my-auto">
         {/* Logo Container with Analytics Ring */}
-        <div className="relative inline-flex items-center justify-center mb-6 sm:mb-8 animate-logo-in">
-          {/* Subtle Ambient Radial Glow */}
-          <div className="absolute -inset-10 bg-[radial-gradient(circle,rgba(255,112,72,0.12)_0%,rgba(255,64,95,0.02)_50%,transparent_75%)] blur-2xl rounded-full pointer-events-none animate-subtle-pulse" />
-
-          {/* Thin Analytical Ring Around Logo */}
-          <div className="absolute -inset-5 sm:-inset-6 pointer-events-none">
-            <svg
-              className="w-full h-full animate-ring-spin"
-              viewBox="0 0 210 148"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient id="orbitRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ff9438" stopOpacity="0.7" />
-                  <stop offset="50%" stopColor="#ff6e40" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#ff405f" stopOpacity="0.6" />
-                </linearGradient>
-              </defs>
-
-              {/* Analytical data path */}
-              <rect
-                x="3"
-                y="3"
-                width="204"
-                height="142"
-                rx="26"
-                stroke="url(#orbitRingGrad)"
-                strokeWidth="1.2"
-                className="animate-ring-draw"
-                strokeLinecap="round"
-              />
-
-              {/* Tiny analytical nodes along the ring */}
-              <circle cx="28" cy="3" r="2" fill="#ff9438" className="animate-data-node" />
-              <circle cx="207" cy="60" r="1.8" fill="#ff6e40" className="animate-data-node" />
-              <circle cx="170" cy="145" r="2" fill="#ff405f" className="animate-data-node" />
-            </svg>
-          </div>
-
-          {/* Clean Glass Logo Container - Original Logo Asset Preserved */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#0e1a2d]/85 to-[#07111f]/90 border border-white/10 shadow-[0_16px_36px_rgba(0,0,0,0.7),0_0_20px_rgba(255,112,72,0.1)] p-3 sm:p-3.5 backdrop-blur-md">
-            <Image
-              src="/assets/logo.png"
-              alt="TrendSkope Logo"
-              width={160}
-              height={106}
-              priority
-              className="w-32 sm:w-36 md:w-40 h-auto object-contain block"
-            />
+        <div className="relative mb-5 sm:mb-6">
+          <div className="absolute left-1/2 top-6 -translate-x-1/2 w-40 h-40 sm:w-48 sm:h-48 rounded-full pointer-events-none bg-[#E0E5EC] shadow-[12px_12px_20px_rgb(163,177,198,0.45),-12px_-12px_20px_rgba(255,255,255,0.8)]" />
+          <div className="relative">
+            <BrandLockup animated variant="splash" />
           </div>
         </div>
 
-        {/* Brand Name Lockup with Staggered Letter Reveal */}
-        <h1 className="text-3xl sm:text-4xl md:text-[2.65rem] font-extrabold tracking-tight text-white mb-2 flex items-center justify-center">
-          {BRAND_LETTERS.map((item, index) => (
-            <span
-              key={index}
-              className={`inline-block opacity-0 animate-letter-reveal ${
-                item.isAccent ? "gradient-accent" : "text-white"
-              }`}
-              style={{
-                animationDelay: `${index * 45 + 1200}ms`,
-              }}
-            >
-              {item.char}
-            </span>
-          ))}
-        </h1>
-
         {/* Tagline */}
-        <p className="text-xs sm:text-[13px] font-medium tracking-[0.24em] text-slate-400 uppercase opacity-0 animate-tagline-in mb-7 sm:mb-8">
+        <p className="text-xs sm:text-[13px] font-medium tracking-[0.24em] text-[#6B7280] uppercase opacity-0 animate-tagline-in mb-7 sm:mb-8">
           Understand. Predict. Optimize.
         </p>
 
@@ -234,18 +159,18 @@ export default function LoadingScreen({
         <div className="w-full max-w-[290px] sm:max-w-[340px] flex flex-col opacity-0 animate-progress-in">
           {/* Status Row */}
           <div className="flex items-center justify-between text-xs mb-2">
-            <span className="tracking-wide text-[11.5px] sm:text-xs font-medium text-slate-300 transition-colors duration-200">
+            <span className="tracking-wide text-[11.5px] sm:text-xs font-medium text-[#6B7280] transition-colors duration-200">
               {currentStatus}
             </span>
-            <span className="font-mono text-[11px] sm:text-xs font-semibold text-slate-400">
+            <span className="font-mono text-[11px] sm:text-xs font-semibold text-[#6B7280]">
               {progress}%
             </span>
           </div>
 
           {/* Thin Horizontal Progress Line */}
-          <div className="w-full h-1 bg-white/[0.08] rounded-full overflow-hidden relative shadow-inner border border-white/[0.04]">
+          <div className="w-full h-3 bg-[#E0E5EC] rounded-full overflow-hidden relative shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#ff9438] via-[#ff6e40] to-[#ff405f] shadow-[0_0_10px_rgba(255,112,72,0.7)] transition-[width] duration-150 ease-out"
+              className="h-full rounded-full bg-gradient-to-r from-[#6C63FF] via-[#8B84FF] to-[#6C63FF]  transition-[width] duration-150 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -261,13 +186,13 @@ export default function LoadingScreen({
               >
                 <defs>
                   <linearGradient id="microTrendGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#ff9438" stopOpacity="0.4" />
-                    <stop offset="50%" stopColor="#ff6e40" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#ff405f" stopOpacity="0.9" />
+                    <stop offset="0%" stopColor="#6C63FF" stopOpacity="0.4" />
+                    <stop offset="50%" stopColor="#8B84FF" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#6C63FF" stopOpacity="0.9" />
                   </linearGradient>
                   <linearGradient id="microTrendArea" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#ff7048" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="#ff7048" stopOpacity="0" />
+                    <stop offset="0%" stopColor="#6C63FF" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#6C63FF" stopOpacity="0" />
                   </linearGradient>
                 </defs>
 
@@ -288,10 +213,10 @@ export default function LoadingScreen({
 
                 {/* 3-4 Minimal Data Points */}
                 <g className="opacity-80">
-                  <circle cx="32" cy="22" r="2" fill="#ff9438" className="animate-data-node" />
-                  <circle cx="72" cy="14" r="2.2" fill="#ff6e40" className="animate-data-node" />
-                  <circle cx="118" cy="17" r="2" fill="#ff6e40" className="animate-data-node" />
-                  <circle cx="154" cy="6" r="2.4" fill="#ff405f" className="animate-data-node" />
+                  <circle cx="32" cy="22" r="2" fill="#6C63FF" className="animate-data-node" />
+                  <circle cx="72" cy="14" r="2.2" fill="#8B84FF" className="animate-data-node" />
+                  <circle cx="118" cy="17" r="2" fill="#8B84FF" className="animate-data-node" />
+                  <circle cx="154" cy="6" r="2.4" fill="#6C63FF" className="animate-data-node" />
                 </g>
               </svg>
             </div>
@@ -300,7 +225,7 @@ export default function LoadingScreen({
       </main>
 
       {/* Brand Footer */}
-      <footer className="relative z-10 w-full text-center opacity-40 text-[10px] sm:text-[10.5px] text-slate-400 tracking-[0.2em] font-medium uppercase animate-tagline-in">
+      <footer className="relative z-10 w-full text-center opacity-40 text-[10px] sm:text-[10.5px] text-[#6B7280] tracking-[0.2em] font-medium uppercase animate-tagline-in">
         AI-Powered Instagram Content Performance Intelligence
       </footer>
     </div>

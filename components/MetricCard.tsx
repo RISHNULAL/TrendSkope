@@ -24,36 +24,34 @@ export default function MetricCard({
 
   return (
     <div
-      className={`glass-card p-5 flex flex-col justify-between min-h-[140px] relative overflow-visible group transition-all duration-200 hover:-translate-y-1 hover:border-slate-500/50 hover:shadow-[0_10px_28px_rgba(0,0,0,0.45),0_0_16px_rgba(255,112,72,0.08)] ${
-        highlight ? "border-primary/50 shadow-[0_0_20px_rgba(255,112,72,0.12)]" : "border-border/80"
-      }`}
+      className="glass-card p-5 flex flex-col justify-between min-h-[140px] relative overflow-visible group"
     >
       {/* Top Header */}
       <div className="flex items-center justify-between gap-1.5 mb-2">
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+          <span className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">
             {label}
           </span>
           {tooltip && (
             <div className="relative group/tip inline-flex items-center">
-              <Info className="w-3.5 h-3.5 text-slate-500 hover:text-slate-300 cursor-help transition-colors" />
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/tip:block z-30 w-56 p-2.5 rounded-lg bg-[#0c1626] border border-white/10 text-[11px] font-normal leading-normal text-slate-300 shadow-xl pointer-events-none">
+              <Info className="w-3.5 h-3.5 text-[#6B7280] hover:text-[#6B7280] cursor-help transition-colors" />
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/tip:block z-30 w-56 p-2.5 rounded-2xl bg-[#E0E5EC] border border-transparent text-[11px] font-normal leading-normal text-[#6B7280] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] pointer-events-none">
                 {tooltip}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0c1626]" />
+                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#E0E5EC]" />
               </div>
             </div>
           )}
         </div>
 
         {badge && (
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E0E5EC] border border-transparent text-[#6B7280]">
             {badge}
           </span>
         )}
 
         {isReadyValue && !badge && (
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#38B2AC] animate-pulse" />
           </span>
         )}
       </div>
@@ -63,10 +61,10 @@ export default function MetricCard({
         <div
           className={`text-2xl md:text-3xl font-extrabold tracking-tight font-sans ${
             isReadyValue
-              ? "text-emerald-400"
+              ? "text-[#0F766E]"
               : value === "Not Trained"
-              ? "text-rose-400"
-              : "text-white"
+              ? "text-[#BE123C]"
+              : "text-[#3D4852]"
           }`}
         >
           {value}
@@ -75,11 +73,11 @@ export default function MetricCard({
 
       {/* Subtitle / Description */}
       {subtitle && (
-        <p className="text-xs text-slate-400 leading-snug line-clamp-1">{subtitle}</p>
+        <p className="text-xs text-[#6B7280] leading-snug line-clamp-1">{subtitle}</p>
       )}
 
       {/* Subtle corner accent glow */}
-      <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-white/[0.04] to-transparent pointer-events-none rounded-tr-[18px]" />
+      <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-transparent to-transparent pointer-events-none rounded-tr-[18px]" />
     </div>
   );
 }
