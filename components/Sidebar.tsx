@@ -75,7 +75,17 @@ export default function Sidebar({
         {/* Top Branding Section */}
         <div className="p-6 flex-1 overflow-y-auto">
           <div className="flex items-start justify-between gap-2 mb-6">
-            <BrandLockup variant="sidebar" />
+            <a
+              href="/"
+              aria-label="Reload TrendSkope and go to Home"
+              onClick={(event) => {
+                event.preventDefault();
+                window.location.reload();
+              }}
+              className="rounded-2xl cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6C63FF]"
+            >
+              <BrandLockup variant="sidebar" />
+            </a>
             <button
               onClick={() => setMobileOpen(false)}
               aria-label="Close navigation menu"

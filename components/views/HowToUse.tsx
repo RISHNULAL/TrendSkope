@@ -223,31 +223,19 @@ export default function HowToUse({
       className="glass-card scroll-mt-24 p-7 sm:p-9 md:p-10 rounded-3xl border-border/80 relative overflow-hidden"
     >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <Sparkles className="w-4 h-4 text-[#6C63FF]" />
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
-              Interactive Workflow Guide
-            </span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#3D4852] tracking-tight">
-            How to Use <span className="gradient-accent">TrendSkope</span>
-          </h2>
-          <p className="text-sm text-[#6B7280] mt-1">
-            From your post idea to a data-informed publishing decision in a few simple steps.
-          </p>
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-1.5">
+          <Sparkles className="w-4 h-4 text-[#6C63FF]" />
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+            Interactive Workflow Guide
+          </span>
         </div>
-
-        {/* Start Here Badge */}
-        <button
-          onClick={() => setActiveStep(0)}
-          className="self-start sm:self-auto px-3 py-1.5 rounded-full bg-[#E0E5EC] border border-transparent hover:border-[#6C63FF] hover:bg-[#E0E5EC] text-xs font-semibold text-[#6B7280] hover:text-[#3D4852] transition-all duration-200 flex items-center gap-1.5"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-primary-orange" />
-          <span className="text-[11px] font-mono uppercase">New to TrendSkope?</span>
-          <span className="text-[#6C63FF]">Start here →</span>
-        </button>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#3D4852] tracking-tight">
+          How to Use <span className="gradient-accent">TrendSkope</span>
+        </h2>
+        <p className="text-sm text-[#6B7280] mt-1">
+          From your post idea to a data-informed publishing decision in a few simple steps.
+        </p>
       </div>
 
       {/* Step Selector Tabs */}
