@@ -13,6 +13,10 @@ interface HeaderProps {
 }
 
 const tabTitles: Record<string, { title: string; subtitle: string }> = {
+  Dashboard: {
+    title: "TrendSkope Dashboard",
+    subtitle: "Dataset intelligence and model performance at a glance.",
+  },
   Home: {
     title: "Overview",
     subtitle: "AI-Powered Instagram Content Performance Intelligence",
@@ -27,15 +31,19 @@ const tabTitles: Record<string, { title: string; subtitle: string }> = {
   },
   "Model Insights": {
     title: "Model Insights",
-    subtitle: "Model comparisons, validation scores, and limitations",
+    subtitle: "Candidate model comparison, validation scores, and feature influence",
   },
   Dataset: {
     title: "Dataset",
     subtitle: "CSV validation, schema, and dataset provenance",
   },
+  Developers: {
+    title: "Developers",
+    subtitle: "Meet the team behind TrendSkope",
+  },
   "About Project": {
     title: "About & Methodology",
-    subtitle: "How the project and model work",
+    subtitle: "Understanding, predicting, and analyzing Instagram content performance through data-driven methods.",
   },
 };
 
@@ -51,7 +59,7 @@ export default function Header({
     subtitle: "TrendSkope Intelligence",
   };
 
-  const isModelReady = Boolean(modelStatus?.trained);
+  const isModelReady = Boolean(modelStatus?.trained && modelStatus?.status !== "not_ready");
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-[#E0E5EC]/90 backdrop-blur-md">

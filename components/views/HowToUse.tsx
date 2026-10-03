@@ -1,22 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  FileText,
-  Cpu,
-  Target,
-  Sliders,
   ArrowRight,
   ArrowLeft,
-  Sparkles,
-  Info,
-  CheckCircle2,
-  Clock,
   Video,
-  Image as ImageIcon,
-  BarChart2,
-  TrendingUp,
-  Layers,
+  Clock,
+  CheckCircle2,
+  BarChart3,
+  GitCompare,
+  Zap,
+  Sparkles,
 } from "lucide-react";
 
 interface HowToUseProps {
@@ -24,353 +18,590 @@ interface HowToUseProps {
   onNavigateToWhatIf?: () => void;
 }
 
+interface SlideItem {
+  num: string;
+  code: string;
+  title: string;
+  tagline: string;
+  ctaText: string;
+  onCta: () => void;
+  callouts: { num: string; label: string; detail: string }[];
+  renderUI: () => React.ReactNode;
+}
+
 export default function HowToUse({
   onNavigateToPredict,
   onNavigateToWhatIf,
 }: HowToUseProps) {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  const steps = [
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+
+  const SLIDE_DURATION = 5000; // 5 seconds per slide
+  const TICK_INTERVAL = 50;
+
+  // Check reduced motion preference
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      setPrefersReducedMotion(mediaQuery.matches);
+
+      const handleMotionChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+      mediaQuery.addEventListener("change", handleMotionChange);
+      return () => mediaQuery.removeEventListener("change", handleMotionChange);
+    }
+  }, []);
+
+  // IntersectionObserver: Only enable autoplay when section is visible in viewport
+  useEffect(() => {
+    const target = sectionRef.current;
+    if (!target || typeof window === "undefined" || !("IntersectionObserver" in window)) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsVisible(entry.isIntersecting);
+      },
+      {
+        threshold: 0.35, // Autoplay starts when 35% of section is visible
+      }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const slides: SlideItem[] = [
     {
-      id: "01",
-      badge: "01 CREATE",
-      title: "Create your post idea",
-      shortDesc: "Enter the details of the Instagram post you are planning to publish.",
-      fullDesc:
-        "Input your planned caption, choose your media format (Image, Reel, or Carousel), set your scheduled publication time, and provide your account's follower scale. All inputs represent information available strictly before the post goes live.",
-      keyPoints: [
-        "Caption text, length, and hashtag strategy",
-        "Planned media format & aspect ratio",
-        "Scheduled day of week and posting hour",
-        "Historical account scale context",
+      num: "01",
+      code: "CREATE",
+      title: "01",
+      tagline: "Add your planned post details.",
+      ctaText: "Start Creating →",
+      onCta: onNavigateToPredict,
+      callouts: [
+        { num: "①", label: "Caption", detail: "Text length, tone & hashtags" },
+        { num: "②", label: "Format", detail: "Reel video / carousel / image" },
+        { num: "③", label: "Publishing time", detail: "Scheduled day & peak hour" },
       ],
-      actionText: "Analyze Your Post",
-      onAction: onNavigateToPredict,
-      illustration: (
-        <div className="p-4 rounded-xl bg-[#E0E5EC] border border-transparent space-y-3 font-sans">
-          <div className="flex items-center justify-between text-xs text-[#6B7280] pb-2 border-b border-transparent">
-            <span className="font-semibold text-[#3D4852]">Post Draft Input</span>
-            <span className="text-[10px] font-mono text-[#0F766E] bg-emerald-500/10 px-2 py-0.5 rounded">
-              Ready to analyze
+      renderUI: () => (
+        <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] space-y-4">
+          {/* Header Bar */}
+          <div className="flex items-center justify-between pb-2 border-b border-border/20 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#6C63FF]" />
+              <strong className="text-[#3D4852] font-bold text-xs sm:text-sm">Analyze Post Workspace</strong>
+            </div>
+            <span className="text-[10px] font-mono text-[#0F766E] bg-emerald-500/10 px-2.5 py-0.5 rounded-full font-semibold">
+              Pre-Publication Draft
             </span>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[10.5px] font-mono uppercase text-[#6B7280]">
-              Planned Caption
-            </label>
-            <div className="p-2.5 rounded-2xl bg-[#E0E5EC] border border-transparent text-xs text-[#6B7280] line-clamp-2">
-              &quot;Behind the scenes of our summer collection release ☀️ Drop a comment below! #summer #launch&quot;
+          {/* ① Caption */}
+          <div className="relative p-3.5 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase font-bold text-[#6B7280]">
+                Planned Caption Text
+              </span>
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#6C63FF] text-white text-[11px] font-bold shadow-sm">
+                ①
+              </span>
+            </div>
+            <div className="text-xs text-[#3D4852] font-medium leading-relaxed bg-[#E0E5EC] p-2.5 rounded-lg shadow-[inset_2px_2px_4px_rgb(163,177,198,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
+              &quot;Behind the scenes of our summer collection release 🎬 Drop your thoughts below! #behindthescenes #launch&quot;
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div className="p-2 rounded-2xl bg-[#E0E5EC] border border-transparent">
-              <span className="text-[10px] font-mono text-[#6B7280] block">Media Type</span>
-              <span className="text-xs font-semibold text-[#3D4852] flex items-center gap-1 mt-0.5">
-                <Video className="w-3.5 h-3.5 text-[#6C63FF]" /> Reel Video
-              </span>
+          {/* ② Format & ③ Publishing Time */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* ② Format */}
+            <div className="relative p-3 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase font-bold text-[#6B7280]">
+                  Media Format
+                </span>
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#6C63FF] text-white text-[11px] font-bold shadow-sm">
+                  ②
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-[#6C63FF]/10 border border-[#6C63FF]/30 text-xs font-bold text-[#6C63FF]">
+                <Video className="w-3.5 h-3.5 shrink-0" />
+                <span>Reel (Short Video)</span>
+              </div>
             </div>
-            <div className="p-2 rounded-2xl bg-[#E0E5EC] border border-transparent">
-              <span className="text-[10px] font-mono text-[#6B7280] block">Scheduled Time</span>
-              <span className="text-xs font-semibold text-[#3D4852] flex items-center gap-1 mt-0.5">
-                <Clock className="w-3.5 h-3.5 text-[#6C63FF]" /> 7:30 PM (Evening)
-              </span>
+
+            {/* ③ Publishing time */}
+            <div className="relative p-3 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase font-bold text-[#6B7280]">
+                  Publishing Time
+                </span>
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#6C63FF] text-white text-[11px] font-bold shadow-sm">
+                  ③
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-[#E0E5EC] shadow-[inset_2px_2px_4px_rgb(163,177,198,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.5)] text-xs font-semibold text-[#3D4852]">
+                <Clock className="w-3.5 h-3.5 text-[#6C63FF] shrink-0" />
+                <span>Friday · 7:30 PM (Peak)</span>
+              </div>
             </div>
           </div>
         </div>
       ),
     },
     {
-      id: "02",
-      badge: "02 ANALYZE",
-      title: "Analyze pre-publication signals",
-      shortDesc: "TrendSkope extracts and cleans 25 pre-publication features automatically.",
-      fullDesc:
-        "When you click Analyze, TrendSkope parses your post details into linguistic, temporal, media, and scale features. No future data or post-hoc metrics (like actual likes or comments) are ever used, ensuring honest out-of-sample evaluation.",
-      keyPoints: [
-        "Linguistic features (sentiment, caption length, emojis)",
-        "Temporal features (day of week, peak hours, cyclical signals)",
-        "Media parameters (video/image encoding flag)",
-        "Log follower normalization for fair comparison",
+      num: "02",
+      code: "ANALYZE",
+      title: "02",
+      tagline: "Understand the signals extracted from your content.",
+      ctaText: "Analyze a Post →",
+      onCta: onNavigateToPredict,
+      callouts: [
+        { num: "①", label: "Content signals", detail: "Sentiment, length & keyword patterns" },
+        { num: "②", label: "Media signals", detail: "Format binary flags & encoding" },
+        { num: "③", label: "Caption signals", detail: "Hashtags, question markers & emojis" },
       ],
-      actionText: "Run Prediction Now",
-      onAction: onNavigateToPredict,
-      illustration: (
-        <div className="p-4 rounded-xl bg-[#E0E5EC] border border-transparent space-y-3 font-sans">
-          <div className="flex items-center justify-between text-xs text-[#6B7280] pb-2 border-b border-transparent">
-            <span className="font-semibold text-[#3D4852]">Feature Extraction Pipeline</span>
-            <span className="text-[10px] font-mono text-[#6C63FF] bg-primary-orange/10 px-2 py-0.5 rounded">
+      renderUI: () => (
+        <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] space-y-3.5">
+          {/* Header Bar */}
+          <div className="flex items-center justify-between pb-2 border-b border-border/20 text-xs">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-[#6C63FF]" />
+              <strong className="text-[#3D4852] font-bold text-xs sm:text-sm">Signal Extraction Matrix</strong>
+            </div>
+            <span className="text-[10px] font-mono text-[#6C63FF] bg-primary-orange/10 px-2.5 py-0.5 rounded-full font-semibold">
               25 Signals Parsed
             </span>
           </div>
 
-          <div className="space-y-1.5 text-xs">
-            <div className="flex items-center justify-between p-2 rounded-2xl bg-[#E0E5EC] border border-transparent">
-              <span className="text-[#6B7280] flex items-center gap-2">
-                <FileText className="w-3.5 h-3.5 text-[#6C63FF]" /> Caption Sentiment & Length
+          {/* ① Content Signals */}
+          <div className="relative p-3 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] flex items-center justify-between">
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-mono font-bold uppercase text-[#6B7280]">
+                Content Signals
               </span>
-              <span className="text-[10px] font-mono text-[#0F766E]">Extracted</span>
+              <div className="text-xs font-mono text-[#3D4852] font-bold">
+                Sentiment: +0.62 · Length: 94 chars · Positive Tone
+              </div>
             </div>
-            <div className="flex items-center justify-between p-2 rounded-2xl bg-[#E0E5EC] border border-transparent">
-              <span className="text-[#6B7280] flex items-center gap-2">
-                <Clock className="w-3.5 h-3.5 text-[#6C63FF]" /> Temporal Sine/Cosine Timing
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#6C63FF] text-white text-[11px] font-bold shadow-sm">
+              ①
+            </span>
+          </div>
+
+          {/* ② Media Signals */}
+          <div className="relative p-3 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] flex items-center justify-between">
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-mono font-bold uppercase text-[#6B7280]">
+                Media Signals
               </span>
-              <span className="text-[10px] font-mono text-[#0F766E]">Extracted</span>
+              <div className="text-xs font-mono text-[#3D4852] font-bold">
+                is_reel: 1.0 · is_image: 0.0 · is_carousel: 0.0
+              </div>
             </div>
-            <div className="flex items-center justify-between p-2 rounded-2xl bg-[#E0E5EC] border border-transparent">
-              <span className="text-[#6B7280] flex items-center gap-2">
-                <Video className="w-3.5 h-3.5 text-[#6C63FF]" /> Format & Account Scale
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#6C63FF] text-white text-[11px] font-bold shadow-sm">
+              ②
+            </span>
+          </div>
+
+          {/* ③ Caption Signals */}
+          <div className="relative p-3 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] flex items-center justify-between">
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-mono font-bold uppercase text-[#6B7280]">
+                Caption Signals
               </span>
-              <span className="text-[10px] font-mono text-[#0F766E]">Extracted</span>
+              <div className="text-xs font-mono text-[#3D4852] font-bold">
+                Hashtags: 2 · Emojis: 1 · Questions: 1 (Engagement Prompt)
+              </div>
             </div>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#6C63FF] text-white text-[11px] font-bold shadow-sm">
+              ③
+            </span>
           </div>
         </div>
       ),
     },
     {
-      id: "03",
-      badge: "03 PREDICT",
-      title: "Understand the prediction & performance band",
-      shortDesc: "Review your predicted engagement rate, confidence interval, and signal impact.",
-      fullDesc:
-        "The model produces a predicted engagement rate accompanied by an empirical uncertainty interval and an intuitive performance band (Above Baseline, Average, or Below Baseline) to contextualize expected performance against historical posts.",
-      keyPoints: [
-        "Expected engagement rate with historical context",
-        "Performance band ranking (relative to dataset baseline)",
-        "Top positive and negative signal drivers",
-        "Actionable recommendations to improve engagement",
+      num: "03",
+      code: "PREDICT",
+      title: "03",
+      tagline: "Estimate engagement before publishing.",
+      ctaText: "Try a Prediction →",
+      onCta: onNavigateToPredict,
+      callouts: [
+        { num: "①", label: "Estimated engagement", detail: "Follower-normalized engagement estimate" },
+        { num: "②", label: "Model status", detail: "Bayesian Ridge trained regression model" },
+        { num: "③", label: "Performance interpretation", detail: "Ranked vs historical corpus percentiles" },
       ],
-      actionText: "View Predict View",
-      onAction: onNavigateToPredict,
-      illustration: (
-        <div className="p-4 rounded-xl bg-[#E0E5EC] border border-transparent space-y-3 font-sans">
-          <div className="flex items-center justify-between text-xs text-[#6B7280] pb-2 border-b border-transparent">
-            <span className="font-semibold text-[#3D4852]">Prediction Interpretation</span>
-            <span className="text-[10px] font-mono text-[#0F766E] bg-emerald-500/10 px-2 py-0.5 rounded">
-              High Confidence
+      renderUI: () => (
+        <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] space-y-4">
+          {/* Header Bar */}
+          <div className="flex items-center justify-between pb-2 border-b border-border/20 text-xs">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-[#6C63FF]" />
+              <strong className="text-[#3D4852] font-bold text-xs sm:text-sm">Model Prediction Output</strong>
+            </div>
+            <span className="text-[10px] font-mono text-[#6B7280] bg-[#E0E5EC] px-2.5 py-0.5 rounded-full shadow-[inset_2px_2px_4px_rgb(163,177,198,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
+              Illustrative Result
             </span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-[#E0E5EC] border border-transparent">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] text-[#6B7280]">Performance Band</span>
-              <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wide">
+          {/* ① Estimated Engagement & ③ Performance Interpretation */}
+          <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-mono uppercase font-bold text-[#6B7280]">
+                  Estimated Engagement
+                </span>
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#6C63FF] text-white text-[10px] font-bold">
+                  ①
+                </span>
+              </div>
+              <div className="text-3xl font-mono font-black text-[#3D4852]">
+                8.42% <span className="text-xs font-normal text-[#6B7280]">est.</span>
+              </div>
+              <div className="text-[10px] text-[#6B7280] font-mono">
+                Uncertainty range: 7.15% → 9.69%
+              </div>
+            </div>
+
+            {/* ③ Performance Interpretation */}
+            <div className="text-right space-y-1.5">
+              <div className="flex items-center justify-end gap-1">
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#6C63FF] text-white text-[10px] font-bold">
+                  ③
+                </span>
+                <span className="text-[10px] font-mono text-[#6B7280]">Performance Band</span>
+              </div>
+              <span className="inline-block px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-bold text-[#0F766E]">
                 Above Baseline
               </span>
-            </div>
-            <div className="w-full h-1.5 bg-[#E0E5EC] rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-primary-orange to-emerald-400 rounded-full w-[78%]" />
+              <div className="text-[10px] text-[#6B7280] font-mono">Top 25% of corpus</div>
             </div>
           </div>
 
-          <div className="text-[11px] text-[#6B7280] leading-snug">
-            <span className="text-[#6B7280] font-semibold block mb-0.5">Top Signal Driver:</span>
-            Reel video format posted during peak evening window positively influences expected reach.
+          {/* ② Model Status */}
+          <div className="p-3 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#38B2AC] animate-pulse" />
+              <span className="text-[#3D4852] font-semibold">Model Status:</span>
+              <span className="text-[#6C63FF] font-mono font-bold">Bayesian Ridge Regression (Ready)</span>
+            </div>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#6C63FF] text-white text-[11px] font-bold shadow-sm">
+              ②
+            </span>
           </div>
         </div>
       ),
     },
     {
-      id: "04",
-      badge: "04 OPTIMIZE",
-      title: "Use What-If analysis to compare options",
-      shortDesc: "Test different captions, media types, and schedules side-by-side.",
-      fullDesc:
-        "Before hitting publish, use the What-If Analysis view to experiment with alternative scenarios. See how moving your scheduled time from afternoon to evening or changing an image into a video changes the predicted engagement rate.",
-      keyPoints: [
-        "Side-by-side scenario comparison",
-        "Timing sensitivity (morning vs evening vs weekend)",
-        "Media type comparison (Single Image vs Carousel vs Reel)",
-        "Data-backed publishing optimization",
+      num: "04",
+      code: "OPTIMIZE",
+      title: "04",
+      tagline: "Compare alternative post configurations.",
+      ctaText: "Open What-If →",
+      onCta: onNavigateToWhatIf || onNavigateToPredict,
+      callouts: [
+        { num: "①", label: "Scenario A", detail: "Original draft configuration (5.80%)" },
+        { num: "②", label: "Scenario B", detail: "Optimized variant with Reel format (8.42%)" },
+        { num: "③", label: "Estimated difference", detail: "+2.62 pp data-informed shift" },
       ],
-      actionText: "Try What-If Analysis",
-      onAction: onNavigateToWhatIf || onNavigateToPredict,
-      illustration: (
-        <div className="p-4 rounded-xl bg-[#E0E5EC] border border-transparent space-y-3 font-sans">
-          <div className="flex items-center justify-between text-xs text-[#6B7280] pb-2 border-b border-transparent">
-            <span className="font-semibold text-[#3D4852]">What-If Scenario Comparison</span>
-            <span className="text-[10px] font-mono text-[#6C63FF] bg-primary-orange/10 px-2 py-0.5 rounded">
-              2 Scenarios
+      renderUI: () => (
+        <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] space-y-4">
+          {/* Header Bar */}
+          <div className="flex items-center justify-between pb-2 border-b border-border/20 text-xs">
+            <div className="flex items-center gap-2">
+              <GitCompare className="w-4 h-4 text-[#6C63FF]" />
+              <strong className="text-[#3D4852] font-bold text-xs sm:text-sm">What-If Studio Comparison</strong>
+            </div>
+            <span className="text-[10px] font-mono text-[#6C63FF] bg-primary-orange/10 px-2.5 py-0.5 rounded-full font-semibold">
+              Side-by-Side Analysis
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-2.5 rounded-2xl bg-[#E0E5EC] border border-transparent">
-              <span className="text-[10px] font-mono text-[#6B7280] uppercase block">Scenario A (Draft)</span>
-              <span className="text-[#6B7280] font-medium block mt-1">Friday 2:00 PM</span>
-              <span className="text-[11px] text-[#6B7280]">Static Image</span>
-              <span className="text-[10px] font-semibold text-[#6B7280] block mt-1">Baseline Result</span>
+          {/* ① Scenario A vs ② Scenario B */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* ① Scenario A */}
+            <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold uppercase text-[#6B7280]">
+                  Scenario A
+                </span>
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#6B7280] text-white text-[10px] font-bold">
+                  ①
+                </span>
+              </div>
+              <div className="text-lg sm:text-xl font-mono font-bold text-[#6B7280]">
+                5.80% <span className="text-[10px] font-normal">est.</span>
+              </div>
+              <div className="text-[11px] text-[#6B7280]">
+                Single Image · Fri 2:00 PM
+              </div>
             </div>
 
-            <div className="p-2.5 rounded-2xl bg-primary-orange/10 border border-transparent">
-              <span className="text-[10px] font-mono text-[#6C63FF] uppercase block font-semibold">Scenario B (Optimized)</span>
-              <span className="text-[#3D4852] font-medium block mt-1">Friday 7:30 PM</span>
-              <span className="text-[#6B7280] text-[11px]">Reel Video</span>
-              <span className="text-[10px] font-bold text-[#0F766E] block mt-1">↑ Improved Trajectory</span>
+            {/* ② Scenario B */}
+            <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] border border-[#6C63FF]/30 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold uppercase text-[#6C63FF]">
+                  Scenario B
+                </span>
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#6C63FF] text-white text-[10px] font-bold">
+                  ②
+                </span>
+              </div>
+              <div className="text-lg sm:text-xl font-mono font-bold text-[#0F766E]">
+                8.42% <span className="text-[10px] font-normal">est.</span>
+              </div>
+              <div className="text-[11px] text-[#3D4852] font-semibold">
+                Reel Video · Fri 7:30 PM
+              </div>
             </div>
+          </div>
+
+          {/* ③ Estimated Difference */}
+          <div className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] flex items-center justify-between text-xs">
+            <div className="space-y-0.5">
+              <span className="text-[#6B7280] text-[10px] uppercase font-bold block">
+                Estimated Difference
+              </span>
+              <div className="font-bold text-[#0F766E] flex items-center gap-1.5 text-xs sm:text-sm">
+                <span>Expected Impact:</span>
+                <span className="font-mono text-base font-black">+2.62 pp</span>
+              </div>
+            </div>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#6C63FF] text-white text-[11px] font-bold shadow-sm">
+              ③
+            </span>
           </div>
         </div>
       ),
     },
   ];
 
-  const current = steps[activeStep];
+  const totalSlides = slides.length;
+
+  // Autoplay handler: Only runs if isVisible is true, not isHovered, and not prefersReducedMotion
+  useEffect(() => {
+    if (!isVisible || isHovered || prefersReducedMotion) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          setActiveSlide((curr) => (curr + 1) % totalSlides);
+          return 0;
+        }
+        return prev + (TICK_INTERVAL / SLIDE_DURATION) * 100;
+      });
+    }, TICK_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [isVisible, isHovered, prefersReducedMotion, totalSlides]);
+
+  // Manual slide selection
+  const goToSlide = (idx: number) => {
+    setActiveSlide(idx);
+    setProgress(0);
+  };
+
+  const nextSlide = () => {
+    setActiveSlide((curr) => (curr + 1) % totalSlides);
+    setProgress(0);
+  };
+
+  const prevSlide = () => {
+    setActiveSlide((curr) => (curr - 1 + totalSlides) % totalSlides);
+    setProgress(0);
+  };
+
+  const current = slides[activeSlide];
 
   return (
     <section
       id="how-to-use"
-      className="glass-card scroll-mt-24 p-7 sm:p-9 md:p-10 rounded-3xl border-border/80 relative overflow-hidden"
+      ref={sectionRef}
+      className="space-y-4 max-w-7xl mx-auto"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-1.5">
-          <Sparkles className="w-4 h-4 text-[#6C63FF]" />
-          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
-            Interactive Workflow Guide
+      {/* 1. Header */}
+      <div className="space-y-1 text-left">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-[#6C63FF] uppercase bg-[#E0E5EC] px-2.5 py-1 rounded-full shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] inline-flex items-center gap-1.5">
+            <Sparkles className="w-3 h-3" />
+            <span>Interactive Product Tour</span>
           </span>
+          <span className="text-[10px] text-[#6B7280]">·</span>
+          <span className="text-xs font-semibold text-[#6B7280]">Step-by-Step Preview</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-[#3D4852] tracking-tight">
-          How to Use <span className="gradient-accent">TrendSkope</span>
+          How to Use
         </h2>
-        <p className="text-sm text-[#6B7280] mt-1">
-          From your post idea to a data-informed publishing decision in a few simple steps.
+        <p className="text-xs sm:text-sm text-[#6B7280]">
+          Explore TrendSkope step by step.
         </p>
       </div>
 
-      {/* Step Selector Tabs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 mb-8">
-        {steps.map((step, index) => {
-          const isActive = activeStep === index;
-          return (
-            <button
-              key={step.id}
-              onClick={() => setActiveStep(index)}
-              className={`p-3 sm:p-3.5 rounded-xl text-left transition-all duration-200 border ${
-                isActive
-                  ? "bg-[#E0E5EC] text-[#3D4852] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border-transparent"
-                  : "bg-[#E0E5EC] border-transparent hover:bg-[#E0E5EC] hover:border-transparent text-[#6B7280]"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span
-                  className={`text-[10px] font-mono font-bold uppercase tracking-wider ${
-                    isActive ? "text-[#6C63FF]" : "text-[#6B7280]"
-                  }`}
-                >
-                  Step {step.id}
-                </span>
-                {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary-orange animate-pulse" />
+      {/* 2. Walkthrough Card */}
+      <div className="p-6 sm:p-8 md:p-10 rounded-3xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-6 sm:space-y-8">
+        {/* Step tabs (01 CREATE, 02 ANALYZE, 03 PREDICT, 04 OPTIMIZE) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+          {slides.map((step, idx) => {
+            const isActive = activeSlide === idx;
+            return (
+              <button
+                key={step.num}
+                type="button"
+                onClick={() => goToSlide(idx)}
+                className={`relative overflow-hidden p-3.5 rounded-2xl text-left transition-all duration-300 ${
+                  isActive
+                    ? "bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
+                    : "bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:-translate-y-px"
+                }`}
+              >
+                {/* Active Timer Progress Line */}
+                {isActive && isVisible && !isHovered && !prefersReducedMotion && (
+                  <div
+                    className="absolute bottom-0 left-0 h-1 bg-[#6C63FF] transition-all duration-75 ease-linear rounded-full"
+                    style={{ width: `${progress}%` }}
+                  />
                 )}
-              </div>
-              <span className="text-xs sm:text-sm font-bold block truncate text-[#3D4852]">
-                {step.badge.split(" ")[1]}
-              </span>
-            </button>
-          );
-        })}
-      </div>
 
-      {/* Active Step Walkthrough Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-2xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] border border-transparent p-6 sm:p-8">
-        {/* Left Side: Step Details & Narrative */}
-        <div className="lg:col-span-7 space-y-5">
-          <div className="space-y-2">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#6C63FF] bg-primary-orange/10 px-2.5 py-1 rounded-xl border border-transparent inline-block">
-              {current.badge}
-            </span>
-            <h3 className="text-xl sm:text-2xl font-extrabold text-[#3D4852] tracking-tight">
-              {current.title}
-            </h3>
-            <p className="text-sm text-[#6B7280] leading-relaxed font-normal">
-              {current.fullDesc}
-            </p>
+                <div className="flex items-center justify-between mb-1">
+                  <span
+                    className={`text-[10px] font-mono font-bold uppercase tracking-wider ${
+                      isActive ? "text-[#6C63FF]" : "text-[#6B7280]"
+                    }`}
+                  >
+                    Step {step.num}
+                  </span>
+                  {isActive && (
+                    <span className="w-2 h-2 rounded-full bg-[#6C63FF] animate-pulse" />
+                  )}
+                </div>
+
+                <div className="text-xs sm:text-sm font-bold text-[#3D4852] truncate">
+                  {step.code}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Slide Stage: LEFT UI visual, RIGHT short text */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
+          {/* LEFT: Realistic UI preview */}
+          <div className="lg:col-span-7 transition-all duration-300">
+            {current.renderUI()}
           </div>
 
-          {/* Key Checklist Points */}
-          <div className="space-y-2 pt-1">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[#6B7280] font-semibold block">
-              What happens in this step:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              {current.keyPoints.map((point, idx) => (
-                <div key={idx} className="flex items-start gap-2 text-[#6B7280]">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#6C63FF] shrink-0 mt-0.5" />
-                  <span>{point}</span>
-                </div>
-              ))}
+          {/* RIGHT: Short text & Callouts */}
+          <div className="lg:col-span-5 space-y-4">
+            <div className="space-y-1">
+              <span className="text-xs font-mono font-bold text-[#6C63FF] uppercase tracking-widest block">
+                {current.num}
+              </span>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-[#3D4852] tracking-tight">
+                {current.code}
+              </h3>
+              <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+                {current.tagline}
+              </p>
+            </div>
+
+            {/* 2–3 Callouts */}
+            <div className="p-3.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] space-y-2">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B7280] block">
+                Screen Elements:
+              </span>
+              <div className="space-y-1.5">
+                {current.callouts.map((c, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-xs">
+                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#6C63FF] text-white text-[10px] font-bold shrink-0">
+                      {c.num}
+                    </span>
+                    <div className="min-w-0">
+                      <strong className="text-[#3D4852] font-semibold mr-1.5">{c.label}:</strong>
+                      <span className="text-[#6B7280] text-[11px]">{c.detail}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Action CTA & Navigation Buttons */}
+            <div className="flex items-center justify-between gap-3 pt-2">
+              <button
+                type="button"
+                onClick={current.onCta}
+                className="btn-primary text-xs px-4 py-2.5 group inline-flex items-center gap-1.5"
+              >
+                <span>{current.ctaText}</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+              </button>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={prevSlide}
+                  aria-label="Previous slide"
+                  className="w-8 h-8 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] active:shadow-[inset_2px_2px_4px_rgb(163,177,198,0.6)] text-[#6B7280] hover:text-[#3D4852] flex items-center justify-center transition-all"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={nextSlide}
+                  aria-label="Next slide"
+                  className="w-8 h-8 rounded-xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] active:shadow-[inset_2px_2px_4px_rgb(163,177,198,0.6)] text-[#6B7280] hover:text-[#3D4852] flex items-center justify-center transition-all"
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Navigation Controls & Action */}
-          <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-transparent">
-            <button
-              onClick={() => setActiveStep((prev) => Math.max(0, prev - 1))}
-              disabled={activeStep === 0}
-              className={`btn-secondary text-xs px-3.5 py-2 ${
-                activeStep === 0 ? "opacity-40 cursor-not-allowed" : "hover:bg-[#E0E5EC]"
-              }`}
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Previous</span>
-            </button>
-
-            {activeStep < steps.length - 1 ? (
-              <button
-                onClick={() => setActiveStep((prev) => Math.min(steps.length - 1, prev + 1))}
-                className="btn-secondary text-xs px-3.5 py-2 hover:bg-[#E0E5EC]"
-              >
-                <span>Next Step</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            ) : null}
-
-            <button
-              onClick={current.onAction}
-              className="btn-primary text-xs px-4 py-2 group ml-auto"
-            >
-              <span>{current.actionText}</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-            </button>
-          </div>
         </div>
 
-        {/* Right Side: Step UI Illustration */}
-        <div className="lg:col-span-5">
-          {current.illustration}
-        </div>
-      </div>
+        {/* Bottom Progress & Dots (● ━━━ ○ ━━━ ○ ━━━ ○) */}
+        <div className="flex items-center justify-center gap-4 pt-2 border-t border-border/20">
+          <span className="text-xs font-mono font-bold text-[#3D4852]">
+            {current.num} <span className="text-[#6B7280]">/</span> 04
+          </span>
 
-      {/* Helpful Technical Concepts Tooltips */}
-      <div className="mt-8 pt-6 border-t border-transparent grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-[#6B7280]">
-        <div className="flex items-start gap-2 p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] border border-transparent">
-          <Info className="w-4 h-4 text-[#6C63FF] shrink-0 mt-0.5" />
-          <div>
-            <span className="text-[#3D4852] font-semibold block mb-0.5">
-              Predicted Engagement
-            </span>
-            <span>Estimated engagement rate based on pre-publication signals and the trained model.</span>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-2 p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] border border-transparent">
-          <Info className="w-4 h-4 text-[#6C63FF] shrink-0 mt-0.5" />
-          <div>
-            <span className="text-[#3D4852] font-semibold block mb-0.5">
-              Performance Band
-            </span>
-            <span>A relative interpretation comparing your post against historical dataset percentiles.</span>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-2 p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] border border-transparent">
-          <Info className="w-4 h-4 text-[#6C63FF] shrink-0 mt-0.5" />
-          <div>
-            <span className="text-[#3D4852] font-semibold block mb-0.5">
-              What-If Analysis
-            </span>
-            <span>Compare alternative post configurations (timing, formats) before publishing.</span>
+          <div className="flex items-center gap-2">
+            {slides.map((_, idx) => {
+              const isActive = activeSlide === idx;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => goToSlide(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  className="group flex items-center gap-1.5 focus:outline-none"
+                >
+                  <span
+                    className={`inline-block transition-all duration-300 rounded-full ${
+                      isActive
+                        ? "w-7 h-2 bg-[#6C63FF] shadow-[0_0_8px_rgba(108,99,255,0.6)]"
+                        : "w-2 h-2 bg-[#6B7280]/40 group-hover:bg-[#6B7280]"
+                    }`}
+                  />
+                  {idx < slides.length - 1 && (
+                    <span className="w-4 h-0.5 bg-border/40 rounded-full" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

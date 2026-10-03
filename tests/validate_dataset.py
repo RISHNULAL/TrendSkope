@@ -64,7 +64,7 @@ def validate_dataset_file(csv_path: Path) -> dict:
         assert (df["shares"] >= 0).all(), "Found negative shares"
 
     # 9. Media types check
-    valid_media = {"image", "carousel", "reel"}
+    valid_media = {"image", "carousel", "reel", "photo"}
     actual_media = set(df["media_type"].str.lower().unique())
     assert actual_media.issubset(valid_media), f"Invalid media types found: {actual_media - valid_media}"
 

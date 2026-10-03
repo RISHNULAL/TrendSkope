@@ -5,8 +5,17 @@ export interface ModelMetrics {
   median_absolute_error: number;
 }
 
+export interface FeatureCoefficient {
+  feature: string;
+  coefficient: number;
+  direction: string;
+  abs_coefficient: number;
+}
+
 export interface ModelStatusResponse {
   trained: boolean;
+  status?: string;
+  reason?: string;
   selected_model: string | null;
   metrics: ModelMetrics | null;
   dataset_size: number | null;
@@ -16,6 +25,68 @@ export interface ModelStatusResponse {
     validation: number;
     test: number;
   } | null;
+  feature_coefficients?: FeatureCoefficient[];
+}
+
+export interface DashboardSummaryResponse {
+  success: boolean;
+  system_status?: string;
+  model: {
+    status: "ready" | "not_ready";
+    status_label: string;
+    system_status?: string;
+    name: string;
+    active_model?: string;
+    target: string;
+    target_formula?: string;
+    dataset_size: number;
+    features: number;
+    last_training: string;
+    training_status?: string;
+    validation_methodology: string;
+    selection_metric?: string;
+    splits: {
+      train: number;
+      validation: number;
+      test: number;
+    } | null;
+    metrics: ModelMetrics | null;
+    validation_mae?: number | null;
+    coefficients: FeatureCoefficient[];
+    comparison?: ModelComparisonRow[];
+  };
+  dataset: {
+    posts: number;
+    accounts: number;
+    date_start: string;
+    date_end: string;
+    date_coverage?: string;
+    media_types: Record<string, number>;
+    missing_values: number;
+    duplicate_rows?: number;
+    rows?: number;
+    columns?: number;
+    invalid_records?: number;
+    required_fields_status?: string;
+    quality_status?: string;
+    health: string;
+    provenance: string;
+    posts_over_time?: { period: string; count: number }[];
+    engagement_quartiles?: {
+      q25?: number;
+      median?: number;
+      q75?: number;
+      mean?: number;
+      min?: number;
+      max?: number;
+    };
+    account_stats?: {
+      avg_posts: number;
+      min_posts: number;
+      max_posts: number;
+    };
+    provenance_history?: DatasetProvenanceRecord[];
+  };
 }
 
 export interface PostPredictionInput {
@@ -66,15 +137,68 @@ export interface InsightsResponse {
       validation: number;
       test: number;
     };
+    feature_coefficients?: FeatureCoefficient[];
   } | null;
   comparison: ModelComparisonRow[];
+}
+
+export interface DatasetProvenanceRecord {
+  timestamp: string;
+  filename: string;
+  rows_uploaded: number;
+  rows_accepted: number;
+  rows_rejected: number;
+  duplicates_skipped: number;
+  rows_added: number;
+  previous_size: number;
+  resulting_size: number;
+  selected_model: string;
+  previous_mae?: number | null;
+  new_mae?: number | null;
+  mae_delta?: number | null;
+  previous_r2?: number | null;
+  new_r2?: number | null;
+  r2_delta?: number | null;
+  evaluation_note?: string;
+  provenance_type?: string;
 }
 
 export interface CsvValidationResponse {
   valid: boolean;
   errors: string[];
   post_count: number;
+  total_uploaded?: number;
+  valid_count?: number;
+  invalid_count?: number;
+  duplicate_count?: number;
+  new_count?: number;
+  invalid_details?: string[];
+  duplicate_ids?: string[];
+  current_master_size?: number;
+  projected_master_size?: number;
   preview: Record<string, any>[];
+  status_message?: string;
+}
+
+export interface RetrainResponse {
+  success: boolean;
+  status: string;
+  message: string;
+  rows_added?: number;
+  duplicates_skipped?: number;
+  previous_size?: number;
+  resulting_size?: number;
+  selected_model?: string;
+  validation_mae?: number;
+  test_metrics?: ModelMetrics;
+  previous_mae?: number | null;
+  new_mae?: number | null;
+  mae_delta?: number | null;
+  previous_r2?: number | null;
+  new_r2?: number | null;
+  r2_delta?: number | null;
+  evaluation_note?: string;
+  provenance?: DatasetProvenanceRecord;
 }
 
 // Multimodal Content Analysis Types

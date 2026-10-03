@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   GitCompare,
   ArrowRight,
@@ -71,6 +71,22 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
   const [error, setError] = useState<string | null>(null);
   const [resA, setResA] = useState<PredictionResultData | null>(null);
   const [resB, setResB] = useState<PredictionResultData | null>(null);
+  const resultRef = useRef<HTMLDivElement | null>(null);
+
+  // Smooth scroll to comparison result when both results arrive
+  useEffect(() => {
+    if (resA && resB && resultRef.current) {
+      const prefersReducedMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      requestAnimationFrame(() => {
+        resultRef.current?.scrollIntoView({
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+          block: "start",
+        });
+      });
+    }
+  }, [resA, resB]);
 
   // Compute live differences between Plan A and Plan B
   const differences = useMemo(() => {
@@ -540,7 +556,11 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
 
       {/* SECTION: Model Results & Comparison Card */}
       {delta !== null && resA && resB && (
-        <div className="glass-card-accent p-6 md:p-10 rounded-3xl animate-fade-in space-y-8">
+        <div
+          id="what-if-result"
+          ref={resultRef}
+          className="glass-card-accent p-6 md:p-10 rounded-3xl animate-fade-in space-y-8 scroll-mt-24"
+        >
           {/* Main Delta Result Header */}
           <div className="text-center space-y-3">
             <span className="text-xs font-bold uppercase tracking-widest text-[#6B7280]">

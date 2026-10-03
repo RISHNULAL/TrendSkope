@@ -6,7 +6,6 @@ import {
   Sparkles,
   Database,
   Cpu,
-  Target,
   BarChart3,
   ShieldCheck,
   Info,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import MetricCard from "../MetricCard";
 import PerformancePreview from "../PerformancePreview";
+import HowItWorks from "./HowItWorks";
 import HowToUse from "./HowToUse";
 import { ModelStatusResponse } from "@/types";
 
@@ -40,38 +40,7 @@ export default function HomeView({
   const datasetSize = modelStatus?.dataset_size
     ? modelStatus.dataset_size.toLocaleString()
     : "--";
-  const selectedModelName = modelStatus?.selected_model || "Random Forest Regressor";
-
-  const workflowSteps = [
-    {
-      num: "01",
-      icon: Database,
-      title: "DATA",
-      heading: "Historical post records",
-      desc: "Historical post records are cleaned, normalized, and validated for empirical analysis.",
-    },
-    {
-      num: "02",
-      icon: Cpu,
-      title: "FEATURES",
-      heading: "Pre-publication signals",
-      desc: "Caption, timing, media type, and account signals are extracted without target leakage.",
-    },
-    {
-      num: "03",
-      icon: Target,
-      title: "ML MODEL",
-      heading: "Ensemble estimation",
-      desc: "The trained machine learning model estimates expected engagement rate.",
-    },
-    {
-      num: "04",
-      icon: BarChart3,
-      title: "INSIGHT",
-      heading: "Actionable interpretation",
-      desc: "TrendSkope converts predictions into clear performance bands and what-if comparisons.",
-    },
-  ];
+  const selectedModelName = modelStatus?.selected_model || "Ridge Regression";
 
   return (
     <div className="space-y-12 animate-fade-in max-w-7xl mx-auto pb-8">
@@ -137,75 +106,14 @@ export default function HomeView({
         </div>
       </section>
 
-      {/* 2. How to Use TrendSkope (Interactive 4-Step Walkthrough) */}
+      {/* 2. How to Use (Interactive Visual Walkthrough with IntersectionObserver) */}
       <HowToUse
         onNavigateToPredict={onNavigateToPredict}
         onNavigateToWhatIf={onNavigateToWhatIf}
       />
 
-      {/* 3. How TrendSkope Works (Workflow Pipeline Section) */}
-      <section className="glass-card p-7 sm:p-9 md:p-10 rounded-3xl border-border/80 relative overflow-hidden">
-        <div className="max-w-3xl mb-8">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#3D4852] tracking-tight">
-            How <span className="gradient-accent">TrendSkope</span> Works
-          </h2>
-          <p className="text-sm text-[#6B7280] mt-1.5 leading-relaxed">
-            A research-first machine learning workflow designed to estimate engagement before publication.
-          </p>
-        </div>
-
-        {/* 4-Step Process Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 relative">
-          {workflowSteps.map((step, idx) => {
-            const Icon = step.icon;
-            return (
-              <div
-                key={step.num}
-                className="p-5 sm:p-6 rounded-[32px] bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] transition-all duration-300 relative group flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-mono font-bold tracking-widest text-[#6C63FF]/70 group-hover:text-[#6C63FF] transition-colors">
-                      {step.num} · {step.title}
-                    </span>
-                    <div className="p-2.5 rounded-2xl bg-[#E0E5EC] text-[#6C63FF] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]">
-                      <Icon className="w-4 h-4" />
-                    </div>
-                  </div>
-
-                  <h3 className="text-sm font-bold text-[#3D4852] mb-2 tracking-tight">
-                    {step.heading}
-                  </h3>
-
-                  <p className="text-xs text-[#6B7280] leading-relaxed font-normal">
-                    {step.desc}
-                  </p>
-                </div>
-
-                {/* Step Connector Indicator for Large Viewports */}
-                {idx < workflowSteps.length - 1 && (
-                  <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 z-20 text-[#6B7280]">
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Research-First Methodology Banner */}
-        <div className="mt-7 pt-5 border-t border-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#6B7280]">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#0F766E] shrink-0" />
-            <span className="font-medium text-[#6B7280]">
-              Predictions use information available strictly before publication.
-            </span>
-          </div>
-          <span className="text-[11px] font-mono text-[#6B7280] bg-[#E0E5EC] px-2.5 py-1 rounded-xl border border-transparent">
-            Pre-publication signals only · Zero target leakage
-          </span>
-        </div>
-      </section>
+      {/* 3. How It Works (4-Stage Workflow Architecture) */}
+      <HowItWorks />
 
       {/* 4. Key Performance Metrics */}
       <section className="space-y-4">
@@ -277,7 +185,7 @@ export default function HomeView({
               Model Architecture
             </span>
             <span className="text-sm font-semibold text-[#3D4852]">
-              {isTrained ? selectedModelName : "Random Forest Regressor"}
+              {isTrained ? selectedModelName : "Ridge Regression"}
             </span>
           </div>
 
@@ -295,7 +203,7 @@ export default function HomeView({
               Validation Strategy
             </span>
             <span className="text-sm font-semibold text-[#3D4852]">
-              Chronological hold-out (80/20)
+              Chronological hold-out (70/15/15)
             </span>
           </div>
 

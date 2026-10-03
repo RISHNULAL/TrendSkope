@@ -119,6 +119,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
   const [loadingStep, setLoadingStep] = useState<string>("Preparing analysis...");
   const [error, setError] = useState<string | null>(null);
   const [analysisReport, setAnalysisReport] = useState<AnalyzeContentResponse | null>(null);
+  const resultRef = useRef<HTMLDivElement | null>(null);
 
   // Live Caption Statistics
   const charCount = caption.length;
@@ -343,6 +344,21 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
       });
     };
   }, []);
+
+  // Smooth scroll to analysis result when it arrives
+  useEffect(() => {
+    if (analysisReport && resultRef.current) {
+      const prefersReducedMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      requestAnimationFrame(() => {
+        resultRef.current?.scrollIntoView({
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+          block: "start",
+        });
+      });
+    }
+  }, [analysisReport]);
 
   // Handle Form Submit
   const handleAnalyze = async (e: React.FormEvent) => {
@@ -1276,7 +1292,11 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
         {/* Right Column: Pre-Publish Performance Report */}
         <div className="lg:col-span-6 space-y-6">
           {analysisReport ? (
-            <div className="space-y-6 animate-fade-in">
+            <div
+              id="analysis-result"
+              ref={resultRef}
+              className="scroll-mt-24 space-y-6 animate-fade-in"
+            >
               {/* 22. Prediction Score Card */}
               <div className="glass-card-accent p-7 sm:p-8 text-center space-y-4 ">
                 <span className="text-[11px] font-mono font-bold text-[#6B7280] uppercase tracking-widest block">

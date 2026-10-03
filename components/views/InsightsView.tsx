@@ -9,6 +9,11 @@ import {
   Terminal,
   Activity,
   Layers,
+  TrendingUp,
+  TrendingDown,
+  ShieldAlert,
+  Info,
+  Sliders,
 } from "lucide-react";
 import { fetchInsights } from "@/lib/api";
 import { InsightsResponse } from "@/types";
@@ -38,16 +43,17 @@ export default function InsightsView() {
   const metrics = data?.metrics?.test;
   const splits = data?.metrics?.splits;
   const comparison = data?.comparison || [];
+  const coefficients = data?.metrics?.feature_coefficients || [];
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto">
+    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto pb-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl md:text-3xl font-extrabold text-[#3D4852]">
           Model & Experiment Insights
         </h1>
         <p className="text-sm text-[#6B7280] mt-1">
-          Rigorous out-of-sample evaluation on chronologically held-out test partitions.
+          Rigorous out-of-sample evaluation on chronologically held-out test partitions and linear coefficient analysis.
         </p>
       </div>
 
@@ -68,7 +74,7 @@ export default function InsightsView() {
 
           <div className="max-w-lg mx-auto p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-left font-mono text-xs text-[#6B7280] flex items-center gap-3">
             <Terminal className="w-4 h-4 text-[#6C63FF] shrink-0" />
-            <code>python -m src.train data/raw/your_posts.csv</code>
+            <code>python -m src.train data/raw/instagram_posts_1000.csv</code>
           </div>
 
           <p className="text-[11px] text-[#6B7280]">
@@ -84,7 +90,7 @@ export default function InsightsView() {
                 Active Production Model
               </span>
               <h2 className="text-2xl md:text-3xl font-extrabold text-[#3D4852] flex items-center gap-3">
-                {data?.metrics?.selected_model || "Regression Model"}
+                {data?.metrics?.selected_model || "Ridge Regression"}
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-ready/10 border border-ready/30 text-ready">
                   Best Validation MAE
                 </span>
@@ -96,15 +102,15 @@ export default function InsightsView() {
 
             {splits && (
               <div className="flex items-center gap-3 text-xs">
-                <div className="px-3 py-2 rounded-xl bg-surface border border-border text-center">
-                  <span className="text-[10px] text-[#6B7280] block">Train Set</span>
+                <div className="px-3.5 py-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-center">
+                  <span className="text-[10px] text-[#6B7280] block">Train Partition</span>
                   <strong className="text-[#3D4852] font-mono">{splits.train.toLocaleString()} posts</strong>
                 </div>
-                <div className="px-3 py-2 rounded-xl bg-surface border border-border text-center">
-                  <span className="text-[10px] text-[#6B7280] block">Validation Set</span>
+                <div className="px-3.5 py-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-center">
+                  <span className="text-[10px] text-[#6B7280] block">Validation Partition</span>
                   <strong className="text-[#3D4852] font-mono">{splits.validation.toLocaleString()} posts</strong>
                 </div>
-                <div className="px-3 py-2 rounded-xl bg-surface border border-border text-center">
+                <div className="px-3.5 py-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-center">
                   <span className="text-[10px] text-[#6B7280] block">Held-out Test</span>
                   <strong className="text-[#3D4852] font-mono">{splits.test.toLocaleString()} posts</strong>
                 </div>
@@ -141,42 +147,44 @@ export default function InsightsView() {
             />
           </div>
 
-          {/* Model Comparison Table & Visuals */}
+          {/* Model Comparison Table */}
           {comparison.length > 0 && (
             <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h3 className="text-lg font-bold text-[#3D4852] flex items-center gap-2">
                     <Layers className="w-5 h-5 text-[#6C63FF]" />
-                    Validation Model Comparison
+                    Candidate Model Evaluation on Validation Split
                   </h3>
                   <p className="text-xs text-[#6B7280] mt-0.5">
-                    Candidate models evaluated on identical chronological validation partition.
+                    Linear Regression, Ridge Regression, and Lasso Regression evaluated on identical chronological validation partition.
                   </p>
                 </div>
-                <span className="text-xs text-[#6B7280] font-mono">reports/model_comparison.csv</span>
+                <span className="text-xs text-[#6B7280] font-mono bg-[#E0E5EC] px-3 py-1 rounded-xl shadow-[inset_4px_4px_8px_rgb(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
+                  reports/model_comparison.csv
+                </span>
               </div>
 
               {/* Table */}
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] p-2">
                 <table className="w-full text-xs text-left">
-                  <thead className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider border-b border-border bg-black/20">
+                  <thead className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider border-b border-transparent">
                     <tr>
-                      <th className="py-3.5 px-4">Candidate Model</th>
-                      <th className="py-3.5 px-4 text-right">Validation MAE</th>
-                      <th className="py-3.5 px-4 text-right">Validation RMSE</th>
-                      <th className="py-3.5 px-4 text-right">Validation R²</th>
-                      <th className="py-3.5 px-4 text-right">Median Absolute Error</th>
-                      <th className="py-3.5 px-4 text-center">Status</th>
+                      <th className="py-3 px-4">Candidate Model</th>
+                      <th className="py-3 px-4 text-right">Validation MAE</th>
+                      <th className="py-3 px-4 text-right">Validation RMSE</th>
+                      <th className="py-3 px-4 text-right">Validation R²</th>
+                      <th className="py-3 px-4 text-right">Median Absolute Error</th>
+                      <th className="py-3 px-4 text-center">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border/60">
+                  <tbody className="divide-y divide-border/30">
                     {comparison.map((row, idx) => {
                       const isSelected = row.model === data?.metrics?.selected_model;
                       return (
                         <tr
                           key={idx}
-                          className={`hover:bg-[#E0E5EC] transition-colors ${
+                          className={`transition-colors ${
                             isSelected ? "bg-primary-orange/5 font-semibold" : ""
                           }`}
                         >
@@ -216,14 +224,95 @@ export default function InsightsView() {
             </div>
           )}
 
-          {/* Research Transparency Notice */}
-          <div className="p-4 rounded-2xl bg-surface border border-border text-xs text-[#6B7280] flex items-start gap-3">
-            <Activity className="w-4 h-4 text-[#6C63FF] shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-[#6B7280]">Scientific Integrity Notice</p>
-              <p className="mt-0.5 leading-relaxed">
-                SHAP feature attributions, CatBoost gradient boosting, and conformal prediction intervals
-                are documented in future work and are intentionally withheld from display until their real artifacts are generated.
+          {/* Feature Influence Table (Linear Model Coefficients) */}
+          {coefficients.length > 0 && (
+            <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-lg font-bold text-[#3D4852] flex items-center gap-2">
+                    <Sliders className="w-5 h-5 text-[#6C63FF]" />
+                    Feature Influence & Standardized Coefficients
+                  </h3>
+                  <p className="text-xs text-[#6B7280] mt-0.5">
+                    Coefficients derived from the trained {data?.metrics?.selected_model || "Ridge Regression"} model.
+                  </p>
+                </div>
+                <span className="text-xs font-mono font-bold text-[#6C63FF] bg-[#E0E5EC] px-3 py-1 rounded-xl shadow-[inset_4px_4px_8px_rgb(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
+                  {coefficients.length} Features
+                </span>
+              </div>
+
+              <p className="text-xs text-[#6B7280] leading-relaxed">
+                Standardized features allow comparative interpretation of coefficient magnitudes. Features with larger absolute coefficients exhibit stronger statistical association with follower-normalized engagement rate in the training corpus.
+              </p>
+
+              {/* Coefficients Table */}
+              <div className="overflow-x-auto rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] p-2">
+                <table className="w-full text-xs text-left">
+                  <thead className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider border-b border-transparent">
+                    <tr>
+                      <th className="py-3 px-4">Feature Name</th>
+                      <th className="py-3 px-4 text-right">Coefficient</th>
+                      <th className="py-3 px-4 text-center">Direction of Association</th>
+                      <th className="py-3 px-4 text-right">Relative Magnitude</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/30">
+                    {coefficients.map((item, idx) => {
+                      const isPositive = item.coefficient > 0;
+                      const isNegative = item.coefficient < 0;
+                      return (
+                        <tr key={idx} className="hover:bg-primary-orange/5 transition-colors">
+                          <td className="py-3 px-4 font-mono font-medium text-[#3D4852]">
+                            {item.feature}
+                          </td>
+                          <td
+                            className={`py-3 px-4 text-right font-mono font-bold ${
+                              isPositive
+                                ? "text-[#0F766E]"
+                                : isNegative
+                                ? "text-[#BE123C]"
+                                : "text-[#6B7280]"
+                            }`}
+                          >
+                            {isPositive ? `+${item.coefficient.toFixed(4)}` : item.coefficient.toFixed(4)}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                isPositive
+                                  ? "bg-emerald-500/10 text-[#0F766E]"
+                                  : isNegative
+                                  ? "bg-rose-500/10 text-[#BE123C]"
+                                  : "bg-gray-500/10 text-[#6B7280]"
+                              }`}
+                            >
+                              {isPositive && <TrendingUp className="w-3 h-3" />}
+                              {isNegative && <TrendingDown className="w-3 h-3" />}
+                              {item.direction}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-right font-mono text-[#6B7280]">
+                            {item.abs_coefficient.toFixed(4)}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Interpretation Guidance & Scientific Integrity Notice */}
+          <div className="p-5 rounded-3xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-xs text-[#6B7280] flex items-start gap-3">
+            <Info className="w-5 h-5 text-[#6C63FF] shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <strong className="text-[#3D4852] block font-bold text-sm">
+                Interpretation & Scientific Integrity Guidance
+              </strong>
+              <p className="leading-relaxed">
+                Coefficients describe <strong>statistical associations</strong> observed within the training dataset. They do not demonstrate causal mechanisms. For example, a positive coefficient for <code className="font-mono text-[#6C63FF]">question_count</code> indicates that posts with question marks exhibited higher engagement rates on average in this corpus, not that adding question marks will inherently increase real-world performance.
               </p>
             </div>
           </div>

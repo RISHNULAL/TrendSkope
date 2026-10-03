@@ -12,6 +12,12 @@ from pydantic import BaseModel, Field
 
 from src.config import MODELS, REPORTS, ROOT
 from src.data_cleaning import clean_posts, validate_posts
+from src.dataset_manager import (
+    MASTER_DATASET_PATH,
+    get_provenance_history,
+    merge_and_retrain,
+    validate_uploaded_dataframe,
+)
 from src.predict import load_artifact, predict_one
 from src.media_analysis import (
     analyze_image_bytes,
@@ -115,35 +121,221 @@ def health_check():
 
 @router.get("/model-status")
 def get_model_status():
-    model_path = MODELS / "final_model.joblib"
+    artifact = get_model_artifact()
     metrics_path = REPORTS / "metrics.json"
 
-    is_trained = model_path.exists()
     metrics_data = None
-
     if metrics_path.exists():
         try:
             metrics_data = json.loads(metrics_path.read_text(encoding="utf-8"))
         except Exception:
             metrics_data = None
 
-    if not is_trained or not metrics_data:
+    if artifact is None or not metrics_data:
         return {
-            "trained": is_trained,
+            "trained": False,
+            "status": "not_ready",
+            "reason": "Model artifact not found or unreadable" if artifact is None else "Evaluation metrics file missing",
             "selected_model": None,
             "metrics": None,
             "dataset_size": None,
             "features_used": None,
             "splits": None,
+            "feature_coefficients": [],
         }
 
     return {
         "trained": True,
-        "selected_model": metrics_data.get("selected_model"),
+        "status": "ready",
+        "selected_model": metrics_data.get("selected_model") or artifact.get("selected_model", "Ridge Regression"),
         "metrics": metrics_data.get("test"),
         "dataset_size": metrics_data.get("dataset_size"),
         "features_used": metrics_data.get("features_used"),
         "splits": metrics_data.get("splits"),
+        "feature_coefficients": metrics_data.get("feature_coefficients", []),
+    }
+
+
+@router.get("/dashboard")
+def get_dashboard_summary():
+    artifact = get_model_artifact()
+    metrics_path = REPORTS / "metrics.json"
+    comp_path = REPORTS / "model_comparison.csv"
+    data_path = ROOT / "data" / "raw" / "instagram_posts_1000.csv"
+
+    metrics_data = None
+    if metrics_path.exists():
+        try:
+            metrics_data = json.loads(metrics_path.read_text(encoding="utf-8"))
+        except Exception:
+            metrics_data = None
+
+    model_comparison = []
+    if comp_path.exists():
+        try:
+            cdf = pd.read_csv(comp_path)
+            model_comparison = cdf.to_dict(orient="records")
+        except Exception:
+            model_comparison = []
+
+    # Dataset intelligence and real quality calculation
+    dataset_stats = {
+        "posts": 0,
+        "accounts": 0,
+        "date_start": "",
+        "date_end": "",
+        "date_coverage": "",
+        "media_types": {},
+        "missing_values": 0,
+        "duplicate_rows": 0,
+        "rows": 0,
+        "columns": 0,
+        "invalid_records": 0,
+        "required_fields_status": "Not Available",
+        "quality_status": "Incomplete",
+        "health": "Incomplete",
+        "provenance": "Synthetic Research Corpus",
+        "posts_over_time": [],
+        "engagement_quartiles": {},
+        "account_stats": {"avg_posts": 0, "min_posts": 0, "max_posts": 0},
+        "provenance_history": get_provenance_history(),
+    }
+
+    if MASTER_DATASET_PATH.exists():
+        try:
+            df = pd.read_csv(MASTER_DATASET_PATH)
+            rows_count = len(df)
+            cols_count = len(df.columns)
+            accounts_count = int(df["account_id"].nunique()) if "account_id" in df.columns else 0
+            d_min = str(df["published_at"].min())[:10] if "published_at" in df.columns else ""
+            d_max = str(df["published_at"].max())[:10] if "published_at" in df.columns else ""
+            media_series = df["media_type"].astype(str).str.strip().str.lower().replace({"photo": "image"}) if "media_type" in df.columns else pd.Series([], dtype=str)
+            media_breakdown = media_series.value_counts().to_dict()
+            null_count = int(df.isnull().sum().sum())
+            dup_count = int(df.duplicated(subset=["post_id"]).sum()) if "post_id" in df.columns else int(df.duplicated().sum())
+
+            # Data quality evaluation
+            required_cols = ["post_id", "account_id", "published_at", "media_type", "caption", "likes", "comments", "followers_at_or_near_collection"]
+            missing_req = [c for c in required_cols if c not in df.columns]
+            invalid_records = 0
+            if "followers_at_or_near_collection" in df.columns:
+                invalid_records += int((df["followers_at_or_near_collection"] <= 0).sum())
+
+            if len(missing_req) == 0 and null_count == 0 and dup_count == 0 and invalid_records == 0:
+                health_status = "Healthy"
+            elif len(missing_req) == 0 and (null_count > 0 or dup_count > 0 or invalid_records > 0):
+                health_status = "Needs Attention"
+            else:
+                health_status = "Incomplete"
+
+            # Monthly timeline distribution
+            posts_over_time = []
+            try:
+                dt_series = pd.to_datetime(df["published_at"], utc=True)
+                monthly_counts = dt_series.dt.strftime("%Y-%m").value_counts().sort_index().to_dict()
+                posts_over_time = [{"period": k, "count": int(v)} for k, v in monthly_counts.items()]
+            except Exception:
+                posts_over_time = []
+
+            # Engagement quartiles
+            engagement_quartiles = {}
+            try:
+                tot = df["likes"] + df["comments"] + df.get("saves", 0) + df.get("shares", 0)
+                fol = df["followers_at_or_near_collection"].replace(0, 1)
+                rates = 100.0 * tot / fol
+                q1, q2, q3 = rates.quantile([0.25, 0.5, 0.75])
+                engagement_quartiles = {
+                    "q25": round(float(q1), 2),
+                    "median": round(float(q2), 2),
+                    "q75": round(float(q3), 2),
+                    "mean": round(float(rates.mean()), 2),
+                    "min": round(float(rates.min()), 2),
+                    "max": round(float(rates.max()), 2),
+                }
+            except Exception:
+                engagement_quartiles = {}
+
+            # Account distribution stats
+            account_stats = {"avg_posts": 25, "min_posts": 20, "max_posts": 32}
+            if "account_id" in df.columns:
+                ac_counts = df["account_id"].value_counts()
+                account_stats = {
+                    "avg_posts": round(float(ac_counts.mean()), 1),
+                    "min_posts": int(ac_counts.min()),
+                    "max_posts": int(ac_counts.max()),
+                }
+
+            dataset_stats = {
+                "posts": rows_count,
+                "accounts": accounts_count,
+                "date_start": d_min,
+                "date_end": d_max,
+                "date_coverage": f"{d_min} to {d_max}" if d_min and d_max else "N/A",
+                "media_types": media_breakdown,
+                "missing_values": null_count,
+                "duplicate_rows": dup_count,
+                "rows": rows_count,
+                "columns": cols_count,
+                "invalid_records": invalid_records,
+                "required_fields_status": "All 8 Core Fields Compliant" if len(missing_req) == 0 else f"Missing: {', '.join(missing_req)}",
+                "quality_status": health_status,
+                "health": health_status,
+                "provenance": "Synthetic Research Corpus (10 Creator Domains, 40 Accounts)",
+                "posts_over_time": posts_over_time,
+                "engagement_quartiles": engagement_quartiles,
+                "account_stats": account_stats,
+                "provenance_history": get_provenance_history(),
+            }
+        except Exception as e:
+            dataset_stats["health"] = "Needs Attention"
+            dataset_stats["quality_status"] = f"Error: {str(e)}"
+
+    # Last training timestamp
+    last_training = ""
+    model_path = MODELS / "final_model.joblib"
+    if model_path.exists():
+        try:
+            mtime = model_path.stat().st_mtime
+            last_training = pd.Timestamp.fromtimestamp(mtime, tz="UTC").isoformat()
+        except Exception:
+            pass
+
+    is_ready = artifact is not None and metrics_data is not None
+    selected_name = metrics_data.get("selected_model", "Bayesian Ridge Regression") if metrics_data else (artifact.get("selected_model", "Bayesian Ridge Regression") if artifact else "Bayesian Ridge Regression")
+
+    # Find validation MAE for selected model from comparison
+    validation_mae = None
+    for r in model_comparison:
+        if r.get("model") == selected_name:
+            validation_mae = round(float(r.get("mae", 0)), 3)
+            break
+
+    model_summary = {
+        "status": "ready" if is_ready else "not_ready",
+        "status_label": "READY" if is_ready else "NOT READY",
+        "system_status": "Operational" if is_ready else "Degraded",
+        "name": selected_name,
+        "active_model": selected_name,
+        "target": "Engagement Rate",
+        "target_formula": "log1p(engagement_rate)",
+        "dataset_size": metrics_data.get("dataset_size", dataset_stats["posts"]) if metrics_data else dataset_stats["posts"],
+        "features": metrics_data.get("features_used", 25) if metrics_data else 25,
+        "last_training": last_training,
+        "training_status": "Trained & Validated" if is_ready else "Awaiting Training",
+        "validation_methodology": "Chronological Split (70% Train, 15% Validation, 15% Test)",
+        "selection_metric": "Validation MAE",
+        "splits": metrics_data.get("splits", {"train": 700, "validation": 150, "test": 150}) if metrics_data else None,
+        "metrics": metrics_data.get("test") if metrics_data else None,
+        "validation_mae": validation_mae,
+        "coefficients": metrics_data.get("feature_coefficients", []) if metrics_data else [],
+        "comparison": model_comparison,
+    }
+
+    return {
+        "success": True,
+        "system_status": "Operational" if is_ready else "Degraded",
+        "model": model_summary,
+        "dataset": dataset_stats,
     }
 
 
@@ -171,8 +363,12 @@ def predict_engagement(payload: PredictRequest):
     if not pub_at:
         pub_at = pd.Timestamp.now(tz="UTC").isoformat()
 
-    media_type_clean = (payload.media_type or "image").strip().lower()
-    if media_type_clean not in ["image", "carousel", "reel"]:
+    raw_media_type = (payload.media_type or "image").strip().lower()
+    if raw_media_type in ["photo", "image"]:
+        media_type_clean = "image"
+    elif raw_media_type in ["carousel", "reel"]:
+        media_type_clean = raw_media_type
+    else:
         media_type_clean = "image"
 
     post = {
@@ -387,9 +583,12 @@ def analyze_content_json_endpoint(payload: AnalyzeContentJsonRequest):
     except Exception:
         is_weekend = 0
 
+    raw_media_type = (payload.media_type or "image").strip().lower()
+    media_type_clean = "image" if raw_media_type in ["photo", "image"] else raw_media_type if raw_media_type in ["carousel", "reel"] else "image"
+
     context = {
         "caption": payload.caption,
-        "media_type": payload.media_type,
+        "media_type": media_type_clean,
         "followers": payload.followers,
         "published_at": pub_at,
         "posting_hour": posting_hour,
@@ -401,7 +600,7 @@ def analyze_content_json_endpoint(payload: AnalyzeContentJsonRequest):
     artifact = get_model_artifact()
     post_payload = {
         "caption": payload.caption,
-        "media_type": payload.media_type,
+        "media_type": media_type_clean,
         "followers_at_or_near_collection": payload.followers,
         "published_at": pub_at,
     }
@@ -511,31 +710,58 @@ async def validate_csv(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to parse CSV file: {str(e)}")
 
-    errors = validate_posts(df)
-    if errors:
-        return {
-            "valid": False,
-            "errors": errors,
-            "post_count": len(df),
-            "preview": [],
-        }
-
-    cleaned = clean_posts(df)
-    preview_rows = cleaned.head(5).fillna("").to_dict(orient="records")
-    for row in preview_rows:
-        for k, v in row.items():
-            if isinstance(v, (pd.Timestamp, pd.Timedelta)):
-                row[k] = str(v)
-            elif isinstance(v, (np.integer, np.int64)):
-                row[k] = int(v)
-            elif isinstance(v, (np.floating, np.float64)):
-                row[k] = float(v)
-
+    report = validate_uploaded_dataframe(df)
     return {
-        "valid": True,
-        "errors": [],
-        "post_count": len(df),
-        "preview": preview_rows,
+        "valid": report["valid"],
+        "total_uploaded": report["total_uploaded"],
+        "valid_count": report["valid_count"],
+        "invalid_count": report["invalid_count"],
+        "duplicate_count": report["duplicate_count"],
+        "new_count": report["new_count"],
+        "errors": report["errors"],
+        "invalid_details": report["invalid_details"],
+        "duplicate_ids": report["duplicate_ids"],
+        "current_master_size": report["current_master_size"],
+        "projected_master_size": report["projected_master_size"],
+        "preview": report["preview"],
+        "status_message": report["status_message"],
+        "post_count": report["total_uploaded"],
+    }
+
+
+@router.post("/add-and-retrain")
+async def add_and_retrain_endpoint(file: UploadFile = File(...)):
+    global _MODEL_CACHE
+    if not file.filename.lower().endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only CSV files are supported.")
+
+    try:
+        contents = await file.read()
+        import io
+        df = pd.read_csv(io.BytesIO(contents))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to parse CSV file: {str(e)}")
+
+    try:
+        result = merge_and_retrain(df, filename=file.filename)
+        _MODEL_CACHE = None  # Invalidate cached artifact so new model loads immediately
+        return {
+            "success": True,
+            **result,
+        }
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except RuntimeError as re:
+        raise HTTPException(status_code=500, detail=str(re))
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=f"Unexpected error during retraining: {str(ex)}")
+
+
+@router.get("/dataset-provenance")
+def get_provenance_endpoint():
+    return {
+        "success": True,
+        "history": get_provenance_history(),
     }
 
 
@@ -560,18 +786,16 @@ def compare_scenarios_endpoint(payload: CompareScenariosRequest):
     t_a = item_a.time if item_a.time else "14:00"
     d_a = item_a.date if item_a.date else pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%d")
     pub_a = f"{d_a}T{t_a}:00Z"
-    media_a = (item_a.media_type or "image").strip().lower()
-    if media_a not in ["image", "carousel", "reel"]:
-        media_a = "image"
+    raw_media_a = (item_a.media_type or "image").strip().lower()
+    media_a = "image" if raw_media_a in ["photo", "image"] else raw_media_a if raw_media_a in ["carousel", "reel"] else "image"
     fol_a = item_a.followers if item_a.followers and item_a.followers > 0 else 1000
 
     # Resolve Scenario B publication & media
     t_b = item_b.time if item_b.time else "19:00"
     d_b = item_b.date if item_b.date else pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%d")
     pub_b = f"{d_b}T{t_b}:00Z"
-    media_b = (item_b.media_type or "image").strip().lower()
-    if media_b not in ["image", "carousel", "reel"]:
-        media_b = "image"
+    raw_media_b = (item_b.media_type or "image").strip().lower()
+    media_b = "image" if raw_media_b in ["photo", "image"] else raw_media_b if raw_media_b in ["carousel", "reel"] else "image"
     fol_b = item_b.followers if item_b.followers and item_b.followers > 0 else 1000
 
     post_a = {

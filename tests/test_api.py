@@ -22,6 +22,16 @@ def test_insights_endpoint():
     data = response.json()
     assert "available" in data
 
+def test_dashboard_endpoint():
+    response = client.get("/api/dashboard")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert "model" in data
+    assert "dataset" in data
+    assert data["model"]["name"] == "Bayesian Ridge Regression"
+    assert data["dataset"]["posts"] == 1000
+
 def test_template_download():
     response = client.get("/api/template")
     assert response.status_code == 200
