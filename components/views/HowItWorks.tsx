@@ -46,16 +46,16 @@ export default function HowItWorks() {
       {/* Header */}
       <div className="space-y-1 text-left">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono font-bold tracking-widest text-[#6C63FF] uppercase bg-[#E0E5EC] px-2.5 py-1 rounded-full shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-[#6C4DFF] uppercase bg-[#F0EBFF] px-2.5 py-1 rounded-full border border-[#6C4DFF]/20">
             Workflow Architecture
           </span>
-          <span className="text-[10px] text-[#6B7280]">·</span>
-          <span className="text-xs font-semibold text-[#6B7280]">4-Stage Framework</span>
+          <span className="text-[10px] text-[#68677D]">·</span>
+          <span className="text-xs font-semibold text-[#68677D]">4-Stage Framework</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#3D4852] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#242137] tracking-tight">
           How It Works
         </h2>
-        <p className="text-xs sm:text-sm text-[#6B7280]">
+        <p className="text-xs sm:text-sm text-[#68677D]">
           From your post idea to a data-informed decision.
         </p>
       </div>
@@ -67,23 +67,23 @@ export default function HowItWorks() {
           return (
             <div
               key={step.num}
-              className="p-5 sm:p-6 rounded-3xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] flex flex-col justify-between relative group transition-all duration-300 hover:-translate-y-0.5"
+              className="p-5 sm:p-6 rounded-2xl bg-white border border-[#E7E3F0] shadow-card flex flex-col justify-between relative group transition-all duration-300 hover:shadow-card-hover hover:-translate-y-0.5"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold tracking-wider text-[#6C63FF] uppercase">
+                  <span className="text-[10px] font-mono font-bold tracking-wider text-[#6C4DFF] uppercase">
                     {step.badge}
                   </span>
-                  <div className="w-8 h-8 rounded-2xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] flex items-center justify-center text-[#6C63FF]">
+                  <div className="w-8 h-8 rounded-xl bg-[#F0EBFF] border border-[#6C4DFF]/20 flex items-center justify-center text-[#6C4DFF]">
                     <Icon className="w-4 h-4" />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <h3 className="text-base font-bold text-[#3D4852] tracking-tight">
+                  <h3 className="text-base font-bold text-[#242137] tracking-tight">
                     {step.title}
                   </h3>
-                  <p className="text-xs text-[#6B7280] leading-relaxed">
+                  <p className="text-xs text-[#68677D] leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
@@ -91,7 +91,7 @@ export default function HowItWorks() {
 
               {/* Connecting arrow for large screens */}
               {idx < steps.length - 1 && (
-                <div className="hidden lg:flex absolute -right-3.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-[#E0E5EC] shadow-[3px_3px_6px_rgb(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)] items-center justify-center text-[#6B7280]">
+                <div className="hidden lg:flex absolute -right-3.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-white border border-[#E7E3F0] shadow-sm items-center justify-center text-[#68677D]">
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               )}

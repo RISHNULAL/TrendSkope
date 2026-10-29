@@ -12,13 +12,10 @@ import {
   Info,
   Play,
   History,
-  TrendingUp,
-  TrendingDown,
   Layers,
   ArrowRight,
   ShieldCheck,
   RefreshCw,
-  FolderCheck,
   Sparkles,
   Image as ImageIcon,
   Film,
@@ -142,7 +139,6 @@ export default function DatasetView() {
 
   const datasetStats = dashboardData?.dataset;
   const currentPosts = datasetStats?.posts ?? 15000;
-  const uniquePostIds = datasetStats?.unique_post_ids ?? currentPosts;
   const currentAccounts = datasetStats?.accounts ?? 250;
   const recordsAdded = datasetStats?.records_added ?? 13900;
   const dateRange = datasetStats?.date_coverage || "2025-01-01 → 2026-10-25";
@@ -161,75 +157,75 @@ export default function DatasetView() {
   const trainedCorpusCount = dashboardData?.model?.training_records || (trainCount + valCount);
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto">
+    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto text-[#242137]">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#3D4852]">
+          <h1 className="text-2xl md:text-3xl font-black text-[#242137]">
             Dataset & Validation
           </h1>
-          <p className="text-sm text-[#6B7280] mt-1">
+          <p className="text-sm text-[#68677D] mt-1">
             Maintain the single canonical master dataset. New valid CSV uploads are appended, validated for uniqueness, and used for leakage-free model retraining.
           </p>
         </div>
 
         <button
           onClick={handleDownloadTemplate}
-          className="btn-secondary text-xs self-start md:self-auto"
+          className="btn-secondary text-xs self-start md:self-auto flex items-center gap-2"
         >
-          <Download className="w-4 h-4 text-[#6C63FF]" />
+          <Download className="w-4 h-4 text-[#6C4DFF]" />
           <span>Download CSV Template</span>
         </button>
       </div>
 
       {/* Active Master Dataset Overview Card */}
-      <div className="glass-card-accent p-6 md:p-8 rounded-3xl space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-transparent">
+      <div className="p-6 md:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E7E3F0]">
           <div>
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-[#0F766E] border border-emerald-500/30 text-[10px] font-bold">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#0F9D8A]/10 text-[#0F9D8A] border border-[#0F9D8A]/25 text-[10px] font-bold">
                 Canonical Master Dataset
               </span>
-              <span className="text-xs text-[#0F766E] font-mono font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md">
+              <span className="text-xs text-[#0F9D8A] font-mono font-bold bg-[#0F9D8A]/10 px-2 py-0.5 rounded-md">
                 +{recordsAdded.toLocaleString()} records added
               </span>
-              <span className="text-xs text-[#6B7280] font-mono">
+              <span className="text-xs text-[#68677D] font-mono">
                 {currentPosts.toLocaleString()} Chronological Posts Verified
               </span>
             </div>
-            <h2 className="text-lg font-bold text-[#3D4852]">Master Training Corpus Status</h2>
+            <h2 className="text-lg font-bold text-[#242137]">Master Training Corpus Status</h2>
           </div>
-          <span className="text-xs text-[#6B7280] font-mono bg-[#E0E5EC] px-3 py-1.5 rounded-xl border border-transparent self-start sm:self-auto">
+          <span className="text-xs text-[#68677D] font-mono bg-[#F8F7FC] px-3 py-1.5 rounded-xl border border-[#E7E3F0] self-start sm:self-auto font-semibold">
             instagram_posts_1000.csv
           </span>
         </div>
 
         {/* 4 Core Metrics Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-          <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent">
-            <span className="text-[#6B7280] text-[11px] block mb-1">Master Dataset Size</span>
-            <strong className="text-xl font-mono font-black text-[#3D4852]">{currentPosts.toLocaleString()}</strong>
-            <span className="text-[10px] text-[#0F766E] block mt-0.5">100% unique post_ids</span>
+          <div className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] shadow-sm">
+            <span className="text-[#68677D] text-[11px] block mb-1">Master Dataset Size</span>
+            <strong className="text-xl font-mono font-black text-[#242137]">{currentPosts.toLocaleString()}</strong>
+            <span className="text-[10px] text-[#0F9D8A] block mt-0.5 font-semibold">100% unique post_ids</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent">
-            <span className="text-[#6B7280] text-[11px] block mb-1">Unique Accounts</span>
-            <strong className="text-xl font-mono font-black text-[#3D4852]">{currentAccounts}</strong>
-            <span className="text-[10px] text-[#6B7280] block mt-0.5">15 creator domains active</span>
+          <div className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] shadow-sm">
+            <span className="text-[#68677D] text-[11px] block mb-1">Unique Accounts</span>
+            <strong className="text-xl font-mono font-black text-[#242137]">{currentAccounts}</strong>
+            <span className="text-[10px] text-[#68677D] block mt-0.5">15 creator domains active</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent">
-            <span className="text-[#6B7280] text-[11px] block mb-1">Date Range</span>
-            <strong className="text-xs font-mono font-bold text-[#3D4852] block mt-1">{dateRange}</strong>
-            <span className="text-[10px] text-[#6B7280] block mt-0.5">Chronologically ordered</span>
+          <div className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] shadow-sm">
+            <span className="text-[#68677D] text-[11px] block mb-1">Date Range</span>
+            <strong className="text-xs font-mono font-bold text-[#242137] block mt-1">{dateRange}</strong>
+            <span className="text-[10px] text-[#68677D] block mt-0.5">Chronologically ordered</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent">
-            <span className="text-[#6B7280] text-[11px] block mb-1">Active Model</span>
-            <strong className="text-xs font-mono font-bold text-[#6C63FF] block mt-1 truncate">
+          <div className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] shadow-sm">
+            <span className="text-[#68677D] text-[11px] block mb-1">Active Model</span>
+            <strong className="text-xs font-mono font-bold text-[#6C4DFF] block mt-1 truncate">
               {activeModelName}
             </strong>
-            <span className="text-[10px] text-[#6B7280] block mt-0.5">
+            <span className="text-[10px] text-[#68677D] block mt-0.5">
               Val: {valMaeText} · Test: {testMaeText}
             </span>
           </div>
@@ -237,67 +233,67 @@ export default function DatasetView() {
 
         {/* Corpus Partition Breakdown & Media Distribution */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-1">
-          <div className="p-3.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
-            <span className="text-[#6B7280] text-[10px] uppercase font-bold block mb-1">
+          <div className="p-3.5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] shadow-sm">
+            <span className="text-[#68677D] text-[10px] uppercase font-bold block mb-1">
               Corpus Partitioning
             </span>
             <div className="space-y-1 text-[11px]">
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Master Corpus:</span>
-                <strong className="text-[#3D4852] font-mono">{currentPosts.toLocaleString()} posts (100%)</strong>
+                <span className="text-[#68677D]">Master Corpus:</span>
+                <strong className="text-[#242137] font-mono">{currentPosts.toLocaleString()} posts (100%)</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Active Training Set:</span>
-                <strong className="text-[#6C63FF] font-mono">{trainedCorpusCount.toLocaleString()} posts (85%)</strong>
+                <span className="text-[#68677D]">Active Training Set:</span>
+                <strong className="text-[#6C4DFF] font-mono">{trainedCorpusCount.toLocaleString()} posts (85%)</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Held-Out Test Set:</span>
-                <strong className="text-[#0F766E] font-mono">{testCount.toLocaleString()} posts (15%)</strong>
+                <span className="text-[#68677D]">Held-Out Test Set:</span>
+                <strong className="text-[#0F9D8A] font-mono">{testCount.toLocaleString()} posts (15%)</strong>
               </div>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
-            <span className="text-[#6B7280] text-[10px] uppercase font-bold block mb-1">
+          <div className="p-3.5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] shadow-sm">
+            <span className="text-[#68677D] text-[10px] uppercase font-bold block mb-1">
               Media Format Breakdown
             </span>
             <div className="space-y-1 text-[11px]">
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Photo / Image:</span>
-                <strong className="text-[#3D4852] font-mono">{datasetStats?.media_types?.image?.toLocaleString() || "5,993"} (40.0%)</strong>
+                <span className="text-[#68677D]">Photo / Image:</span>
+                <strong className="text-[#242137] font-mono">{datasetStats?.media_types?.image?.toLocaleString() || "5,993"} (40.0%)</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Reel / Video:</span>
-                <strong className="text-[#3D4852] font-mono">{datasetStats?.media_types?.reel?.toLocaleString() || "5,382"} (35.9%)</strong>
+                <span className="text-[#68677D]">Reel / Video:</span>
+                <strong className="text-[#242137] font-mono">{datasetStats?.media_types?.reel?.toLocaleString() || "5,382"} (35.9%)</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Carousel:</span>
-                <strong className="text-[#3D4852] font-mono">{datasetStats?.media_types?.carousel?.toLocaleString() || "3,625"} (24.1%)</strong>
+                <span className="text-[#68677D]">Carousel:</span>
+                <strong className="text-[#242137] font-mono">{datasetStats?.media_types?.carousel?.toLocaleString() || "3,625"} (24.1%)</strong>
               </div>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] flex flex-col justify-between">
+          <div className="p-3.5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] shadow-sm flex flex-col justify-between">
             <div>
-              <span className="text-[#6B7280] text-[10px] uppercase font-bold block mb-1">
+              <span className="text-[#68677D] text-[10px] uppercase font-bold block mb-1">
                 Data Quality & Provenance
               </span>
-              <strong className="text-xs font-bold text-[#0F766E] block mb-0.5">
+              <strong className="text-xs font-bold text-[#0F9D8A] block mb-0.5">
                 {datasetStats?.duplicate_rows ?? 0} Duplicates · {datasetStats?.missing_values ?? 0} Nulls
               </strong>
             </div>
-            <p className="text-[10px] text-[#6B7280] leading-tight">
+            <p className="text-[10px] text-[#68677D] leading-tight">
               {datasetStats?.provenance || "Synthetic Simulation Research Corpus (250 Accounts, 15 Domains)"}
             </p>
           </div>
         </div>
 
         {/* Scientific Provenance Statement */}
-        <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-xs text-[#6B7280] flex items-start gap-3">
-          <Info className="w-4 h-4 text-[#6C63FF] shrink-0 mt-0.5" />
+        <div className="p-4 rounded-2xl bg-[#F0EBFF] border border-[#6C4DFF]/25 text-xs text-[#4B35B5] flex items-start gap-3">
+          <Info className="w-4 h-4 text-[#6C4DFF] shrink-0 mt-0.5" />
           <div>
-            <strong className="text-[#3D4852] block font-semibold mb-0.5">Dataset Source & Simulation Provenance</strong>
-            <p className="text-[#6B7280] leading-relaxed">
+            <strong className="text-[#242137] block font-bold mb-0.5">Dataset Source & Simulation Provenance</strong>
+            <p className="text-[#4B35B5] leading-relaxed">
               This research prototype utilizes a <strong>synthetic simulation research corpus</strong> of 15,000 unique records designed to emulate realistic Instagram creator engagement distributions across 15 content domains and 250 creator accounts. All historical account features are computed strictly from prior posts without target leakage.
             </p>
           </div>
@@ -305,13 +301,13 @@ export default function DatasetView() {
       </div>
 
       {/* Upload and Incremental Update Area */}
-      <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-6">
+      <div className="p-6 md:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <h2 className="text-base font-bold text-[#3D4852] flex items-center gap-2">
-            <Upload className="w-5 h-5 text-[#6C63FF]" />
+          <h2 className="text-base font-bold text-[#242137] flex items-center gap-2">
+            <Upload className="w-5 h-5 text-[#6C4DFF]" />
             <span>Validate & Add New Posts CSV</span>
           </h2>
-          <span className="text-xs text-[#6B7280]">
+          <span className="text-xs text-[#68677D]">
             Incremental Merge · No Master Data Overwrite
           </span>
         </div>
@@ -319,7 +315,7 @@ export default function DatasetView() {
         {/* Dropzone */}
         <label
           htmlFor="csv-upload"
-          className="border-2 border-dashed border-border hover:border-[#6C63FF] rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] hover:bg-[#E0E5EC] group"
+          className="border-2 border-dashed border-[#E7E3F0] hover:border-[#6C4DFF] rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all bg-[#F8F7FC] hover:bg-[#F0EBFF]/20 group shadow-sm"
         >
           <input
             id="csv-upload"
@@ -328,31 +324,31 @@ export default function DatasetView() {
             onChange={handleFileChange}
             className="hidden"
           />
-          <div className="w-12 h-12 rounded-2xl bg-primary-orange/10 border border-transparent text-[#6C63FF] flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 rounded-2xl bg-[#F0EBFF] border border-[#6C4DFF]/20 text-[#6C4DFF] flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
             <FileSpreadsheet className="w-6 h-6" />
           </div>
-          <p className="text-sm font-semibold text-[#3D4852]">
+          <p className="text-sm font-bold text-[#242137]">
             {file ? file.name : "Click or drag CSV here to validate"}
           </p>
-          <p className="text-xs text-[#6B7280] mt-1">
+          <p className="text-xs text-[#68677D] mt-1">
             Validates schema, uniqueness against master dataset, timestamp formats, follower counts, and engagement values.
           </p>
         </label>
 
         {/* Validation Spinner */}
         {validating && (
-          <div className="flex items-center justify-center gap-3 text-xs text-[#6B7280] py-3">
-            <span className="w-4 h-4 border-2 border-[#6C63FF] border-t-transparent rounded-full animate-spin" />
+          <div className="flex items-center justify-center gap-3 text-xs text-[#68677D] py-3">
+            <span className="w-4 h-4 border-2 border-[#6C4DFF] border-t-transparent rounded-full animate-spin" />
             <span>Validating schema & checking for master dataset duplicates...</span>
           </div>
         )}
 
         {/* Validation Error Alert */}
         {validationError && (
-          <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-[#BE123C] shrink-0 mt-0.5" />
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-3">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
             <div>
-              <strong className="text-rose-100 font-bold block mb-0.5">Validation Failed</strong>
+              <strong className="text-rose-900 font-bold block mb-0.5">Validation Failed</strong>
               <span>{validationError}</span>
             </div>
           </div>
@@ -364,35 +360,35 @@ export default function DatasetView() {
             {validationResult.valid ? (
               <div className="space-y-4">
                 {/* Validation Status Card */}
-                <div className="p-5 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-200 text-xs space-y-3">
+                <div className="p-5 rounded-2xl bg-[#0F9D8A]/5 border border-[#0F9D8A]/25 text-[#242137] text-xs space-y-3 shadow-sm">
                   <div className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#0F766E] shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0F9D8A] shrink-0 mt-0.5" />
                     <div className="space-y-1">
-                      <strong className="text-[#0F766E] font-bold text-sm block">
+                      <strong className="text-[#0F9D8A] font-bold text-sm block">
                         Validation Succeeded: {validationResult.valid_count ?? validationResult.post_count} Valid Records
                       </strong>
-                      <p className="text-emerald-200/90 leading-relaxed">
+                      <p className="text-[#68677D] leading-relaxed">
                         {validationResult.status_message || `${validationResult.new_count ?? validationResult.valid_count} new posts verified and ready to merge into master dataset.`}
                       </p>
                     </div>
                   </div>
 
                   {/* Summary Badges Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-emerald-500/20 text-[11px] font-mono">
-                    <div className="p-2 rounded-lg bg-[#E0E5EC]/60 text-[#3D4852]">
-                      <span className="text-[#6B7280] block text-[10px]">Uploaded Rows</span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-[#0F9D8A]/20 text-[11px] font-mono">
+                    <div className="p-2 rounded-lg bg-white border border-[#E7E3F0] text-[#242137]">
+                      <span className="text-[#68677D] block text-[10px]">Uploaded Rows</span>
                       <strong>{validationResult.total_uploaded ?? validationResult.post_count}</strong>
                     </div>
-                    <div className="p-2 rounded-lg bg-[#E0E5EC]/60 text-[#0F766E]">
-                      <span className="text-[#6B7280] block text-[10px]">New Records</span>
+                    <div className="p-2 rounded-lg bg-white border border-[#E7E3F0] text-[#0F9D8A]">
+                      <span className="text-[#68677D] block text-[10px]">New Records</span>
                       <strong>+{validationResult.new_count ?? validationResult.valid_count}</strong>
                     </div>
-                    <div className="p-2 rounded-lg bg-[#E0E5EC]/60 text-[#6B7280]">
-                      <span className="text-[#6B7280] block text-[10px]">Duplicates Skipped</span>
+                    <div className="p-2 rounded-lg bg-white border border-[#E7E3F0] text-[#68677D]">
+                      <span className="text-[#68677D] block text-[10px]">Duplicates Skipped</span>
                       <strong>{validationResult.duplicate_count ?? 0}</strong>
                     </div>
-                    <div className="p-2 rounded-lg bg-[#E0E5EC]/60 text-[#6C63FF]">
-                      <span className="text-[#6B7280] block text-[10px]">Projected Size</span>
+                    <div className="p-2 rounded-lg bg-white border border-[#E7E3F0] text-[#6C4DFF]">
+                      <span className="text-[#68677D] block text-[10px]">Projected Size</span>
                       <strong>{validationResult.projected_master_size ?? currentPosts + (validationResult.new_count ?? 0)} posts</strong>
                     </div>
                   </div>
@@ -400,12 +396,12 @@ export default function DatasetView() {
 
                 {/* Retrain Action Button */}
                 {(validationResult.new_count ?? 0) > 0 ? (
-                  <div className="p-5 rounded-2xl bg-[#E0E5EC] border border-transparent flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="p-5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                     <div className="space-y-0.5 text-center sm:text-left">
-                      <strong className="text-[#3D4852] text-sm block font-bold">
+                      <strong className="text-[#242137] text-sm block font-bold">
                         Ready to Add Records & Retrain Models
                       </strong>
-                      <p className="text-xs text-[#6B7280]">
+                      <p className="text-xs text-[#68677D]">
                         Merges {validationResult.new_count} posts into master dataset ({currentPosts} → {validationResult.projected_master_size}), recomputes historical features chronologically, and retrains all 6 models.
                       </p>
                     </div>
@@ -429,30 +425,30 @@ export default function DatasetView() {
                     </button>
                   </div>
                 ) : (
-                  <div className="p-4 rounded-xl bg-[#E0E5EC] text-xs text-[#6B7280] flex items-center gap-2">
-                    <Info className="w-4 h-4 text-[#6C63FF]" />
+                  <div className="p-4 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] text-xs text-[#68677D] flex items-center gap-2">
+                    <Info className="w-4 h-4 text-[#6C4DFF]" />
                     <span>All uploaded records already exist in the master dataset. No new records to append.</span>
                   </div>
                 )}
               </div>
             ) : (
               /* Validation Failure Details */
-              <div className="p-5 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs space-y-3">
-                <div className="flex items-center gap-2 text-rose-300 font-bold text-sm">
-                  <AlertCircle className="w-5 h-5 text-[#BE123C]" />
+              <div className="p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-3">
+                <div className="flex items-center gap-2 text-rose-900 font-bold text-sm">
+                  <AlertCircle className="w-5 h-5 text-rose-600" />
                   <span>
                     Validation Issues Found ({validationResult.invalid_count ?? validationResult.errors.length})
                   </span>
                 </div>
-                <p className="text-rose-200/90 text-xs">
+                <p className="text-rose-700 text-xs">
                   Invalid records were detected. Invalid rows cannot be appended to the master dataset. Please review the errors below, correct the CSV, and upload again.
                 </p>
-                <div className="max-h-48 overflow-y-auto space-y-1.5 pl-2 font-mono text-[11px] bg-black/20 p-3 rounded-xl border border-rose-500/20">
+                <div className="max-h-48 overflow-y-auto space-y-1.5 pl-2 font-mono text-[11px] bg-white p-3 rounded-xl border border-rose-200">
                   {(validationResult.invalid_details && validationResult.invalid_details.length > 0
                     ? validationResult.invalid_details
                     : validationResult.errors
                   ).map((err, i) => (
-                    <div key={i} className="text-rose-200/90">
+                    <div key={i} className="text-rose-700">
                       • {err}
                     </div>
                   ))}
@@ -464,16 +460,16 @@ export default function DatasetView() {
             {validationResult.preview && validationResult.preview.length > 0 && (
               <div className="space-y-2 pt-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#6B7280] uppercase tracking-wider">
+                  <span className="font-bold text-[#68677D] uppercase tracking-wider">
                     Sample Preview (First 5 Uploaded Rows)
                   </span>
-                  <span className="text-[#6B7280] font-mono text-[11px]">
+                  <span className="text-[#68677D] font-mono text-[11px]">
                     {validationResult.new_count ?? validationResult.valid_count} verified for append
                   </span>
                 </div>
-                <div className="overflow-x-auto rounded-xl border border-border bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]">
+                <div className="overflow-x-auto rounded-xl border border-[#E7E3F0] bg-white shadow-sm">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-[#E0E5EC] text-[#6B7280] uppercase text-[10px] border-b border-border">
+                    <thead className="bg-[#F8F7FC] text-[#68677D] uppercase text-[10px] border-b border-[#E7E3F0]">
                       <tr>
                         {Object.keys(validationResult.preview[0]).map((key) => (
                           <th key={key} className="py-2.5 px-3 whitespace-nowrap">
@@ -482,13 +478,13 @@ export default function DatasetView() {
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border/60">
+                    <tbody className="divide-y divide-[#E7E3F0]">
                       {validationResult.preview.map((row, idx) => (
-                        <tr key={idx} className="hover:bg-[#E0E5EC]">
+                        <tr key={idx} className="hover:bg-[#F8F7FC]">
                           {Object.values(row).map((val: any, cidx) => (
                             <td
                               key={cidx}
-                              className="py-2.5 px-3 text-[#6B7280] whitespace-nowrap max-w-[200px] truncate font-mono text-[11px]"
+                              className="py-2.5 px-3 text-[#242137] whitespace-nowrap max-w-[200px] truncate font-mono text-[11px]"
                             >
                               {String(val)}
                             </td>
@@ -503,28 +499,28 @@ export default function DatasetView() {
           </div>
         )}
 
-        {/* Retraining Progress Bar / Steps */}
+        {/* Retraining Progress Bar */}
         {retraining && (
-          <div className="p-6 rounded-2xl bg-[#E0E5EC] border border-transparent space-y-3 animate-pulse">
-            <div className="flex items-center justify-between text-xs text-[#3D4852] font-semibold">
+          <div className="p-6 rounded-2xl bg-[#F0EBFF] border border-[#6C4DFF]/30 space-y-3">
+            <div className="flex items-center justify-between text-xs text-[#242137] font-semibold">
               <span className="flex items-center gap-2">
-                <RefreshCw className="w-4 h-4 text-[#6C63FF] animate-spin" />
+                <RefreshCw className="w-4 h-4 text-[#6C4DFF] animate-spin" />
                 <span>Retraining in progress...</span>
               </span>
-              <span className="font-mono text-[11px] text-[#6B7280]">{retrainStep}</span>
+              <span className="font-mono text-[11px] text-[#4B35B5] font-bold">{retrainStep}</span>
             </div>
-            <div className="w-full h-2 rounded-full bg-[#E0E5EC] overflow-hidden shadow-[inset_2px_2px_4px_rgb(163,177,198,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
-              <div className="h-full bg-[#6C63FF] rounded-full animate-indeterminate" style={{ width: "70%" }} />
+            <div className="w-full h-2 rounded-full bg-[#E7E3F0] overflow-hidden">
+              <div className="h-full bg-[#6C4DFF] rounded-full animate-indeterminate" style={{ width: "70%" }} />
             </div>
           </div>
         )}
 
         {/* Retrain Error Alert */}
         {retrainError && (
-          <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-[#BE123C] shrink-0 mt-0.5" />
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-3">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
             <div>
-              <strong className="text-rose-100 font-bold block mb-0.5">Retraining Failed — Safe Rollback Executed</strong>
+              <strong className="text-rose-900 font-bold block mb-0.5">Retraining Failed — Safe Rollback Executed</strong>
               <span>{retrainError}</span>
             </div>
           </div>
@@ -532,75 +528,75 @@ export default function DatasetView() {
 
         {/* Retraining Success Report Card */}
         {retrainResult && (
-          <div className="p-6 rounded-2xl bg-emerald-950/30 border border-emerald-500/40 text-emerald-200 space-y-4 animate-fade-in">
+          <div className="p-6 rounded-2xl bg-[#0F9D8A]/5 border border-[#0F9D8A]/25 text-[#242137] space-y-4 animate-fade-in shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-[#0F766E]" />
-                <h3 className="text-sm font-bold text-[#0F766E]">
+                <ShieldCheck className="w-5 h-5 text-[#0F9D8A]" />
+                <h3 className="text-sm font-bold text-[#0F9D8A]">
                   Master Dataset & Model Updated Successfully
                 </h3>
               </div>
-              <span className="text-[11px] font-mono bg-emerald-500/20 text-[#0F766E] px-2.5 py-1 rounded-full font-bold">
+              <span className="text-[11px] font-mono bg-[#0F9D8A]/10 text-[#0F9D8A] border border-[#0F9D8A]/25 px-2.5 py-1 rounded-full font-bold">
                 {retrainResult.resulting_size} Total Posts
               </span>
             </div>
 
-            <p className="text-xs text-emerald-200/90 leading-relaxed">
+            <p className="text-xs text-[#68677D] leading-relaxed">
               {retrainResult.message}
             </p>
 
             {/* Retraining Evaluation Comparison Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs">
-              <div className="p-3 rounded-xl bg-[#E0E5EC] border border-transparent text-[#3D4852]">
-                <span className="text-[#6B7280] text-[10px] block mb-0.5">Selected Active Model</span>
-                <strong className="text-xs font-mono font-bold text-[#6C63FF] block truncate">
+              <div className="p-3 rounded-xl bg-white border border-[#E7E3F0] text-[#242137] shadow-sm">
+                <span className="text-[#68677D] text-[10px] block mb-0.5">Selected Active Model</span>
+                <strong className="text-xs font-mono font-bold text-[#6C4DFF] block truncate">
                   {retrainResult.selected_model}
                 </strong>
-                <span className="text-[10px] text-[#6B7280] block mt-0.5">Lowest Val MAE</span>
+                <span className="text-[10px] text-[#68677D] block mt-0.5">Lowest Val MAE</span>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#E0E5EC] border border-transparent text-[#3D4852]">
-                <span className="text-[#6B7280] text-[10px] block mb-0.5">Held-out Test MAE</span>
+              <div className="p-3 rounded-xl bg-white border border-[#E7E3F0] text-[#242137] shadow-sm">
+                <span className="text-[#68677D] text-[10px] block mb-0.5">Held-out Test MAE</span>
                 <div className="flex items-baseline gap-1.5">
                   <strong className="text-sm font-mono font-bold">
                     {retrainResult.test_metrics?.mae.toFixed(3)}%
                   </strong>
                   {retrainResult.mae_delta !== undefined && retrainResult.mae_delta !== null && (
-                    <span className={`text-[10px] font-mono ${retrainResult.mae_delta <= 0 ? "text-[#0F766E]" : "text-[#BE123C]"}`}>
+                    <span className={`text-[10px] font-mono ${retrainResult.mae_delta <= 0 ? "text-[#0F9D8A]" : "text-[#F06F73]"}`}>
                       ({retrainResult.mae_delta <= 0 ? "" : "+"}{retrainResult.mae_delta.toFixed(2)} pp)
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] text-[#6B7280] block mt-0.5">
+                <span className="text-[10px] text-[#68677D] block mt-0.5">
                   Prev: {retrainResult.previous_mae ? `${retrainResult.previous_mae.toFixed(2)}%` : "N/A"}
                 </span>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#E0E5EC] border border-transparent text-[#3D4852]">
-                <span className="text-[#6B7280] text-[10px] block mb-0.5">Test R² Score</span>
+              <div className="p-3 rounded-xl bg-white border border-[#E7E3F0] text-[#242137] shadow-sm">
+                <span className="text-[#68677D] text-[10px] block mb-0.5">Test R² Score</span>
                 <strong className="text-sm font-mono font-bold">
                   {retrainResult.test_metrics?.r2.toFixed(3)}
                 </strong>
-                <span className="text-[10px] text-[#6B7280] block mt-0.5">
+                <span className="text-[10px] text-[#68677D] block mt-0.5">
                   Prev: {retrainResult.previous_r2 ? retrainResult.previous_r2.toFixed(3) : "N/A"}
                 </span>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#E0E5EC] border border-transparent text-[#3D4852]">
-                <span className="text-[#6B7280] text-[10px] block mb-0.5">Dataset Corpus Growth</span>
-                <strong className="text-xs font-mono font-bold text-[#0F766E] block">
+              <div className="p-3 rounded-xl bg-white border border-[#E7E3F0] text-[#242137] shadow-sm">
+                <span className="text-[#68677D] text-[10px] block mb-0.5">Dataset Corpus Growth</span>
+                <strong className="text-xs font-mono font-bold text-[#0F9D8A] block">
                   {retrainResult.previous_size} → {retrainResult.resulting_size}
                 </strong>
-                <span className="text-[10px] text-[#6B7280] block mt-0.5">
+                <span className="text-[10px] text-[#68677D] block mt-0.5">
                   +{retrainResult.rows_added} added · {retrainResult.duplicates_skipped ?? 0} skipped
                 </span>
               </div>
             </div>
 
-            {/* Neutral Evaluation Note */}
+            {/* Evaluation Note */}
             {retrainResult.evaluation_note && (
-              <div className="p-3 rounded-xl bg-[#E0E5EC] border border-transparent text-xs text-[#3D4852] flex items-center gap-2">
-                <Info className="w-4 h-4 text-[#6C63FF] shrink-0" />
+              <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] text-xs text-[#242137] flex items-center gap-2">
+                <Info className="w-4 h-4 text-[#6C4DFF] shrink-0" />
                 <span>
                   <strong>Evaluation Assessment:</strong> {retrainResult.evaluation_note}
                 </span>
@@ -612,13 +608,13 @@ export default function DatasetView() {
 
       {/* Dataset Provenance / Upload History Section */}
       {provenanceHistory.length > 0 && (
-        <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-3">
-            <h2 className="text-base font-bold text-[#3D4852] flex items-center gap-2">
-              <History className="w-5 h-5 text-[#6C63FF]" />
+        <div className="p-6 md:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-[#E7E3F0] pb-3">
+            <h2 className="text-base font-bold text-[#242137] flex items-center gap-2">
+              <History className="w-5 h-5 text-[#6C4DFF]" />
               <span>Dataset Provenance & Retraining History</span>
             </h2>
-            <span className="text-xs text-[#6B7280] font-mono">
+            <span className="text-xs text-[#68677D] font-mono">
               {provenanceHistory.length} Recorded Run{provenanceHistory.length > 1 ? "s" : ""}
             </span>
           </div>
@@ -627,34 +623,34 @@ export default function DatasetView() {
             {provenanceHistory.slice(0, 5).map((rec, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent text-xs text-[#3D4852] space-y-2"
+                className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] text-xs text-[#242137] space-y-2 shadow-sm"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-[#6C63FF]">{rec.filename}</span>
-                    <span className="text-[10px] text-[#6B7280] font-mono">
+                    <span className="font-mono font-bold text-[#6C4DFF]">{rec.filename}</span>
+                    <span className="text-[10px] text-[#68677D] font-mono">
                       {new Date(rec.timestamp).toLocaleString()}
                     </span>
                   </div>
-                  <span className="text-[11px] font-mono font-bold text-[#0F766E] bg-emerald-500/10 px-2 py-0.5 rounded-md self-start sm:self-auto">
+                  <span className="text-[11px] font-mono font-bold text-[#0F9D8A] bg-[#0F9D8A]/10 border border-[#0F9D8A]/25 px-2 py-0.5 rounded-md self-start sm:self-auto">
                     {rec.previous_size} → {rec.resulting_size} posts (+{rec.rows_added})
                   </span>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#6B7280]">
-                  <span>Uploaded: <strong className="text-[#3D4852]">{rec.rows_uploaded}</strong></span>
-                  <span>Accepted: <strong className="text-[#0F766E]">{rec.rows_accepted}</strong></span>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#68677D]">
+                  <span>Uploaded: <strong className="text-[#242137]">{rec.rows_uploaded}</strong></span>
+                  <span>Accepted: <strong className="text-[#0F9D8A]">{rec.rows_accepted}</strong></span>
                   {rec.duplicates_skipped > 0 && (
-                    <span>Duplicates: <strong className="text-[#6B7280]">{rec.duplicates_skipped}</strong></span>
+                    <span>Duplicates: <strong className="text-[#68677D]">{rec.duplicates_skipped}</strong></span>
                   )}
-                  <span>Selected Model: <strong className="text-[#6C63FF]">{rec.selected_model}</strong></span>
+                  <span>Selected Model: <strong className="text-[#6C4DFF]">{rec.selected_model}</strong></span>
                   {rec.new_mae && (
-                    <span>Test MAE: <strong className="text-[#3D4852]">{rec.new_mae.toFixed(2)}%</strong></span>
+                    <span>Test MAE: <strong className="text-[#242137]">{rec.new_mae.toFixed(2)}%</strong></span>
                   )}
                 </div>
 
                 {rec.evaluation_note && (
-                  <p className="text-[11px] text-[#6B7280] italic pt-1 border-t border-border/40">
+                  <p className="text-[11px] text-[#68677D] italic pt-1 border-t border-[#E7E3F0]">
                     {rec.evaluation_note}
                   </p>
                 )}
@@ -665,36 +661,36 @@ export default function DatasetView() {
       )}
 
       {/* Specialized Content Audit Datasets (9 Separate Datasets · 45,000 Total Records) */}
-      <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-border pb-4">
+      <div className="p-6 md:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#E7E3F0] pb-4">
           <div>
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-[#0F766E] border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#0F766E]" />
+              <span className="px-2.5 py-0.5 rounded-full bg-[#0F9D8A]/10 text-[#0F9D8A] border border-[#0F9D8A]/25 text-[10px] font-bold flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#0F9D8A]" />
                 Master Dataset Cryptographically Preserved
               </span>
-              <span className="text-xs text-[#6C63FF] font-mono font-bold bg-[#6C63FF]/10 px-2 py-0.5 rounded-md">
+              <span className="text-xs text-[#6C4DFF] font-mono font-bold bg-[#F0EBFF] px-2 py-0.5 rounded-md">
                 9 Separate CSV Datasets · 45,000 Total Records
               </span>
-              <span className="text-xs text-[#6B7280] font-mono">
+              <span className="text-xs text-[#68677D] font-mono">
                 5,000 Valid Records / Dataset
               </span>
             </div>
-            <h2 className="text-lg font-bold text-[#3D4852]">
+            <h2 className="text-lg font-bold text-[#242137]">
               Specialized Content Audit & Multimodal Datasets
             </h2>
-            <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
-              Domain-specific benchmark datasets created in <code className="text-[#6C63FF] font-mono font-bold">data/content_audit_datasets/</code>.
+            <p className="text-xs text-[#68677D] mt-1 leading-relaxed">
+              Domain-specific benchmark datasets created in <code className="text-[#6C4DFF] font-mono font-bold">data/content_audit_datasets/</code>.
               These datasets maintain independent schemas for computer vision, audio acoustics, typography, and sequential storytelling without modifying the canonical 15,000-record master dataset.
             </p>
           </div>
 
-          <div className="p-3 rounded-2xl bg-[#E0E5EC] border border-transparent text-xs text-[#3D4852] shrink-0 space-y-1 shadow-[inset_2px_2px_4px_rgb(163,177,198,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
-            <div className="flex items-center gap-2 font-mono text-[11px] text-[#0F766E]">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#0F766E]" />
+          <div className="p-3 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] text-xs text-[#242137] shrink-0 space-y-1 shadow-sm">
+            <div className="flex items-center gap-2 font-mono text-[11px] text-[#0F9D8A]">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#0F9D8A]" />
               <strong>Master SHA-256 Unchanged:</strong>
             </div>
-            <p className="font-mono text-[10px] text-[#6B7280] break-all select-all">
+            <p className="font-mono text-[10px] text-[#68677D] break-all select-all">
               d6eb91540b3528c9d2b4e303da74cf7a49eed5f44cd014d10526e256049da292
             </p>
           </div>
@@ -823,101 +819,101 @@ export default function DatasetView() {
                   source_type_breakdown: { multimodal_feature_join: 5000 },
                 },
               ]
-          ).map((dataset, idx) => {
+          ).map((item, idx) => {
             const getIcon = (cat: string) => {
               switch (cat) {
                 case "Computer Vision":
-                  return <ImageIcon className="w-4 h-4 text-[#6C63FF]" />;
+                  return <ImageIcon className="w-4 h-4 text-[#6C4DFF]" />;
                 case "Graphic Design":
-                  return <Sparkles className="w-4 h-4 text-amber-500" />;
+                  return <Sparkles className="w-4 h-4 text-[#E9A23B]" />;
                 case "Temporal Video Analysis":
-                  return <Film className="w-4 h-4 text-purple-500" />;
+                  return <Film className="w-4 h-4 text-[#6C4DFF]" />;
                 case "Sequential Storytelling":
-                  return <Layers className="w-4 h-4 text-blue-500" />;
+                  return <Layers className="w-4 h-4 text-[#4285F4]" />;
                 case "Natural Language Processing":
-                  return <MessageSquare className="w-4 h-4 text-emerald-500" />;
+                  return <MessageSquare className="w-4 h-4 text-[#0F9D8A]" />;
                 case "Acoustic Intelligence":
-                  return <Music className="w-4 h-4 text-rose-500" />;
+                  return <Music className="w-4 h-4 text-[#F06F73]" />;
                 case "Quality Assurance":
-                  return <AlertTriangle className="w-4 h-4 text-amber-600" />;
+                  return <AlertTriangle className="w-4 h-4 text-[#E9A23B]" />;
                 case "Prescriptive Guidance":
-                  return <Sparkles className="w-4 h-4 text-[#0F766E]" />;
+                  return <Sparkles className="w-4 h-4 text-[#0F9D8A]" />;
                 case "Machine Learning Features":
-                  return <Database className="w-4 h-4 text-[#6C63FF]" />;
+                  return <Database className="w-4 h-4 text-[#6C4DFF]" />;
                 default:
-                  return <FileSpreadsheet className="w-4 h-4 text-[#6C63FF]" />;
+                  return <FileSpreadsheet className="w-4 h-4 text-[#6C4DFF]" />;
               }
             };
 
             return (
               <div
                 key={idx}
-                className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent text-xs text-[#3D4852] space-y-3 flex flex-col justify-between shadow-[4px_4px_8px_rgb(163,177,198,0.5),-4px_-4px_8px_rgba(255,255,255,0.7)]"
+                className="p-4 rounded-2xl bg-white border border-[#E7E3F0] text-xs text-[#242137] space-y-3 flex flex-col justify-between shadow-sm hover:border-[#6C4DFF]/40 hover:shadow-md transition-all"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="flex items-center gap-1.5 font-bold text-[#3D4852]">
-                      {getIcon(dataset.category)}
-                      <span className="truncate">{dataset.title}</span>
+                    <span className="flex items-center gap-1.5 font-bold text-[#242137]">
+                      {getIcon(item.category)}
+                      <span className="truncate">{item.title}</span>
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#6C63FF]/10 text-[#6C63FF] shrink-0 font-bold">
-                      {dataset.category}
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#F0EBFF] text-[#6C4DFF] shrink-0 font-bold border border-[#6C4DFF]/25">
+                      {item.category}
                     </span>
                   </div>
 
-                  <p className="font-mono text-[11px] text-[#6C63FF] font-semibold truncate">
-                    {dataset.filename}
+                  <p className="font-mono text-[11px] text-[#6C4DFF] font-semibold truncate">
+                    {item.filename}
                   </p>
 
-                  <p className="text-[11px] text-[#6B7280] leading-relaxed line-clamp-2">
-                    {dataset.description}
+                  <p className="text-[11px] text-[#68677D] leading-relaxed line-clamp-2">
+                    {item.description}
                   </p>
                 </div>
 
-                <div className="space-y-2 pt-2 border-t border-border/50 text-[11px]">
-                  <div className="grid grid-cols-3 gap-1 bg-[#E0E5EC] p-2 rounded-xl shadow-[inset_2px_2px_4px_rgb(163,177,198,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.6)] text-center">
+                <div className="space-y-2 pt-2 border-t border-[#E7E3F0] text-[11px]">
+                  <div className="grid grid-cols-3 gap-1 bg-[#F8F7FC] border border-[#E7E3F0] p-2 rounded-xl text-center shadow-inner">
                     <div>
-                      <span className="text-[9px] text-[#6B7280] uppercase block">Records</span>
-                      <strong className="font-mono text-[#3D4852] font-bold">
-                        {dataset.records.toLocaleString()}
+                      <span className="text-[9px] text-[#68677D] uppercase block">Records</span>
+                      <strong className="font-mono text-[#242137] font-bold">
+                        {item.records.toLocaleString()}
                       </strong>
                     </div>
                     <div>
-                      <span className="text-[9px] text-[#6B7280] uppercase block">Columns</span>
-                      <strong className="font-mono text-[#3D4852] font-bold">
-                        {dataset.columns}
+                      <span className="text-[9px] text-[#68677D] uppercase block">Columns</span>
+                      <strong className="font-mono text-[#242137] font-bold">
+                        {item.columns}
                       </strong>
                     </div>
                     <div>
-                      <span className="text-[9px] text-[#6B7280] uppercase block">Size</span>
-                      <strong className="font-mono text-[#3D4852] font-bold">
-                        {dataset.file_size_kb.toFixed(0)} KB
+                      <span className="text-[9px] text-[#68677D] uppercase block">Size</span>
+                      <strong className="font-mono text-[#242137] font-bold">
+                        {item.file_size_kb.toFixed(0)} KB
                       </strong>
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center justify-between text-[10px]">
-                      <span className="text-[#6B7280]">Physical Coverage:</span>
-                      <span className="text-[#3D4852] font-medium text-right truncate max-w-[170px]" title={dataset.physical_media_coverage}>
-                        {dataset.physical_media_coverage}
+                      <span className="text-[#68677D]">Physical Coverage:</span>
+                      <span className="text-[#242137] font-medium text-right truncate max-w-[170px]" title={item.physical_media_coverage}>
+                        {item.physical_media_coverage}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between text-[10px]">
-                      <span className="text-[#6B7280]">Validation Status:</span>
-                      <span className="text-[#0F766E] font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-[#0F766E]" />
+                      <span className="text-[#68677D]">Validation Status:</span>
+                      <span className="text-[#0F9D8A] font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-[#0F9D8A]" />
                         Valid (0 Errors)
                       </span>
                     </div>
 
-                    {dataset.source_type_breakdown && (
-                      <div className="text-[10px] text-[#6B7280] pt-1 border-t border-border/30 flex flex-wrap gap-1">
-                        <span className="font-semibold text-[#3D4852]">Provenance:</span>
-                        {Object.entries(dataset.source_type_breakdown).map(([k, v], sIdx) => (
-                          <span key={sIdx} className="font-mono text-[9px] bg-white/40 px-1.5 py-0.5 rounded">
-                            {k}: <strong className="text-[#3D4852]">{v}</strong>
+                    {item.source_type_breakdown && (
+                      <div className="text-[10px] text-[#68677D] pt-1 border-t border-[#E7E3F0] flex flex-wrap gap-1">
+                        <span className="font-semibold text-[#242137]">Provenance:</span>
+                        {Object.entries(item.source_type_breakdown).map(([k, v], sIdx) => (
+                          <span key={sIdx} className="font-mono text-[9px] bg-[#F8F7FC] border border-[#E7E3F0] px-1.5 py-0.5 rounded text-[#242137]">
+                            {k}: <strong>{v}</strong>
                           </span>
                         ))}
                       </div>
@@ -930,14 +926,14 @@ export default function DatasetView() {
         </div>
 
         {/* Isolation & Data Dictionary Footer */}
-        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="p-4 rounded-2xl bg-[#E9A23B]/10 border border-[#E9A23B]/30 text-xs text-[#242137] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
           <div className="flex items-start gap-2.5">
-            <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <p className="leading-relaxed text-[11px] text-[#3D4852]">
+            <Info className="w-4 h-4 text-[#E9A23B] shrink-0 mt-0.5" />
+            <p className="leading-relaxed text-[11px] text-[#242137]">
               <strong>Strict Pipeline Isolation:</strong> Model training for engagement prediction operates exclusively on validated features derived from the canonical master dataset. Modality benchmarks are maintained in dedicated tabular schemas to avoid cross-contamination.
             </p>
           </div>
-          <span className="text-[11px] font-mono font-bold text-[#6C63FF] bg-[#E0E5EC] px-3 py-1.5 rounded-xl border border-transparent whitespace-nowrap shadow-[2px_2px_4px_rgb(163,177,198,0.5),-2px_-2px_4px_rgba(255,255,255,0.7)]">
+          <span className="text-[11px] font-mono font-bold text-[#6C4DFF] bg-white px-3 py-1.5 rounded-xl border border-[#E7E3F0] whitespace-nowrap shadow-sm">
             data/content_audit_datasets/DATA_DICTIONARY.md
           </span>
         </div>
@@ -946,67 +942,67 @@ export default function DatasetView() {
       {/* Dataset Documentation Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Dataset Card Info */}
-        <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-4">
-          <div className="flex items-center gap-2 text-[#3D4852] font-bold text-base border-b border-border pb-3">
-            <Database className="w-5 h-5 text-[#6C63FF]" />
+        <div className="p-6 md:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-4">
+          <div className="flex items-center gap-2 text-[#242137] font-bold text-base border-b border-[#E7E3F0] pb-3">
+            <Database className="w-5 h-5 text-[#6C4DFF]" />
             <span>Dataset Card Guidelines</span>
           </div>
 
-          <p className="text-xs text-[#6B7280] leading-relaxed">
+          <p className="text-xs text-[#68677D] leading-relaxed">
             TrendSkope emphasizes transparent data provenance. Master datasets maintain strict chronological order to enable realistic offline evaluation.
           </p>
 
-          <div className="space-y-2.5 text-xs text-[#6B7280]">
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <strong className="text-[#3D4852] block mb-0.5">Chronological Ordering & Leakage Prevention</strong>
+          <div className="space-y-2.5 text-xs text-[#68677D]">
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <strong className="text-[#242137] block mb-0.5">Chronological Ordering & Leakage Prevention</strong>
               <span>Historical stats (mean, median, standard deviation of prior posts) are computed strictly on posts published prior to each observation.</span>
             </div>
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <strong className="text-[#3D4852] block mb-0.5">70 / 15 / 15 Chronological Splitting</strong>
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <strong className="text-[#242137] block mb-0.5">70 / 15 / 15 Chronological Splitting</strong>
               <span>Evaluations use past posts for training and subsequent chronological windows for validation and held-out test assessment.</span>
             </div>
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <strong className="text-[#3D4852] block mb-0.5">Known Limitations</strong>
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <strong className="text-[#242137] block mb-0.5">Known Limitations</strong>
               <span>Model predictions estimate historical statistical patterns and do not guarantee future viral performance.</span>
             </div>
           </div>
         </div>
 
         {/* Data Dictionary */}
-        <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-4">
-          <div className="flex items-center gap-2 text-[#3D4852] font-bold text-base border-b border-border pb-3">
-            <FileText className="w-5 h-5 text-[#6C63FF]" />
+        <div className="p-6 md:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-4">
+          <div className="flex items-center gap-2 text-[#242137] font-bold text-base border-b border-[#E7E3F0] pb-3">
+            <FileText className="w-5 h-5 text-[#6C4DFF]" />
             <span>Schema & Data Dictionary</span>
           </div>
 
           <div className="overflow-y-auto max-h-[290px] pr-1 space-y-2 text-xs">
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <span className="text-[#6C63FF] font-mono font-bold">post_id</span>
-              <span className="text-[#6B7280] block text-[11px]">Unique identifier for each post (String/Int, non-null, deduplicated)</span>
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <span className="text-[#6C4DFF] font-mono font-bold">post_id</span>
+              <span className="text-[#68677D] block text-[11px]">Unique identifier for each post (String/Int, non-null, deduplicated)</span>
             </div>
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <span className="text-[#6C63FF] font-mono font-bold">account_id</span>
-              <span className="text-[#6B7280] block text-[11px]">Account identifier for computing chronological history</span>
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <span className="text-[#6C4DFF] font-mono font-bold">account_id</span>
+              <span className="text-[#68677D] block text-[11px]">Account identifier for computing chronological history</span>
             </div>
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <span className="text-[#6C63FF] font-mono font-bold">published_at</span>
-              <span className="text-[#6B7280] block text-[11px]">ISO 8601 publication timestamp (e.g. 2025-01-15T19:00:00Z)</span>
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <span className="text-[#6C4DFF] font-mono font-bold">published_at</span>
+              <span className="text-[#68677D] block text-[11px]">ISO 8601 publication timestamp (e.g. 2025-01-15T19:00:00Z)</span>
             </div>
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <span className="text-[#6C63FF] font-mono font-bold">media_type</span>
-              <span className="text-[#6B7280] block text-[11px]">Categorical post format: &quot;image&quot;, &quot;carousel&quot;, &quot;reel&quot;</span>
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <span className="text-[#6C4DFF] font-mono font-bold">media_type</span>
+              <span className="text-[#68677D] block text-[11px]">Categorical post format: &quot;image&quot;, &quot;carousel&quot;, &quot;reel&quot;</span>
             </div>
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <span className="text-[#6C63FF] font-mono font-bold">caption</span>
-              <span className="text-[#6B7280] block text-[11px]">Raw caption text for NLP and structural feature engineering</span>
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <span className="text-[#6C4DFF] font-mono font-bold">caption</span>
+              <span className="text-[#68677D] block text-[11px]">Raw caption text for NLP and structural feature engineering</span>
             </div>
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <span className="text-[#6C63FF] font-mono font-bold">likes, comments</span>
-              <span className="text-[#6B7280] block text-[11px]">Observed engagement targets (used only to calculate training target, never input)</span>
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <span className="text-[#6C4DFF] font-mono font-bold">likes, comments</span>
+              <span className="text-[#68677D] block text-[11px]">Observed engagement targets (used only to calculate training target, never input)</span>
             </div>
-            <div className="p-3 rounded-xl bg-surface border border-border">
-              <span className="text-[#6C63FF] font-mono font-bold">followers_at_or_near_collection</span>
-              <span className="text-[#6B7280] block text-[11px]">Follower count used for normalization and scale modeling</span>
+            <div className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+              <span className="text-[#6C4DFF] font-mono font-bold">followers_at_or_near_collection</span>
+              <span className="text-[#68677D] block text-[11px]">Follower count used for normalization and scale modeling</span>
             </div>
           </div>
         </div>

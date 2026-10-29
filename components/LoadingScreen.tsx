@@ -102,56 +102,48 @@ export default function LoadingScreen({
         fadingOut ? "opacity-0 scale-[0.99] pointer-events-none" : "opacity-100 scale-100"
       }`}
       style={{
-        backgroundColor: "#E0E5EC",
+        backgroundColor: "#F8F7FC",
       }}
     >
-      {/* Deep Navy Radial Background Layer */}
+      {/* Light Lavender Ambient Radial Layer */}
       <div
-        className="absolute inset-0 pointer-events-none animate-bg-gradient"
+        className="absolute inset-0 pointer-events-none"
         style={{
           background: `
-            radial-gradient(circle at 18% 8%, rgba(255,255,255,0.9) 0%, transparent 42%),
-            radial-gradient(circle at 88% 92%, rgba(163,177,198,0.45) 0%, transparent 40%),
-            #E0E5EC
+            radial-gradient(circle at 18% 8%, rgba(240,235,255,0.85) 0%, transparent 45%),
+            radial-gradient(circle at 88% 92%, rgba(240,235,255,0.7) 0%, transparent 45%),
+            #F8F7FC
           `,
         }}
       />
 
-      {/* Faint Precision Analytical Grid Overlay */}
+      {/* Subtle Analytical Grid Overlay */}
       <div
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(163,177,198,0.45) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(163,177,198,0.45) 1px, transparent 1px)
+            linear-gradient(to right, #6C4DFF 1px, transparent 1px),
+            linear-gradient(to bottom, #6C4DFF 1px, transparent 1px)
           `,
           backgroundSize: "32px 32px",
         }}
       />
 
-      {/* Subtle Corner Vignette */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-40"
-        style={{
-          background: "radial-gradient(circle at center, transparent 40%, rgba(163,177,198,0.35) 100%)",
-        }}
-      />
-
-      {/* Top Spacer for perfect vertical centering */}
+      {/* Top Spacer for vertical centering */}
       <div className="w-full h-8 opacity-0 pointer-events-none" />
 
       {/* Main Visual Center Stage */}
       <main className="relative z-10 flex flex-col items-center text-center max-w-md w-full my-auto">
-        {/* Logo Container with Analytics Ring */}
+        {/* Logo Container with SaaS Glow Ring */}
         <div className="relative mb-5 sm:mb-6">
-          <div className="absolute left-1/2 top-6 -translate-x-1/2 w-40 h-40 sm:w-48 sm:h-48 rounded-full pointer-events-none bg-[#E0E5EC] shadow-[12px_12px_20px_rgb(163,177,198,0.45),-12px_-12px_20px_rgba(255,255,255,0.8)]" />
+          <div className="absolute left-1/2 top-6 -translate-x-1/2 w-40 h-40 sm:w-48 sm:h-48 rounded-full pointer-events-none bg-[#F0EBFF] blur-2xl opacity-70" />
           <div className="relative">
             <BrandLockup animated variant="splash" />
           </div>
         </div>
 
         {/* Tagline */}
-        <p className="text-xs sm:text-[13px] font-medium tracking-[0.24em] text-[#6B7280] uppercase opacity-0 animate-tagline-in mb-7 sm:mb-8">
+        <p className="text-xs sm:text-[13px] font-semibold tracking-[0.24em] text-[#68677D] uppercase opacity-0 animate-tagline-in mb-7 sm:mb-8">
           Understand. Predict. Optimize.
         </p>
 
@@ -159,24 +151,24 @@ export default function LoadingScreen({
         <div className="w-full max-w-[290px] sm:max-w-[340px] flex flex-col opacity-0 animate-progress-in">
           {/* Status Row */}
           <div className="flex items-center justify-between text-xs mb-2">
-            <span className="tracking-wide text-[11.5px] sm:text-xs font-medium text-[#6B7280] transition-colors duration-200">
+            <span className="tracking-wide text-[11.5px] sm:text-xs font-semibold text-[#242137] transition-colors duration-200">
               {currentStatus}
             </span>
-            <span className="font-mono text-[11px] sm:text-xs font-semibold text-[#6B7280]">
+            <span className="font-mono text-[11px] sm:text-xs font-bold text-[#6C4DFF]">
               {progress}%
             </span>
           </div>
 
           {/* Thin Horizontal Progress Line */}
-          <div className="w-full h-3 bg-[#E0E5EC] rounded-full overflow-hidden relative shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
+          <div className="w-full h-2.5 bg-[#E7E3F0] rounded-full overflow-hidden relative shadow-inner">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#6C63FF] via-[#8B84FF] to-[#6C63FF]  transition-[width] duration-150 ease-out"
+              className="h-full rounded-full bg-gradient-to-r from-[#6C4DFF] via-[#4B35B5] to-[#6C4DFF] shadow-sm shadow-[#6C4DFF]/30 transition-[width] duration-150 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
 
           {/* Minimalist Micro Engagement Trend Visualization */}
-          <div className="mt-5 w-full flex items-center justify-center opacity-70">
+          <div className="mt-5 w-full flex items-center justify-center opacity-85">
             <div className="relative w-44 sm:w-48 h-8 flex items-center justify-center">
               <svg
                 className="w-full h-full overflow-visible"
@@ -225,7 +217,7 @@ export default function LoadingScreen({
       </main>
 
       {/* Brand Footer */}
-      <footer className="relative z-10 w-full text-center opacity-40 text-[10px] sm:text-[10.5px] text-[#6B7280] tracking-[0.2em] font-medium uppercase animate-tagline-in">
+      <footer className="relative z-10 w-full text-center opacity-70 text-[10px] sm:text-[10.5px] text-[#68677D] tracking-[0.2em] font-medium uppercase animate-tagline-in">
         AI-Powered Instagram Content Performance Intelligence
       </footer>
     </div>

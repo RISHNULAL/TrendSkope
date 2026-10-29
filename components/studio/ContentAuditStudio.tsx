@@ -5,39 +5,21 @@ import {
   Sparkles,
   CheckCircle2,
   AlertTriangle,
-  AlertCircle,
   HelpCircle,
   Copy,
   Check,
   Eye,
-  Sliders,
   TrendingUp,
-  Layers,
   Image as ImageIcon,
-  Video,
   FileText,
   ShieldCheck,
   ArrowRight,
-  Maximize2,
-  Palette,
-  Type,
-  Layout,
-  Sun,
-  Contrast,
   CheckSquare,
   Square,
-  RefreshCw,
-  ExternalLink,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import {
   AnalyzeContentResponse,
   AuditStudioData,
-  CaptionAlternativeOption,
-  DrawbackItem,
-  ImprovementChecklistItem,
-  PublishingChecklistItem,
 } from "@/types";
 
 interface ContentAuditStudioProps {
@@ -67,7 +49,6 @@ export default function ContentAuditStudio({
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
   const [copiedAltId, setCopiedAltId] = useState<string | null>(null);
   const [selectedAltForCompare, setSelectedAltForCompare] = useState<string>("option-b-professional");
-  const [expandedDrawbackId, setExpandedDrawbackId] = useState<string | null>(null);
 
   // Toggle checklist item completion
   const toggleTaskCompletion = (taskId: string) => {
@@ -93,7 +74,7 @@ export default function ContentAuditStudio({
 
   if (!studio) {
     return (
-      <div className="p-6 rounded-3xl bg-[#0D131F] border border-slate-800 text-slate-300 text-sm">
+      <div className="p-6 rounded-3xl bg-white border border-[#E7E3F0] text-[#68677D] text-sm shadow-sm">
         Content Audit Studio data is loading or standard analysis is active.
       </div>
     );
@@ -118,13 +99,13 @@ export default function ContentAuditStudio({
     (a) => a.id === selectedAltForCompare
   ) || captionStudio?.alternatives[1] || captionStudio?.alternatives[0];
 
-  // Presentation band color helper
+  // Presentation band color helper using our professional SaaS palette
   const getScoreColor = (score: number) => {
-    if (score >= 90) return { stroke: "#10B981", text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30" };
-    if (score >= 80) return { stroke: "#0EA5E9", text: "text-sky-400", bg: "bg-sky-500/10", border: "border-sky-500/30" };
-    if (score >= 70) return { stroke: "#F59E0B", text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/30" };
-    if (score >= 60) return { stroke: "#FF6B4A", text: "text-[#FF6B4A]", bg: "bg-[#FF6B4A]/10", border: "border-[#FF6B4A]/30" };
-    return { stroke: "#EF4444", text: "text-rose-400", bg: "bg-rose-500/10", border: "border-rose-500/30" };
+    if (score >= 90) return { stroke: "#0F9D8A", text: "text-[#0F9D8A]", bg: "bg-[#0F9D8A]/10", border: "border-[#0F9D8A]/30" };
+    if (score >= 80) return { stroke: "#6C4DFF", text: "text-[#6C4DFF]", bg: "bg-[#F0EBFF]", border: "border-[#6C4DFF]/30" };
+    if (score >= 70) return { stroke: "#E9A23B", text: "text-[#E9A23B]", bg: "bg-[#E9A23B]/10", border: "border-[#E9A23B]/30" };
+    if (score >= 60) return { stroke: "#F06F73", text: "text-[#F06F73]", bg: "bg-[#F06F73]/10", border: "border-[#F06F73]/30" };
+    return { stroke: "#EF4444", text: "text-rose-600", bg: "bg-rose-50", border: "border-rose-200" };
   };
 
   const overallColors = overall ? getScoreColor(overall.score) : getScoreColor(75);
@@ -137,31 +118,31 @@ export default function ContentAuditStudio({
     : circumference * 0.25;
 
   return (
-    <div className="space-y-8 text-slate-200">
+    <div className="space-y-8 text-[#242137]">
       {/* =========================================================================
           STUDIO HEADER BAR
           ========================================================================= */}
-      <div className="p-6 sm:p-7 rounded-3xl bg-[#0D131F] border border-slate-800/80 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#FF6B4A]/10 via-amber-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#6C4DFF]/10 via-[#4B35B5]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF6B4A]/15 border border-[#FF6B4A]/30 text-[#FF6B4A] text-xs font-bold uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F0EBFF] border border-[#6C4DFF]/30 text-[#6C4DFF] text-xs font-bold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5" />
                 Audit Studio Active
               </span>
-              <span className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-slate-300 text-xs font-mono font-medium">
+              <span className="px-3 py-1 rounded-full bg-[#F8F7FC] border border-[#E7E3F0] text-[#242137] text-xs font-mono font-medium">
                 {report.input?.media_type?.toUpperCase() || "IMAGE"} POST
               </span>
-              <span className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-slate-400 text-xs font-mono">
+              <span className="px-3 py-1 rounded-full bg-[#F8F7FC] border border-[#E7E3F0] text-[#68677D] text-xs font-mono">
                 {report.input?.category || "General"}
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-black text-[#242137] tracking-tight flex items-center gap-2">
               AI Content Audit, Scoring & Improvement Studio
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#68677D] max-w-2xl leading-relaxed">
               Evidence-based evaluation of visual composition, text legibility, copywriting structure,
               and pre-flight publishing compliance.
             </p>
@@ -169,14 +150,14 @@ export default function ContentAuditStudio({
 
           <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
             <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#68677D] block">
                 Analysis Engine
               </span>
-              <span className="text-xs font-bold text-slate-200">
+              <span className="text-xs font-bold text-[#242137]">
                 Multimodal CV + NLP
               </span>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-[#FF6B4A]/10 border border-[#FF6B4A]/30 flex items-center justify-center text-[#FF6B4A]">
+            <div className="w-10 h-10 rounded-2xl bg-[#F0EBFF] border border-[#6C4DFF]/30 flex items-center justify-center text-[#6C4DFF]">
               <ShieldCheck className="w-5 h-5" />
             </div>
           </div>
@@ -187,11 +168,11 @@ export default function ContentAuditStudio({
           SECTION 1: OVERALL CONTENT QUALITY SCORE GAUGE
           ========================================================================= */}
       {overall && (
-        <div className="p-7 sm:p-8 rounded-3xl bg-[#0D131F] border border-slate-800/80 shadow-2xl relative overflow-hidden">
+        <div className="p-7 sm:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm relative overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left: Circular Score Gauge */}
             <div className="lg:col-span-5 flex flex-col items-center justify-center text-center">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-slate-400 mb-3">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#68677D] mb-3">
                 Overall Content Quality
               </span>
 
@@ -202,7 +183,7 @@ export default function ContentAuditStudio({
                     cx="80"
                     cy="80"
                     r={radius}
-                    stroke="#1E293B"
+                    stroke="#E7E3F0"
                     strokeWidth="12"
                     fill="transparent"
                   />
@@ -223,10 +204,10 @@ export default function ContentAuditStudio({
 
                 {/* Inner Text */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                  <span className="text-4xl sm:text-5xl font-black text-[#242137] tracking-tight">
                     {overall.score}
                   </span>
-                  <span className="text-xs font-mono font-semibold text-slate-400 mt-0.5">
+                  <span className="text-xs font-mono font-semibold text-[#68677D] mt-0.5">
                     / {overall.max_score}
                   </span>
                 </div>
@@ -239,22 +220,22 @@ export default function ContentAuditStudio({
                 >
                   {overall.band}
                 </span>
-                <p className="text-xs text-slate-300 font-medium max-w-xs mx-auto leading-snug">
+                <p className="text-xs text-[#68677D] font-medium max-w-xs mx-auto leading-snug">
                   {overall.verdict}
                 </p>
               </div>
             </div>
 
             {/* Right: Breakdown of Contributing Criteria */}
-            <div className="lg:col-span-7 space-y-4 border-t lg:border-t-0 lg:border-l border-slate-800/80 pt-6 lg:pt-0 lg:pl-8">
+            <div className="lg:col-span-7 space-y-4 border-t lg:border-t-0 lg:border-l border-[#E7E3F0] pt-6 lg:pt-0 lg:pl-8">
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#68677D] flex items-center justify-between">
                   <span>Contributing Quality Pillars</span>
-                  <span className="text-[10px] font-mono text-slate-500 font-normal">
+                  <span className="text-[10px] font-mono text-[#68677D] font-normal">
                     Normalized Weighting
                   </span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-[#68677D] mt-1">
                   Derived strictly from applicable evaluated categories. Engagement prediction is excluded from content craft score.
                 </p>
               </div>
@@ -265,11 +246,11 @@ export default function ContentAuditStudio({
                   return (
                     <div key={idx} className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-slate-200">
+                        <span className="font-semibold text-[#242137]">
                           {cat.name}
                         </span>
                         <div className="flex items-center gap-2 font-mono">
-                          <span className="text-[11px] text-slate-400">
+                          <span className="text-[11px] text-[#68677D]">
                             Weight: {Math.round(cat.weight * 100)}%
                           </span>
                           <span className={`font-bold ${catColor.text}`}>
@@ -279,7 +260,7 @@ export default function ContentAuditStudio({
                       </div>
 
                       {/* Progress Bar */}
-                      <div className="w-full h-2 rounded-full bg-slate-800/90 overflow-hidden">
+                      <div className="w-full h-2 rounded-full bg-[#F0EBFF] overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-700"
                           style={{
@@ -294,20 +275,20 @@ export default function ContentAuditStudio({
               </div>
 
               {/* Calibrated Bands Guide */}
-              <div className="pt-2 text-[10.5px] font-mono text-slate-400 grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-center">
-                <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <div className="pt-2 text-[10.5px] font-mono text-[#68677D] grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-center">
+                <div className="p-1.5 rounded-lg bg-[#0F9D8A]/10 border border-[#0F9D8A]/20 text-[#0F9D8A] font-semibold">
                   90–100: Excellent
                 </div>
-                <div className="p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400">
+                <div className="p-1.5 rounded-lg bg-[#F0EBFF] border border-[#6C4DFF]/30 text-[#6C4DFF] font-semibold">
                   80–89: Very Good
                 </div>
-                <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                <div className="p-1.5 rounded-lg bg-[#E9A23B]/10 border border-[#E9A23B]/20 text-[#E9A23B] font-semibold">
                   70–79: Good
                 </div>
-                <div className="p-1.5 rounded-lg bg-[#FF6B4A]/10 border border-[#FF6B4A]/20 text-[#FF6B4A]">
+                <div className="p-1.5 rounded-lg bg-[#F06F73]/10 border border-[#F06F73]/20 text-[#F06F73] font-semibold">
                   60–69: Review
                 </div>
-                <div className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400">
+                <div className="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 font-semibold">
                   &lt;60: Significant
                 </div>
               </div>
@@ -320,18 +301,18 @@ export default function ContentAuditStudio({
           SECTION 2: IMAGE & POSTER QUALITY AUDIT
           ========================================================================= */}
       {imageAudit && imageAudit.evaluated && (
-        <div className="p-7 sm:p-8 rounded-3xl bg-[#0D131F] border border-slate-800/80 shadow-2xl space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div className="p-7 sm:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E7E3F0] pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#FF6B4A] to-amber-500 flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6C4DFF] to-[#4B35B5] flex items-center justify-center text-white">
                   <ImageIcon className="w-4 h-4" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold text-[#242137] tracking-tight">
                   Image & Poster Quality Audit
                 </h3>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#68677D] mt-1">
                 Photometric diagnostics, resolution suitability, edge sharpness, and visual hierarchy.
               </p>
             </div>
@@ -339,10 +320,10 @@ export default function ContentAuditStudio({
             {imageAudit.overall_score !== null && (
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <span className="text-[10px] font-mono uppercase text-slate-400 block">
+                  <span className="text-[10px] font-mono uppercase text-[#68677D] block">
                     Image Quality Rating
                   </span>
-                  <span className="text-lg font-black text-white font-mono">
+                  <span className="text-lg font-black text-[#242137] font-mono">
                     {imageAudit.overall_score} / 100
                   </span>
                 </div>
@@ -359,7 +340,7 @@ export default function ContentAuditStudio({
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             {mediaPreviewUrl && (
               <div className="md:col-span-4 space-y-3">
-                <div className="rounded-2xl border border-slate-800 bg-[#070A10] p-2 overflow-hidden shadow-inner flex items-center justify-center">
+                <div className="rounded-2xl border border-[#E7E3F0] bg-[#F8F7FC] p-2 overflow-hidden shadow-inner flex items-center justify-center">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={mediaPreviewUrl}
@@ -367,16 +348,16 @@ export default function ContentAuditStudio({
                     className="max-h-64 rounded-xl object-contain"
                   />
                 </div>
-                <div className="text-[11px] font-mono text-slate-400 space-y-1">
+                <div className="text-[11px] font-mono text-[#68677D] space-y-1">
                   <div className="flex justify-between">
                     <span>Framing:</span>
-                    <strong className="text-slate-200">
+                    <strong className="text-[#242137]">
                       {report.media_analysis?.dimensions?.aspect_ratio || "Detected"}
                     </strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Resolution:</span>
-                    <strong className="text-slate-200">
+                    <strong className="text-[#242137]">
                       {report.media_analysis?.dimensions?.width || 1080} × {report.media_analysis?.dimensions?.height || 1350}px
                     </strong>
                   </div>
@@ -384,22 +365,22 @@ export default function ContentAuditStudio({
 
                 {/* Dominant Palette Swatches */}
                 {report.media_analysis?.visual_metrics?.dominant_colors && (
-                  <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">
+                  <div className="p-3 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-2">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#68677D] block">
                       Color Palette Harmony
                     </span>
                     <div className="flex items-center gap-2 flex-wrap">
                       {report.media_analysis.visual_metrics.dominant_colors.map((c, cIdx) => (
                         <div
                           key={cIdx}
-                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60"
+                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white border border-[#E7E3F0]"
                         >
                           <span
-                            className="w-3.5 h-3.5 rounded-full border border-white/20 shrink-0"
+                            className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0"
                             style={{ backgroundColor: c.hex }}
                           />
-                          <span className="text-[10px] font-mono text-slate-200">{c.hex}</span>
-                          <span className="text-[9px] font-mono text-slate-400">({c.percentage}%)</span>
+                          <span className="text-[10px] font-mono text-[#242137]">{c.hex}</span>
+                          <span className="text-[9px] font-mono text-[#68677D]">({c.percentage}%)</span>
                         </div>
                       ))}
                     </div>
@@ -416,10 +397,10 @@ export default function ContentAuditStudio({
                   return (
                     <div
                       key={idx}
-                      className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-slate-700 transition-all space-y-2"
+                      className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] hover:border-[#6C4DFF]/40 hover:bg-white transition-all space-y-2 shadow-sm"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white">
+                        <span className="text-xs font-bold text-[#242137]">
                           {cat.category}
                         </span>
                         <div className="flex items-center gap-2 font-mono">
@@ -434,16 +415,16 @@ export default function ContentAuditStudio({
                         </div>
                       </div>
 
-                      <p className="text-xs text-slate-300 font-medium leading-snug">
+                      <p className="text-xs text-[#68677D] font-medium leading-snug">
                         {cat.explanation}
                       </p>
 
-                      <div className="text-[11px] font-mono text-slate-400 bg-slate-950/60 p-2 rounded-lg border border-slate-800/60 leading-tight">
-                        <strong className="text-slate-300">Evidence:</strong> {cat.evidence}
+                      <div className="text-[11px] font-mono text-[#68677D] bg-white p-2 rounded-lg border border-[#E7E3F0] leading-tight">
+                        <strong className="text-[#242137]">Evidence:</strong> {cat.evidence}
                       </div>
 
-                      <div className="text-[11px] text-slate-300 flex items-start gap-1.5 leading-snug pt-0.5">
-                        <ArrowRight className="w-3.5 h-3.5 text-[#FF6B4A] shrink-0 mt-0.5" />
+                      <div className="text-[11px] text-[#242137] flex items-start gap-1.5 leading-snug pt-0.5 font-medium">
+                        <ArrowRight className="w-3.5 h-3.5 text-[#6C4DFF] shrink-0 mt-0.5" />
                         <span>{cat.recommendation}</span>
                       </div>
                     </div>
@@ -459,18 +440,18 @@ export default function ContentAuditStudio({
           SECTION 3: CAPTION & HASHTAG AUDIT + CAPTION IMPROVEMENT STUDIO
           ========================================================================= */}
       {captionAudit && captionAudit.evaluated && (
-        <div className="p-7 sm:p-8 rounded-3xl bg-[#0D131F] border border-slate-800/80 shadow-2xl space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div className="p-7 sm:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E7E3F0] pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-[#FF6B4A] flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6C4DFF] to-[#0F9D8A] flex items-center justify-center text-white">
                   <FileText className="w-4 h-4" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold text-[#242137] tracking-tight">
                   Caption & Hashtag Quality Audit
                 </h3>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#68677D] mt-1">
                 Linguistic structure, opening hook clarity, call-to-action placement, and discoverability.
               </p>
             </div>
@@ -478,10 +459,10 @@ export default function ContentAuditStudio({
             {captionAudit.overall_score !== null && (
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <span className="text-[10px] font-mono uppercase text-slate-400 block">
+                  <span className="text-[10px] font-mono uppercase text-[#68677D] block">
                     Caption Score
                   </span>
-                  <span className="text-lg font-black text-white font-mono">
+                  <span className="text-lg font-black text-[#242137] font-mono">
                     {captionAudit.overall_score} / 100
                   </span>
                 </div>
@@ -501,10 +482,10 @@ export default function ContentAuditStudio({
               return (
                 <div
                   key={idx}
-                  className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/90 space-y-1.5"
+                  className="p-3.5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1.5 shadow-sm"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white truncate pr-1">
+                    <span className="text-xs font-bold text-[#242137] truncate pr-1">
                       {cat.category}
                     </span>
                     <span className={`text-xs font-bold font-mono ${catColor.text}`}>
@@ -516,7 +497,7 @@ export default function ContentAuditStudio({
                   >
                     {cat.status}
                   </span>
-                  <p className="text-[11px] text-slate-400 leading-snug">
+                  <p className="text-[11px] text-[#68677D] leading-snug">
                     {cat.explanation}
                   </p>
                 </div>
@@ -525,21 +506,21 @@ export default function ContentAuditStudio({
           </div>
 
           {/* Hashtags Analysis */}
-          <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="space-y-1">
-              <span className="font-bold text-white flex items-center gap-1.5">
+              <span className="font-bold text-[#242137] flex items-center gap-1.5">
                 <span>Hashtag Allocation:</span>
-                <span className="font-mono text-amber-400">{captionAudit.hashtag_analysis.count} tags</span>
-                <span className="text-[10px] text-slate-400">({captionAudit.hashtag_analysis.density_label})</span>
+                <span className="font-mono text-[#6C4DFF]">{captionAudit.hashtag_analysis.count} tags</span>
+                <span className="text-[10px] text-[#68677D]">({captionAudit.hashtag_analysis.density_label})</span>
               </span>
-              <p className="text-slate-400">
+              <p className="text-[#68677D]">
                 {captionAudit.hashtag_analysis.recommendation}
               </p>
             </div>
             {captionAudit.hashtag_analysis.detected.length > 0 && (
               <div className="flex items-center gap-1.5 flex-wrap">
                 {captionAudit.hashtag_analysis.detected.slice(0, 6).map((ht, hIdx) => (
-                  <span key={hIdx} className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700/80 font-mono text-[10.5px] text-slate-300">
+                  <span key={hIdx} className="px-2 py-0.5 rounded bg-white border border-[#E7E3F0] font-mono text-[10.5px] text-[#242137]">
                     {ht}
                   </span>
                 ))}
@@ -550,18 +531,18 @@ export default function ContentAuditStudio({
           {/* CAPTION IMPROVEMENT STUDIO: 3 PRACTICAL ALTERNATIVES */}
           {captionStudio && captionStudio.alternatives.length > 0 && (
             <div className="space-y-4 pt-2">
-              <div className="flex items-center justify-between border-t border-slate-800 pt-5">
+              <div className="flex items-center justify-between border-t border-[#E7E3F0] pt-5">
                 <div>
-                  <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#FF6B4A]" />
+                  <h4 className="text-sm font-bold text-[#242137] uppercase tracking-wider flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#6C4DFF]" />
                     Caption Improvement Studio (3 Practical Alternatives)
                   </h4>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-[#68677D] mt-0.5">
                     Preserves all factual dates, prices, and names. Choose the best tone for your objective.
                   </p>
                 </div>
                 {captionStudio.preserved_entities && (
-                  <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 hidden md:inline-block">
+                  <span className="text-[11px] font-mono text-[#0F9D8A] bg-[#0F9D8A]/10 px-2.5 py-1 rounded-full border border-[#0F9D8A]/25 hidden md:inline-block font-semibold">
                     ✓ Factual Details Protected
                   </span>
                 )}
@@ -579,8 +560,8 @@ export default function ContentAuditStudio({
                       key={alt.id}
                       className={`p-5 rounded-2xl border transition-all flex flex-col justify-between space-y-4 ${
                         isOptionB
-                          ? "bg-slate-900/90 border-[#FF6B4A]/50 shadow-lg shadow-[#FF6B4A]/5"
-                          : "bg-slate-900/50 border-slate-800 hover:border-slate-700"
+                          ? "bg-white border-2 border-[#6C4DFF] shadow-md shadow-[#6C4DFF]/10"
+                          : "bg-white border-[#E7E3F0] hover:border-[#6C4DFF]/40 shadow-sm"
                       }`}
                     >
                       <div className="space-y-3">
@@ -588,37 +569,37 @@ export default function ContentAuditStudio({
                           <span
                             className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
                               isOptionB
-                                ? "bg-[#FF6B4A]/15 text-[#FF6B4A] border-[#FF6B4A]/30"
+                                ? "bg-[#F0EBFF] text-[#6C4DFF] border-[#6C4DFF]/30"
                                 : isOptionA
-                                ? "bg-sky-500/15 text-sky-400 border-sky-500/30"
-                                : "bg-purple-500/15 text-purple-400 border-purple-500/30"
+                                ? "bg-blue-50 text-[#4285F4] border-blue-200"
+                                : "bg-purple-50 text-purple-700 border-purple-200"
                             }`}
                           >
                             {alt.title}
                           </span>
-                          <span className="text-[10.5px] font-mono text-slate-400">
+                          <span className="text-[10.5px] font-mono text-[#68677D]">
                             {alt.word_count} words
                           </span>
                         </div>
 
-                        <p className="text-xs text-slate-400 leading-snug">
+                        <p className="text-xs text-[#68677D] leading-snug">
                           {alt.subtitle}
                         </p>
 
                         {/* Caption Text Box */}
-                        <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/90 text-xs text-slate-200 font-sans whitespace-pre-line leading-relaxed max-h-56 overflow-y-auto">
+                        <div className="p-3.5 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] text-xs text-[#242137] font-sans whitespace-pre-line leading-relaxed max-h-56 overflow-y-auto">
                           {alt.text}
                         </div>
 
                         {/* Key Improvements */}
                         <div className="space-y-1">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#68677D] block">
                             Key Refinements:
                           </span>
-                          <ul className="text-[11px] text-slate-300 space-y-0.5">
+                          <ul className="text-[11px] text-[#242137] space-y-0.5">
                             {alt.key_changes.map((ch, cIdx) => (
                               <li key={cIdx} className="flex items-start gap-1.5">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0 mt-0.5" />
+                                <CheckCircle2 className="w-3 h-3 text-[#0F9D8A] shrink-0 mt-0.5" />
                                 <span>{ch}</span>
                               </li>
                             ))}
@@ -633,8 +614,8 @@ export default function ContentAuditStudio({
                           onClick={() => handleCopy(alt.id, alt.text)}
                           className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold border flex items-center justify-center gap-1.5 transition-all ${
                             isCopied
-                              ? "bg-emerald-500 text-white border-emerald-400"
-                              : "bg-slate-800 hover:bg-slate-700 text-white border-slate-700"
+                              ? "bg-[#0F9D8A] text-white border-[#0F9D8A]"
+                              : "bg-[#6C4DFF] hover:bg-[#5B3FE6] text-white border-transparent shadow-sm shadow-[#6C4DFF]/25"
                           }`}
                         >
                           {isCopied ? (
@@ -654,7 +635,7 @@ export default function ContentAuditStudio({
                           <button
                             type="button"
                             onClick={() => onApplyCaption(alt.text)}
-                            className="py-2 px-3 rounded-xl text-xs font-bold bg-[#FF6B4A]/10 text-[#FF6B4A] border border-[#FF6B4A]/30 hover:bg-[#FF6B4A]/20 transition-all flex items-center gap-1"
+                            className="py-2 px-3 rounded-xl text-xs font-bold bg-[#F0EBFF] text-[#6C4DFF] border border-[#6C4DFF]/30 hover:bg-[#6C4DFF] hover:text-white transition-all flex items-center gap-1"
                             title="Insert into Caption form"
                           >
                             Apply
@@ -673,23 +654,23 @@ export default function ContentAuditStudio({
       {/* =========================================================================
           SECTION 4: DRAWBACKS AND DETECTED ISSUES ("WHAT NEEDS IMPROVEMENT?")
           ========================================================================= */}
-      <div className="p-7 sm:p-8 rounded-3xl bg-[#0D131F] border border-slate-800/80 shadow-2xl space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <div className="p-7 sm:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E7E3F0] pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-rose-500 to-[#FF6B4A] flex items-center justify-center text-white">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#F06F73] to-[#E9A23B] flex items-center justify-center text-white">
                 <AlertTriangle className="w-4 h-4" />
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <h3 className="text-base sm:text-lg font-bold text-[#242137] tracking-tight">
                 What Needs Improvement? (Prioritized Drawbacks)
               </h3>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#68677D] mt-1">
               Detected flaws ordered by severity. Includes evidence, causal explanation, and expected usability benefit.
             </p>
           </div>
 
-          <span className="text-xs font-mono text-slate-400 self-start sm:self-auto">
+          <span className="text-xs font-mono text-[#68677D] self-start sm:self-auto">
             {drawbacks.length} issue{drawbacks.length !== 1 ? "s" : ""} detected
           </span>
         </div>
@@ -701,18 +682,16 @@ export default function ContentAuditStudio({
               const isHigh = db.severity === "High";
               const isMed = db.severity === "Medium";
 
-              const badgeClass = isCrit
-                ? "bg-rose-500/15 text-rose-400 border-rose-500/30"
-                : isHigh
-                ? "bg-[#FF6B4A]/15 text-[#FF6B4A] border-[#FF6B4A]/30"
+              const badgeClass = isCrit || isHigh
+                ? "bg-[#F06F73]/10 text-[#F06F73] border-[#F06F73]/30"
                 : isMed
-                ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-                : "bg-sky-500/15 text-sky-400 border-sky-500/30";
+                ? "bg-[#E9A23B]/10 text-[#E9A23B] border-[#E9A23B]/30"
+                : "bg-blue-50 text-[#4285F4] border-blue-200";
 
               return (
                 <div
                   key={db.id}
-                  className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-slate-700 transition-all space-y-3"
+                  className="p-5 rounded-2xl bg-white border border-[#E7E3F0] hover:border-[#6C4DFF]/40 transition-all space-y-3 shadow-sm"
                 >
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2.5">
@@ -721,35 +700,35 @@ export default function ContentAuditStudio({
                       >
                         {db.severity} Priority
                       </span>
-                      <span className="text-sm font-bold text-white">
+                      <span className="text-sm font-bold text-[#242137]">
                         {db.title}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+                    <div className="flex items-center gap-2 text-xs font-mono text-[#68677D]">
                       <span>Confidence:</span>
-                      <strong className="text-slate-200">{db.confidence}</strong>
+                      <strong className="text-[#242137]">{db.confidence}</strong>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-3 text-xs">
                     <div className="md:col-span-6 space-y-2">
-                      <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800">
-                        <strong className="text-slate-300 font-mono block mb-0.5">Evidence:</strong>
-                        <span className="text-slate-300 font-mono">{db.evidence}</span>
+                      <div className="p-2.5 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+                        <strong className="text-[#68677D] font-mono block mb-0.5">Evidence:</strong>
+                        <span className="text-[#242137] font-mono">{db.evidence}</span>
                       </div>
-                      <p className="text-slate-300 leading-relaxed font-medium">
-                        <strong className="text-slate-400">Why it matters:</strong> {db.explanation}
+                      <p className="text-[#242137] leading-relaxed font-medium">
+                        <strong className="text-[#68677D]">Why it matters:</strong> {db.explanation}
                       </p>
                     </div>
 
                     <div className="md:col-span-6 space-y-2">
-                      <div className="p-2.5 rounded-xl bg-[#FF6B4A]/10 border border-[#FF6B4A]/20 text-slate-200">
-                        <strong className="text-[#FF6B4A] font-bold block mb-0.5">Recommended Fix:</strong>
+                      <div className="p-2.5 rounded-xl bg-[#F0EBFF] border border-[#6C4DFF]/25 text-[#242137]">
+                        <strong className="text-[#6C4DFF] font-bold block mb-0.5">Recommended Fix:</strong>
                         <span>{db.recommended_fix}</span>
                       </div>
-                      <p className="text-emerald-400 font-mono text-[11px] leading-snug">
-                        <strong>Expected benefit:</strong> {db.expected_benefit}
+                      <p className="text-[#0F9D8A] font-mono text-[11px] leading-snug font-bold">
+                        <span>Expected benefit: </span>{db.expected_benefit}
                       </p>
                     </div>
                   </div>
@@ -758,10 +737,10 @@ export default function ContentAuditStudio({
             })}
           </div>
         ) : (
-          <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-400 text-center space-y-2">
+          <div className="p-6 rounded-2xl bg-[#0F9D8A]/5 border border-[#0F9D8A]/25 text-[#0F9D8A] text-center space-y-2">
             <CheckCircle2 className="w-8 h-8 mx-auto" />
             <h4 className="font-bold text-sm">No Critical Drawbacks Detected!</h4>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
+            <p className="text-xs text-[#68677D] max-w-md mx-auto">
               Your content demonstrates strong visual discipline and structural clarity. Review the recommendations checklist below for optional refinements.
             </p>
           </div>
@@ -771,18 +750,18 @@ export default function ContentAuditStudio({
       {/* =========================================================================
           SECTION 5: ACTIONABLE IMPROVEMENT STUDIO (CHECKLIST & FILTERS)
           ========================================================================= */}
-      <div className="p-7 sm:p-8 rounded-3xl bg-[#0D131F] border border-slate-800/80 shadow-2xl space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="p-7 sm:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E7E3F0] pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6C4DFF] to-[#4285F4] flex items-center justify-center text-white">
                 <CheckSquare className="w-4 h-4" />
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <h3 className="text-base sm:text-lg font-bold text-[#242137] tracking-tight">
                 Improvement Studio (Interactive Action Checklist)
               </h3>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#68677D] mt-1">
               Check off improvements as you apply them. Progress is tracked for this session.
             </p>
           </div>
@@ -790,16 +769,16 @@ export default function ContentAuditStudio({
           {/* Live Completion Counter */}
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <span className="text-[10px] font-mono text-slate-400 block uppercase">
+              <span className="text-[10px] font-mono text-[#68677D] block uppercase">
                 Tasks Completed
               </span>
-              <span className="text-sm font-bold font-mono text-white">
+              <span className="text-sm font-bold font-mono text-[#242137]">
                 {completedTasks.size} / {checklist.length} ({completionPct}%)
               </span>
             </div>
-            <div className="w-20 h-2 rounded-full bg-slate-800 overflow-hidden">
+            <div className="w-20 h-2 rounded-full bg-[#E7E3F0] overflow-hidden">
               <div
-                className="h-full bg-[#FF6B4A] transition-all duration-300"
+                className="h-full bg-[#6C4DFF] transition-all duration-300"
                 style={{ width: `${completionPct}%` }}
               />
             </div>
@@ -821,8 +800,8 @@ export default function ContentAuditStudio({
               onClick={() => setActiveChecklistFilter(tab.id)}
               className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${
                 activeChecklistFilter === tab.id
-                  ? "bg-[#FF6B4A] text-white shadow-md shadow-[#FF6B4A]/20"
-                  : "bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800"
+                  ? "bg-[#6C4DFF] text-white shadow-sm shadow-[#6C4DFF]/30"
+                  : "bg-white text-[#68677D] hover:text-[#242137] border border-[#E7E3F0]"
               }`}
             >
               {tab.label}
@@ -839,17 +818,17 @@ export default function ContentAuditStudio({
               <div
                 key={item.id}
                 onClick={() => toggleTaskCompletion(item.id)}
-                className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex items-start gap-4 ${
+                className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex items-start gap-4 shadow-sm ${
                   isDone
-                    ? "bg-slate-950/40 border-slate-800/50 opacity-60"
-                    : "bg-slate-900/70 border-slate-800 hover:border-slate-700"
+                    ? "bg-[#F8F7FC] border-[#E7E3F0] opacity-75"
+                    : "bg-white border-[#E7E3F0] hover:border-[#6C4DFF]/40"
                 }`}
               >
                 <div className="pt-0.5 shrink-0">
                   {isDone ? (
-                    <CheckSquare className="w-5 h-5 text-emerald-400" />
+                    <CheckSquare className="w-5 h-5 text-[#0F9D8A]" />
                   ) : (
-                    <Square className="w-5 h-5 text-slate-500 hover:text-slate-300" />
+                    <Square className="w-5 h-5 text-[#68677D] hover:text-[#6C4DFF]" />
                   )}
                 </div>
 
@@ -857,7 +836,7 @@ export default function ContentAuditStudio({
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <span
                       className={`font-bold text-sm ${
-                        isDone ? "line-through text-slate-400" : "text-white"
+                        isDone ? "line-through text-[#68677D]" : "text-[#242137]"
                       }`}
                     >
                       {item.title}
@@ -865,25 +844,25 @@ export default function ContentAuditStudio({
                     <span
                       className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase border ${
                         item.priority === "Critical" || item.priority === "High"
-                          ? "bg-[#FF6B4A]/10 text-[#FF6B4A] border-[#FF6B4A]/30"
-                          : "bg-slate-800 text-slate-300 border-slate-700"
+                          ? "bg-[#F06F73]/10 text-[#F06F73] border-[#F06F73]/30"
+                          : "bg-[#F8F7FC] text-[#68677D] border-[#E7E3F0]"
                       }`}
                     >
                       {item.priority}
                     </span>
                   </div>
 
-                  <p className="text-slate-300 leading-relaxed font-medium">
-                    <strong className="text-slate-400">Proposed Change:</strong> {item.proposed_change}
+                  <p className="text-[#242137] leading-relaxed font-medium">
+                    <strong className="text-[#68677D]">Proposed Change:</strong> {item.proposed_change}
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-mono text-[11px] text-slate-400">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-mono text-[11px] text-[#68677D]">
                     <div>
-                      <span className="text-slate-500">Current Issue:</span> {item.current_issue}
+                      <span className="text-[#68677D]">Current Issue:</span> {item.current_issue}
                     </div>
                     <div>
-                      <span className="text-slate-500">Expected Benefit:</span>{" "}
-                      <span className="text-emerald-400 font-bold">{item.expected_benefit}</span>
+                      <span className="text-[#68677D]">Expected Benefit:</span>{" "}
+                      <span className="text-[#0F9D8A] font-bold">{item.expected_benefit}</span>
                     </div>
                   </div>
                 </div>
@@ -896,17 +875,17 @@ export default function ContentAuditStudio({
       {/* =========================================================================
           SECTION 6: BEFORE-AND-AFTER COMPARISON
           ========================================================================= */}
-      <div className="p-7 sm:p-8 rounded-3xl bg-[#0D131F] border border-slate-800/80 shadow-2xl space-y-6">
-        <div className="border-b border-slate-800 pb-4">
+      <div className="p-7 sm:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-6">
+        <div className="border-b border-[#E7E3F0] pb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-500 to-[#FF6B4A] flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6C4DFF] to-[#4B35B5] flex items-center justify-center text-white">
               <Eye className="w-4 h-4" />
             </div>
-            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+            <h3 className="text-base sm:text-lg font-bold text-[#242137] tracking-tight">
               Before & After Comparison Studio
             </h3>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[#68677D] mt-1">
             Compare original copy and visual layout specifications side-by-side.
           </p>
         </div>
@@ -915,7 +894,7 @@ export default function ContentAuditStudio({
         {captionStudio && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#242137]">
                 Caption Comparison
               </span>
               <div className="flex items-center gap-1.5 text-xs">
@@ -926,8 +905,8 @@ export default function ContentAuditStudio({
                     onClick={() => setSelectedAltForCompare(a.id)}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                       selectedAltForCompare === a.id
-                        ? "bg-[#FF6B4A] text-white"
-                        : "bg-slate-800 text-slate-400 hover:text-slate-200"
+                        ? "bg-[#6C4DFF] text-white"
+                        : "bg-[#F8F7FC] text-[#68677D] hover:text-[#242137] border border-[#E7E3F0]"
                     }`}
                   >
                     {a.title.split("—")[0].trim()}
@@ -938,41 +917,41 @@ export default function ContentAuditStudio({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Original */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
+              <div className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-mono font-bold uppercase text-slate-400">
+                  <span className="text-[11px] font-mono font-bold uppercase text-[#68677D]">
                     Original Caption
                   </span>
-                  <span className="text-[10px] font-mono text-slate-400">
+                  <span className="text-[10px] font-mono text-[#68677D]">
                     {report.caption_analysis?.metrics?.words || 0} words
                   </span>
                 </div>
-                <div className="text-xs text-slate-300 whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto">
+                <div className="text-xs text-[#242137] whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto">
                   {captionStudio.original_caption || "No caption entered"}
                 </div>
               </div>
 
               {/* Improved Alternative */}
               {activeAlternative && (
-                <div className="p-4 rounded-2xl bg-slate-900/90 border border-[#FF6B4A]/40 space-y-2 shadow-lg shadow-[#FF6B4A]/5">
+                <div className="p-4 rounded-2xl bg-[#F0EBFF] border border-[#6C4DFF]/40 space-y-2 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono font-bold uppercase text-[#FF6B4A]">
+                    <span className="text-[11px] font-mono font-bold uppercase text-[#6C4DFF]">
                       {activeAlternative.title}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleCopy(activeAlternative.id, activeAlternative.text)}
-                      className="text-[11px] font-mono font-bold text-slate-300 hover:text-white flex items-center gap-1"
+                      className="text-[11px] font-mono font-bold text-[#6C4DFF] hover:text-[#4B35B5] flex items-center gap-1"
                     >
                       {copiedAltId === activeAlternative.id ? (
-                        <Check className="w-3 h-3 text-emerald-400" />
+                        <Check className="w-3 h-3 text-[#0F9D8A]" />
                       ) : (
-                        <Copy className="w-3 h-3 text-slate-400" />
+                        <Copy className="w-3 h-3 text-[#6C4DFF]" />
                       )}
                       <span>Copy</span>
                     </button>
                   </div>
-                  <div className="text-xs text-slate-100 whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto font-sans">
+                  <div className="text-xs text-[#242137] whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto font-sans">
                     {activeAlternative.text}
                   </div>
                 </div>
@@ -983,40 +962,40 @@ export default function ContentAuditStudio({
 
         {/* Visual Design Specification Specification Box */}
         {visualSpec && visualSpec.has_media && (
-          <div className="space-y-3 pt-3 border-t border-slate-800">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+          <div className="space-y-3 pt-3 border-t border-[#E7E3F0]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#242137] block">
               Enhanced Visual Design Specification
             </span>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-              <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase block">Optimal Framing</span>
-                <span className="font-bold text-white text-xs">{visualSpec.recommended_aspect}</span>
-                <p className="text-[11px] text-slate-400 leading-tight">
+              <div className="p-3.5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1">
+                <span className="text-[10px] font-mono text-[#68677D] uppercase block">Optimal Framing</span>
+                <span className="font-bold text-[#242137] text-xs">{visualSpec.recommended_aspect}</span>
+                <p className="text-[11px] text-[#68677D] leading-tight">
                   Current: {visualSpec.original_aspect}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase block">Subject Placement</span>
-                <span className="font-bold text-white text-xs">Rule-of-Thirds Safe Zone</span>
-                <p className="text-[11px] text-slate-400 leading-tight">
+              <div className="p-3.5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1">
+                <span className="text-[10px] font-mono text-[#68677D] uppercase block">Subject Placement</span>
+                <span className="font-bold text-[#242137] text-xs">Rule-of-Thirds Safe Zone</span>
+                <p className="text-[11px] text-[#68677D] leading-tight">
                   {visualSpec.framing_advice}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase block">Contrast Overlay</span>
-                <span className="font-bold text-amber-400 text-xs">WCAG AA 4.5:1 Target</span>
-                <p className="text-[11px] text-slate-400 leading-tight">
+              <div className="p-3.5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1">
+                <span className="text-[10px] font-mono text-[#68677D] uppercase block">Contrast Overlay</span>
+                <span className="font-bold text-[#E9A23B] text-xs">WCAG AA 4.5:1 Target</span>
+                <p className="text-[11px] text-[#68677D] leading-tight">
                   {visualSpec.contrast_advice}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase block">UI Margins</span>
-                <span className="font-bold text-white text-xs">IG Overlay Buffer</span>
-                <p className="text-[11px] text-slate-400 leading-tight">
+              <div className="p-3.5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1">
+                <span className="text-[10px] font-mono text-[#68677D] uppercase block">UI Margins</span>
+                <span className="font-bold text-[#242137] text-xs">IG Overlay Buffer</span>
+                <p className="text-[11px] text-[#68677D] leading-tight">
                   {visualSpec.safe_zone_notes}
                 </p>
               </div>
@@ -1029,78 +1008,78 @@ export default function ContentAuditStudio({
           SECTION 7: SEGREGATED ENGAGEMENT PREDICTION (SEPARATED FROM QUALITY SCORE)
           ========================================================================= */}
       {segregatedPred && (
-        <div className="p-7 sm:p-8 rounded-3xl bg-[#090D17] border-2 border-slate-800/90 shadow-2xl space-y-5 relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div className="p-7 sm:p-8 rounded-3xl bg-white border-2 border-[#E7E3F0] shadow-sm space-y-5 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E7E3F0] pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-sky-500 flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6C4DFF] to-[#4285F4] flex items-center justify-center text-white">
                   <TrendingUp className="w-4 h-4" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold text-[#242137] tracking-tight">
                   Engagement Prediction (Statistical Offline Model)
                 </h3>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#68677D] mt-1">
                 Strictly separated from content quality scoring. Models historical audience reaction velocity.
               </p>
             </div>
 
-            <span className="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono">
+            <span className="px-3 py-1 rounded-full bg-[#F8F7FC] border border-[#E7E3F0] text-[#242137] text-xs font-mono font-medium">
               Model: {segregatedPred.model_name}
             </span>
           </div>
 
           {/* Important Segregation Banner */}
-          <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 flex items-start gap-3">
-            <HelpCircle className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+          <div className="p-4 rounded-2xl bg-[#F0EBFF] border border-[#6C4DFF]/30 text-xs text-[#4B35B5] flex items-start gap-3">
+            <HelpCircle className="w-4 h-4 text-[#6C4DFF] shrink-0 mt-0.5" />
             <div className="space-y-1 leading-relaxed">
-              <strong className="text-white block">Methodology Distinction:</strong>
+              <strong className="text-[#242137] block font-bold">Methodology Distinction:</strong>
               <span>{segregatedPred.methodology_notice}</span>
             </div>
           </div>
 
           {/* Metrics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">
+            <div className="p-5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1 shadow-sm">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-[#68677D] block">
                 Predicted Engagement Rate
               </span>
-              <div className="text-3xl sm:text-4xl font-black text-white font-mono">
+              <div className="text-3xl sm:text-4xl font-black text-[#6C4DFF] font-mono">
                 {segregatedPred.predicted_rate.toFixed(2)}%
               </div>
-              <span className="text-xs font-bold text-amber-400">
+              <span className="text-xs font-bold text-[#E9A23B]">
                 {segregatedPred.performance_band} Engagement Band
               </span>
             </div>
 
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">
+            <div className="p-5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1 shadow-sm">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-[#68677D] block">
                 90% Uncertainty Interval
               </span>
-              <div className="text-2xl sm:text-3xl font-black text-slate-200 font-mono">
+              <div className="text-2xl sm:text-3xl font-black text-[#242137] font-mono">
                 {segregatedPred.lower_bound.toFixed(2)}% — {segregatedPred.upper_bound.toFixed(2)}%
               </div>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-[#68677D]">
                 Confidence range across corpus variance
               </span>
             </div>
 
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">
+            <div className="p-5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1 shadow-sm">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-[#68677D] block">
                 Historical Benchmark
               </span>
-              <div className="text-2xl sm:text-3xl font-black text-slate-200 font-mono">
+              <div className="text-2xl sm:text-3xl font-black text-[#242137] font-mono">
                 {segregatedPred.historical_baseline.category_average.toFixed(2)}%
               </div>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-[#68677D]">
                 Average in {segregatedPred.historical_baseline.category}
               </span>
             </div>
           </div>
 
-          <div className="text-[11px] font-mono text-slate-500 space-y-1 pt-1">
-            <div><strong>Formula:</strong> {segregatedPred.target_definition}</div>
-            <ul className="list-disc list-inside space-y-0.5 text-slate-400">
+          <div className="text-[11px] font-mono text-[#68677D] space-y-1 pt-1">
+            <div><strong className="text-[#242137]">Formula:</strong> {segregatedPred.target_definition}</div>
+            <ul className="list-disc list-inside space-y-0.5 text-[#68677D]">
               {segregatedPred.limitations.map((lim, lIdx) => (
                 <li key={lIdx}>{lim}</li>
               ))}
@@ -1113,36 +1092,36 @@ export default function ContentAuditStudio({
           SECTION 8: FINAL PUBLISHING-READINESS CHECKLIST
           ========================================================================= */}
       {publishingChecklist && (
-        <div className="p-7 sm:p-8 rounded-3xl bg-[#0D131F] border border-slate-800/80 shadow-2xl space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div className="p-7 sm:p-8 rounded-3xl bg-white border border-[#E7E3F0] shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E3F0] pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0F9D8A] to-[#6C4DFF] flex items-center justify-center text-white">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold text-[#242137] tracking-tight">
                   Final Pre-Flight Publishing Checklist
                 </h3>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#68677D] mt-1">
                 10 automated pre-publication verification checks evaluating clarity, accessibility, and compliance.
               </p>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <span className="text-[10px] font-mono text-slate-400 uppercase block">
+                <span className="text-[10px] font-mono text-[#68677D] uppercase block">
                   Readiness Status
                 </span>
-                <span className="text-sm font-bold font-mono text-white">
+                <span className="text-sm font-bold font-mono text-[#242137]">
                   {publishingChecklist.summary.readiness_percentage}% Ready
                 </span>
               </div>
               <span
                 className={`px-3 py-1 rounded-full text-xs font-bold border ${
                   publishingChecklist.summary.is_ready_to_publish
-                    ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-                    : "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                    ? "bg-[#0F9D8A]/10 text-[#0F9D8A] border-[#0F9D8A]/30"
+                    : "bg-[#E9A23B]/10 text-[#E9A23B] border-[#E9A23B]/30"
                 }`}
               >
                 {publishingChecklist.summary.is_ready_to_publish
@@ -1154,16 +1133,16 @@ export default function ContentAuditStudio({
 
           {/* Counts Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs font-mono">
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            <div className="p-2.5 rounded-xl bg-[#0F9D8A]/10 border border-[#0F9D8A]/20 text-[#0F9D8A] font-bold">
               {publishingChecklist.summary.passed} Passed
             </div>
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+            <div className="p-2.5 rounded-xl bg-[#E9A23B]/10 border border-[#E9A23B]/20 text-[#E9A23B] font-bold">
               {publishingChecklist.summary.needs_review} Needs Review
             </div>
-            <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
+            <div className="p-2.5 rounded-xl bg-[#F06F73]/10 border border-[#F06F73]/20 text-[#F06F73] font-bold">
               {publishingChecklist.summary.failed} Failed
             </div>
-            <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-slate-400">
+            <div className="p-2.5 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] text-[#68677D]">
               {publishingChecklist.summary.not_evaluated} Not Evaluated
             </div>
           </div>
@@ -1176,19 +1155,19 @@ export default function ContentAuditStudio({
               const isFail = chk.status === "failed";
 
               const statusBadge = isPass ? (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-[#0F9D8A]/10 text-[#0F9D8A] border border-[#0F9D8A]/30">
                   PASSED
                 </span>
               ) : isReview ? (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-[#E9A23B]/10 text-[#E9A23B] border border-[#E9A23B]/30">
                   NEEDS REVIEW
                 </span>
               ) : isFail ? (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-[#F06F73]/10 text-[#F06F73] border border-[#F06F73]/30">
                   FAILED
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-slate-800 text-slate-400 border border-slate-700">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-[#F8F7FC] text-[#68677D] border border-[#E7E3F0]">
                   NOT EVALUATED
                 </span>
               );
@@ -1196,15 +1175,15 @@ export default function ContentAuditStudio({
               return (
                 <div
                   key={chk.id}
-                  className="p-3.5 sm:p-4 rounded-2xl bg-slate-900/60 border border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs"
+                  className="p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E7E3F0] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shadow-sm hover:border-[#6C4DFF]/30 transition-all"
                 >
                   <div className="space-y-0.5 flex-1 pr-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-white">{chk.item}</span>
+                      <span className="font-bold text-[#242137]">{chk.item}</span>
                     </div>
-                    <p className="text-slate-400 text-[11px]">{chk.description}</p>
-                    <div className="text-[10.5px] font-mono text-slate-400 pt-0.5">
-                      <strong className="text-slate-300">Finding:</strong> {chk.evidence}
+                    <p className="text-[#68677D] text-[11px]">{chk.description}</p>
+                    <div className="text-[10.5px] font-mono text-[#68677D] pt-0.5">
+                      <strong className="text-[#242137]">Finding:</strong> {chk.evidence}
                     </div>
                   </div>
 

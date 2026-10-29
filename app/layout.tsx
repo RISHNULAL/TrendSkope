@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
-      <body className="antialiased min-h-screen bg-[#E0E5EC] text-[#3D4852] font-sans">
+      <body className="antialiased min-h-screen bg-[#F8F7FC] text-[#242137] font-sans selection:bg-[#F0EBFF] selection:text-[#6C4DFF]">
         {children}
       </body>
     </html>

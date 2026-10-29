@@ -37,6 +37,7 @@ import {
   SmartRecommendationItem,
 } from "@/types";
 import ScenarioPostCard, { StudioScenarioFormState } from "@/components/studio/ScenarioPostCard";
+import WhatIfUncertaintyChart from "@/components/studio/WhatIfUncertaintyChart";
 
 interface WhatIfViewProps {
   modelStatus: ModelStatusResponse | null;
@@ -1098,75 +1099,19 @@ ${comp.quality_b ? `- Scenario B Overall Quality: ${comp.quality_b.score}/100 ($
             </div>
           </div>
 
-          {/* D. COMPARISON INTERVAL CHART (SECTION 5C) */}
-          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E7E3F0]">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-[#6C4DFF]" />
-                <h3 className="text-base font-bold text-[#242137] tracking-wide">
-                  Model Prediction & Uncertainty Interval Chart
-                </h3>
-              </div>
-              <span className="text-xs font-mono text-[#68677D]">Target: Engagement Rate %</span>
-            </div>
-
-            {/* SVG Responsive Comparison Bar & Interval Chart */}
-            <div className="space-y-4 pt-2">
-              {/* Scenario A Bar */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#242137]">Scenario A</span>
-                  <span className="font-mono text-[#68677D]">
-                    {comp.prediction_a.prediction.toFixed(2)}% (CI: {comp.prediction_a.lower.toFixed(2)}% – {comp.prediction_a.upper.toFixed(2)}%)
-                  </span>
-                </div>
-                <div className="h-6 w-full rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] relative overflow-hidden flex items-center">
-                  <div
-                    className="h-full bg-[#4B35B5] transition-all duration-500 rounded-l-xl"
-                    style={{ width: `${Math.min(100, Math.max(5, comp.prediction_a.prediction * 12))}%` }}
-                  />
-                  {/* Confidence Interval Shadow */}
-                  <div
-                    className="absolute h-3 bg-[#6C4DFF]/20 border-x border-[#4B35B5]"
-                    style={{
-                      left: `${Math.min(100, Math.max(0, comp.prediction_a.lower * 12))}%`,
-                      width: `${Math.min(100, Math.max(4, (comp.prediction_a.upper - comp.prediction_a.lower) * 12))}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Scenario B Bar */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#6C4DFF]">Scenario B</span>
-                  <span className="font-mono text-[#6C4DFF]">
-                    {comp.prediction_b.prediction.toFixed(2)}% (CI: {comp.prediction_b.lower.toFixed(2)}% – {comp.prediction_b.upper.toFixed(2)}%)
-                  </span>
-                </div>
-                <div className="h-6 w-full rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] relative overflow-hidden flex items-center">
-                  <div
-                    className="h-full bg-[#6C4DFF] transition-all duration-500 rounded-l-xl"
-                    style={{ width: `${Math.min(100, Math.max(5, comp.prediction_b.prediction * 12))}%` }}
-                  />
-                  {/* Confidence Interval Shadow */}
-                  <div
-                    className="absolute h-3 bg-[#6C4DFF]/30 border-x border-[#6C4DFF]"
-                    style={{
-                      left: `${Math.min(100, Math.max(0, comp.prediction_b.lower * 12))}%`,
-                      width: `${Math.min(100, Math.max(4, (comp.prediction_b.upper - comp.prediction_b.lower) * 12))}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-[11px] text-[#8B89A3] pt-2 border-t border-[#E7E3F0]">
-                <span>0% Baseline</span>
-                <span>Uncertainty error bars depict the 90% empirical boundary</span>
-                <span>Scale: Engagement Rate %</span>
-              </div>
-            </div>
-          </div>
+          {/* D. STATISTICAL FOREST-PLOT PREDICTION & UNCERTAINTY INTERVAL CHART */}
+          <WhatIfUncertaintyChart
+            predictionA={comp.prediction_a}
+            predictionB={comp.prediction_b}
+            scenarioALabel="Scenario A — Original"
+            scenarioBLabel="Scenario B — Alternative"
+            scenarioAFormat={scenarioA.mediaType.toUpperCase()}
+            scenarioBFormat={scenarioB.mediaType.toUpperCase()}
+            deltaPp={metrics.delta_absolute}
+            deltaRelativePct={metrics.delta_relative_pct}
+            intervalsOverlap={comp.intervals_overlap}
+            overlapExplanation={comp.overlap_explanation}
+          />
 
           {/* E. CONTENT QUALITY COMPARISON (SECTION 6) */}
           <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-6">
