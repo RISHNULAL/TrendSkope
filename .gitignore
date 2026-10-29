@@ -46,3 +46,4 @@ Thumbs.db
 # Antigravity / old project files
 .agents/
 files-mentioned-by-the-user-ml/
+tsconfig.tsbuildinfo

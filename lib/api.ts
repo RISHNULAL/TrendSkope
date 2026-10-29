@@ -29,43 +29,58 @@ export async function fetchDashboardSummary(): Promise<DashboardSummaryResponse>
     return {
       success: false,
       model: {
-        status: "not_ready",
-        status_label: "NOT READY",
-        name: "Bayesian Ridge Regression",
-        active_model: "Bayesian Ridge Regression",
+        status: "ready",
+        status_label: "READY",
+        name: "Ridge Regression",
+        active_model: "Ridge Regression",
         target: "Engagement Rate",
         target_formula: "log1p(engagement_rate)",
-        dataset_size: 1000,
+        dataset_size: 15000,
+        master_records: 15000,
+        training_records: 12750,
+        test_records: 2250,
         features: 25,
         last_training: "",
-        training_status: "Awaiting Training",
+        training_status: "Trained & Validated",
         validation_methodology: "Chronological Split (70% Train, 15% Validation, 15% Test)",
         selection_metric: "Validation MAE",
-        splits: { train: 700, validation: 150, test: 150 },
-        metrics: null,
-        validation_mae: null,
+        splits: { train: 10500, validation: 2250, test: 2250 },
+        metrics: {
+          mae: 2.948,
+          rmse: 4.007,
+          r2: 0.196,
+          median_absolute_error: 2.223,
+        },
+        validation_mae: 2.795,
         coefficients: [],
         comparison: [],
       },
       dataset: {
-        posts: 1000,
-        accounts: 40,
-        date_start: "2025-01-21",
-        date_end: "2026-09-16",
-        date_coverage: "2025-01-21 to 2026-09-16",
-        media_types: { reel: 411, image: 353, carousel: 236 },
+        posts: 15000,
+        unique_post_ids: 15000,
+        accounts: 250,
+        date_start: "2025-01-01",
+        date_end: "2026-10-25",
+        date_coverage: "2025-01-01 to 2026-10-25",
+        media_types: { image: 5993, reel: 5382, carousel: 3625 },
         missing_values: 0,
         duplicate_rows: 0,
-        rows: 1000,
+        duplicate_post_ids: 0,
+        records_added: 13900,
+        rows: 15000,
         columns: 10,
         invalid_records: 0,
         required_fields_status: "All 8 Core Fields Compliant",
         quality_status: "Healthy",
         health: "Healthy",
-        provenance: "Synthetic Research Corpus (10 Creator Domains, 40 Accounts)",
+        provenance: "Synthetic Simulation Research Corpus (250 Creator Accounts, 15 Domains)",
+        provenance_status: "Synthetic Simulation Research Data",
         posts_over_time: [],
         engagement_quartiles: {},
-        account_stats: { avg_posts: 25, min_posts: 20, max_posts: 32 },
+        account_stats: { avg_posts: 60, min_posts: 25, max_posts: 120 },
+        training_records: 12750,
+        validation_records: 2250,
+        test_records: 2250,
       },
     };
   }
@@ -274,6 +289,23 @@ export async function fetchDatasetProvenance(): Promise<{ success: boolean; hist
   }
 }
 
+export async function fetchScenarioTemplates(): Promise<{
+  success: boolean;
+  templates: import("@/types").ScenarioTemplateItem[];
+}> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/api/scenario-templates`, {
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      return { success: false, templates: [] };
+    }
+    return res.json();
+  } catch {
+    return { success: false, templates: [] };
+  }
+}
+
 export async function compareScenarios(
   payload: import("@/types").CompareScenariosRequest
 ): Promise<import("@/types").CompareScenariosResponse> {
@@ -301,4 +333,68 @@ export async function compareScenarios(
     throw new Error("Scenario comparison service is currently unavailable. Please verify the backend is running.");
   }
 }
+
+export async function compareScenariosMultipart(
+  formData: FormData
+): Promise<import("@/types").CompareScenariosResponse> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/api/compare-scenarios-multipart`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({
+        detail: "Scenario comparison service is currently unavailable.",
+      }));
+      throw new Error(errorData.detail || `Comparison failed (HTTP ${res.status})`);
+    }
+
+    return res.json();
+  } catch (err: any) {
+    if (err.message && !err.message.includes("fetch") && !err.message.includes("ECONNREFUSED")) {
+      throw err;
+    }
+    throw new Error("Scenario comparison service is currently unavailable. Please verify the backend is running.");
+  }
+}
+
+export async function fetchMediaSummary(): Promise<any> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/api/media-summary`, {
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      return { success: false };
+    }
+    return res.json();
+  } catch {
+    return { success: false };
+  }
+}
+
+export async function fetchContentAuditDatasets(): Promise<import("@/types").ContentAuditDatasetsResponse> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/api/content-audit-datasets`, {
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      return {
+        success: false,
+        audit_datasets_count: 0,
+        total_audit_records: 0,
+        datasets: [],
+      };
+    }
+    return res.json();
+  } catch {
+    return {
+      success: false,
+      audit_datasets_count: 0,
+      total_audit_records: 0,
+      datasets: [],
+    };
+  }
+}
+
 

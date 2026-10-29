@@ -28,8 +28,8 @@ def validate_dataset_file(csv_path: Path) -> dict:
     df = pd.read_csv(csv_path)
     n_rows = len(df)
     
-    # 1. Row count check (target ~1,000)
-    assert 950 <= n_rows <= 1100, f"Expected 950-1100 rows, got {n_rows}"
+    # 1. Row count check (target exactly 15,000)
+    assert n_rows == 15000, f"Expected 15,000 rows, got {n_rows}"
 
     # 2. Schema check
     for col in REQUIRED_COLUMNS:
@@ -92,8 +92,8 @@ def test_dataset_validation():
     target_csv = DATA_RAW / "instagram_posts_1000.csv"
     res = validate_dataset_file(target_csv)
     assert res["status"] == "PASS"
-    assert res["rows"] == 1000
-    assert res["unique_post_ids"] == 1000
+    assert res["rows"] == 15000
+    assert res["unique_post_ids"] == 15000
     assert res["duplicate_rows"] == 0
 
 

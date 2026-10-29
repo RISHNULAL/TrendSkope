@@ -8,20 +8,26 @@ import {
   Layers,
   Music,
   Trash2,
-  RefreshCw,
   Copy,
-  Info,
-  Sliders,
+  RotateCcw,
   CheckCircle2,
   AlertCircle,
   Plus,
   Volume2,
   VolumeX,
+  FileText,
+  Calendar,
+  Clock,
+  Users,
+  Target,
+  Sparkles,
+  Info,
 } from "lucide-react";
 import { StudioMediaItem } from "@/types";
 import { analyzeImageFile, analyzeVideoFile, analyzeLiveCaption } from "@/lib/media-signals";
 
 export interface StudioScenarioFormState {
+  name?: string;
   caption: string;
   mediaType: "image" | "carousel" | "reel";
   followers: number;
@@ -33,31 +39,36 @@ export interface StudioScenarioFormState {
   audioType: "original" | "custom" | "uploaded" | "none";
   audioId: string;
   media: StudioMediaItem | null;
+  rawFile?: File | null;
   carouselItems: StudioMediaItem[];
+  carouselFiles?: File[];
 }
 
 interface ScenarioPostCardProps {
   planId: "A" | "B";
   title: string;
+  subtitle?: string;
   state: StudioScenarioFormState;
   onChange: (updater: (prev: StudioScenarioFormState) => StudioScenarioFormState) => void;
-  changedFields: Set<string>;
-  singleVariableMode: boolean;
+  changedFields?: Set<string>;
+  singleVariableMode?: boolean;
   onCopyFromA?: () => void;
+  onReset?: () => void;
 }
 
 export default function ScenarioPostCard({
   planId,
   title,
+  subtitle,
   state,
   onChange,
-  changedFields,
-  singleVariableMode,
+  changedFields = new Set(),
+  singleVariableMode = false,
   onCopyFromA,
+  onReset,
 }: ScenarioPostCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const carouselInputRef = useRef<HTMLInputElement>(null);
-  const audioInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [analyzingMedia, setAnalyzingMedia] = useState(false);
@@ -81,14 +92,15 @@ export default function ScenarioPostCard({
 
     if (state.mediaType === "image" && !isImage) {
       if (isVideo) {
-        // Auto-switch to reel
         try {
           const analyzed = await analyzeVideoFile(file);
           onChange((prev) => ({
             ...prev,
             mediaType: "reel",
             media: analyzed,
+            rawFile: file,
             carouselItems: [],
+            carouselFiles: [],
           }));
           setAnalyzingMedia(false);
           return;
@@ -108,13 +120,16 @@ export default function ScenarioPostCard({
           ...prev,
           mediaType: "reel",
           media: analyzed,
+          rawFile: file,
           carouselItems: [],
+          carouselFiles: [],
         }));
       } else {
         const analyzed = await analyzeImageFile(file);
         onChange((prev) => ({
           ...prev,
           media: analyzed,
+          rawFile: file,
         }));
       }
     } catch (err: any) {
@@ -131,11 +146,14 @@ export default function ScenarioPostCard({
 
     try {
       const items: StudioMediaItem[] = [...state.carouselItems];
+      const rawFiles: File[] = state.carouselFiles ? [...state.carouselFiles] : [];
+
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (file.type.startsWith("image/") || /\.(jpg|jpeg|png|webp)$/i.test(file.name)) {
           const analyzed = await analyzeImageFile(file);
           items.push(analyzed);
+          rawFiles.push(file);
         }
       }
 
@@ -149,7 +167,9 @@ export default function ScenarioPostCard({
         ...prev,
         mediaType: "carousel",
         media: items[0],
+        rawFile: rawFiles[0],
         carouselItems: items,
+        carouselFiles: rawFiles,
       }));
     } catch (err: any) {
       setUploadError("Failed to analyze one or more carousel images.");
@@ -179,742 +199,547 @@ export default function ScenarioPostCard({
     onChange((prev) => ({
       ...prev,
       media: null,
+      rawFile: null,
       carouselItems: [],
+      carouselFiles: [],
     }));
 
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (carouselInputRef.current) carouselInputRef.current.value = "";
   };
 
-  const handleRemoveCarouselItem = (idxToRemove: number) => {
-    const updated = state.carouselItems.filter((_, idx) => idx !== idxToRemove);
-    onChange((prev) => ({
-      ...prev,
-      carouselItems: updated,
-      media: updated.length > 0 ? updated[0] : null,
-    }));
-  };
-
-  const isFieldChanged = (field: string) => singleVariableMode && planId === "B" && changedFields.has(field);
+  const isFieldChanged = (field: string) => planId === "B" && changedFields.has(field);
 
   return (
     <div
-      className={`glass-card p-6 md:p-8 rounded-3xl space-y-6 transition-all duration-300 relative border ${
+      className={`p-6 sm:p-7 rounded-2xl bg-white transition-all duration-200 border flex flex-col justify-between ${
         planId === "B" && changedFields.size > 0
-          ? "border-transparent "
-          : "border-border/80"
+          ? "border-[#6C4DFF]/40 shadow-card hover:border-[#6C4DFF]"
+          : "border-[#E7E3F0] shadow-card hover:shadow-card-hover"
       }`}
     >
-      {/* Scenario Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-border/80">
-        <div className="flex items-center gap-3">
-          <span
-            className={`w-3 h-3 rounded-full ${
-              planId === "A" ? "bg-[#A3B1C6]" : "bg-[#6C63FF] animate-pulse"
-            }`}
-          />
-          <div>
-            <h2 className="text-base sm:text-lg font-extrabold text-[#3D4852] flex items-center gap-2">
-              <span>{title}</span>
-            </h2>
-            <p className="text-xs text-[#6B7280]">
-              {planId === "A" ? "The version you start with" : "The version you want to compare"}
-            </p>
+      <div className="space-y-5">
+        {/* =========================================================================
+            SCENARIO HEADER BAR
+            ========================================================================= */}
+        <div className="flex items-start justify-between pb-4 border-b border-[#E7E3F0] gap-3">
+          <div className="flex items-center gap-3">
+            <span
+              className={`w-3 h-3 rounded-full shrink-0 ${
+                planId === "A"
+                  ? "bg-[#68677D]"
+                  : "bg-[#6C4DFF] animate-pulse"
+              }`}
+            />
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-base sm:text-lg font-black text-[#242137] tracking-tight">
+                  {title}
+                </h3>
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider ${
+                    planId === "A"
+                      ? "bg-[#F8F7FC] border border-[#E7E3F0] text-[#68677D]"
+                      : "bg-[#F0EBFF] border border-[#6C4DFF]/30 text-[#6C4DFF]"
+                  }`}
+                >
+                  Scenario {planId}
+                </span>
+              </div>
+              <p className="text-xs text-[#68677D] mt-0.5">
+                {subtitle ||
+                  (planId === "A"
+                    ? "Baseline or original reference version"
+                    : "Alternative variation being tested")}
+              </p>
+            </div>
+          </div>
+
+          {/* Quick Header Actions (Match Option A or Reset) */}
+          <div className="flex items-center gap-2 shrink-0">
+            {planId === "B" && onCopyFromA && (
+              <button
+                type="button"
+                onClick={onCopyFromA}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F0EBFF] hover:bg-[#E2D8FF] border border-[#6C4DFF]/20 text-xs font-semibold text-[#6C4DFF] transition-all active:scale-95 shadow-sm"
+                title="Duplicate Scenario A as starting point"
+              >
+                <Copy className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Duplicate A</span>
+              </button>
+            )}
+            {onReset && (
+              <button
+                type="button"
+                onClick={onReset}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#F8F7FC] hover:bg-[#F0EBFF] border border-[#E7E3F0] text-xs text-[#68677D] hover:text-[#6C4DFF] transition-colors"
+                title={`Reset Scenario ${planId} independently`}
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {planId === "B" && onCopyFromA && (
-            <button
-              onClick={onCopyFromA}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-[#6B7280] hover:text-[#3D4852] hover:border-[#6C63FF] transition-colors"
-              title="Copy Option A into Option B"
-            >
-              <Copy className="w-3.5 h-3.5 text-[#6C63FF]" />
-              <span className="hidden sm:inline">Match option A</span>
-            </button>
-          )}
-          <span
-            className={`px-2.5 py-1 rounded-2xl text-xs font-mono font-bold ${
-              planId === "A"
-                ? "bg-[#E0E5EC] text-[#3D4852] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]"
-                : "bg-primary-orange/15 text-[#6C63FF] border border-transparent"
-            }`}
-          >
-            {planId === "A" ? "A" : "B"}
-          </span>
-        </div>
-      </div>
-
-      {/* SECTION: Media Type Selector (Controls UI Structure) */}
-      <div
-        className={`p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
-          isFieldChanged("media_type") ? "border-primary-orange " : "border-border/80"
-        }`}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <label htmlFor={`media-type-${planId}`} className="font-bold text-[#6B7280] uppercase tracking-wider text-xs flex items-center gap-2">
-            <span>Format</span>
-            {isFieldChanged("media_type") && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
-                ● Changed
-              </span>
-            )}
+        {/* =========================================================================
+            SCENARIO NAME INPUT
+            ========================================================================= */}
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D] flex items-center justify-between">
+            <span>Scenario Name</span>
+            <span className="text-[10px] text-[#8B89A3]">Optional Label</span>
           </label>
-          <span className="text-[11px] text-[#6B7280]">Photo, carousel, or Reel</span>
+          <input
+            type="text"
+            value={state.name || ""}
+            onChange={(e) =>
+              onChange((prev) => ({
+                ...prev,
+                name: e.target.value,
+              }))
+            }
+            placeholder={
+              planId === "A" ? "e.g., Original Product Poster" : "e.g., Revised Question Hook"
+            }
+            className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E7E3F0] text-sm text-[#242137] placeholder:text-[#9E9DB5] focus:outline-none focus:border-[#6C4DFF] transition-colors"
+          />
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            type="button"
-            onClick={() =>
-              onChange((prev) => ({
-                ...prev,
-                mediaType: "image",
-                // Reset carousel if switching
-                carouselItems: [],
-              }))
-            }
-            className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all ${
-              state.mediaType === "image"
-                ? "bg-[#6C63FF] border-transparent text-white shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
-                : "bg-surface/50 border-border text-[#6B7280] hover:text-[#3D4852]"
-            }`}
-          >
-            <ImageIcon className="w-4 h-4 shrink-0" />
-            <span>Photo</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              onChange((prev) => ({
-                ...prev,
-                mediaType: "carousel",
-              }))
-            }
-            className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all ${
-              state.mediaType === "carousel"
-                ? "bg-[#6C63FF] border-transparent text-white shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
-                : "bg-surface/50 border-border text-[#6B7280] hover:text-[#3D4852]"
-            }`}
-          >
-            <Layers className="w-4 h-4 shrink-0" />
-            <span>Carousel</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              onChange((prev) => ({
-                ...prev,
-                mediaType: "reel",
-                audioType: prev.audioType === "none" ? "none" : prev.audioType || "original",
-              }))
-            }
-            className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all ${
-              state.mediaType === "reel"
-                ? "bg-[#6C63FF] border-transparent text-white shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
-                : "bg-surface/50 border-border text-[#6B7280] hover:text-[#3D4852]"
-            }`}
-          >
-            <Video className="w-4 h-4 shrink-0" />
-            <span>Reel</span>
-          </button>
-        </div>
-      </div>
-
-      {/* SECTION: Planned Content Upload & Preview */}
-      <div
-        className={`p-5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
-          isFieldChanged("content") ? "border-primary-orange " : "border-border/80"
-        }`}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
-              File <span className="normal-case tracking-normal font-medium text-[#6B7280]">optional</span>
+        {/* =========================================================================
+            FORMAT SELECTOR
+            ========================================================================= */}
+        <div
+          className={`p-3.5 rounded-xl bg-[#F8F7FC] border transition-all ${
+            isFieldChanged("media_type")
+              ? "border-[#6C4DFF] ring-2 ring-[#6C4DFF]/15"
+              : "border-[#E7E3F0]"
+          }`}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D] flex items-center gap-2">
+              <span>Media Format</span>
+              {isFieldChanged("media_type") && (
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F0EBFF] text-[#6C4DFF] border border-[#6C4DFF]/30">
+                  Different from A
+                </span>
+              )}
             </span>
-            {isFieldChanged("content") && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
-                ● Changed
-              </span>
-            )}
+            <span className="text-[10px] text-[#8B89A3]">Photo, Carousel, or Reel</span>
           </div>
-          <span className="text-[11px] text-[#6B7280] font-medium">
-            {state.mediaType === "image"
-              ? "JPG, PNG, WEBP"
-              : state.mediaType === "carousel"
-              ? "Multiple Images"
-              : "MP4, MOV, WEBM"}
-          </span>
+
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                onChange((prev) => ({
+                  ...prev,
+                  mediaType: "image",
+                  carouselItems: [],
+                  carouselFiles: [],
+                }))
+              }
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                state.mediaType === "image"
+                  ? "bg-[#6C4DFF] text-white shadow-sm"
+                  : "bg-white hover:bg-[#F0EBFF] text-[#68677D] hover:text-[#6C4DFF] border border-[#E7E3F0]"
+              }`}
+            >
+              <ImageIcon className="w-3.5 h-3.5 shrink-0" />
+              <span>Photo</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                onChange((prev) => ({
+                  ...prev,
+                  mediaType: "carousel",
+                }))
+              }
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                state.mediaType === "carousel"
+                  ? "bg-[#6C4DFF] text-white shadow-sm"
+                  : "bg-white hover:bg-[#F0EBFF] text-[#68677D] hover:text-[#6C4DFF] border border-[#E7E3F0]"
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 shrink-0" />
+              <span>Carousel</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                onChange((prev) => ({
+                  ...prev,
+                  mediaType: "reel",
+                  carouselItems: [],
+                  carouselFiles: [],
+                }))
+              }
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                state.mediaType === "reel"
+                  ? "bg-[#6C4DFF] text-white shadow-sm"
+                  : "bg-white hover:bg-[#F0EBFF] text-[#68677D] hover:text-[#6C4DFF] border border-[#E7E3F0]"
+              }`}
+            >
+              <Video className="w-3.5 h-3.5 shrink-0" />
+              <span>Reel</span>
+            </button>
+          </div>
         </div>
 
-        {/* Hidden inputs */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={state.mediaType === "reel" ? "video/mp4,video/quicktime,video/webm" : "image/jpeg,image/png,image/webp"}
-          onChange={(e) => {
-            if (e.target.files && e.target.files[0]) {
-              handleSingleFile(e.target.files[0]);
-            }
-          }}
-          className="hidden"
-        />
-        <input
-          ref={carouselInputRef}
-          type="file"
-          multiple
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => {
-            if (e.target.files && e.target.files.length > 0) {
-              handleCarouselFiles(e.target.files);
-            }
-          }}
-          className="hidden"
-        />
+        {/* =========================================================================
+            MEDIA UPLOAD & PREVIEW (OPTIONAL)
+            ========================================================================= */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D]">
+              Media Creative
+            </span>
+            <span className="text-[10px] text-[#8B89A3]">Optional · Drag & drop</span>
+          </div>
 
-        {/* Empty Upload State */}
-        {!state.media && state.carouselItems.length === 0 ? (
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragActive(true);
-            }}
-            onDragLeave={() => setDragActive(false)}
-            onDrop={handleDrop}
-            onClick={() => {
-              if (state.mediaType === "carousel") {
-                carouselInputRef.current?.click();
-              } else {
-                fileInputRef.current?.click();
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={state.mediaType === "reel" ? "video/*" : "image/*"}
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                handleSingleFile(e.target.files[0]);
               }
             }}
-            className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all ${
-              dragActive
-                ? "border-primary-orange bg-primary-orange/10 scale-[0.99]"
-                : "border-[#A3B1C6] bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
-            }`}
-          >
-            <div className="w-12 h-12 rounded-2xl bg-surface border border-transparent flex items-center justify-center mx-auto mb-3 text-[#6B7280]">
-              {state.mediaType === "reel" ? (
-                <Video className="w-6 h-6 text-[#6C63FF]" />
-              ) : state.mediaType === "carousel" ? (
-                <Layers className="w-6 h-6 text-[#6C63FF]" />
-              ) : (
-                <Upload className="w-6 h-6 text-[#6C63FF]" />
-              )}
+            className="hidden"
+          />
+
+          <input
+            ref={carouselInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                handleCarouselFiles(e.target.files);
+              }
+            }}
+            className="hidden"
+          />
+
+          {uploadError && (
+            <div className="p-3 rounded-xl bg-[#FEEFF0] border border-[#F06F73]/30 text-[#F06F73] text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{uploadError}</span>
             </div>
+          )}
 
-            <p className="text-sm font-bold text-[#3D4852] mb-1">
-              {state.mediaType === "carousel"
-                ? "Add carousel photos"
-                : state.mediaType === "reel"
-                ? "Add a Reel"
-                : "Add a photo"}
-            </p>
-            <p className="text-xs text-[#6B7280] mb-3">
-              Optional. Drop a file here, or choose one. The estimate still uses the format you picked.
-            </p>
+          {state.media ? (
+            /* Media Uploaded Preview Card */
+            <div className="relative rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] overflow-hidden group">
+              <div className="aspect-[4/3] w-full bg-[#F0EBFF]/50 flex items-center justify-center relative overflow-hidden">
+                {state.mediaType === "reel" ? (
+                  <video
+                    src={state.media.url}
+                    controls
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <img
+                    src={state.media.url}
+                    alt="Uploaded scenario preview"
+                    className="w-full h-full object-contain"
+                  />
+                )}
 
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border text-xs font-semibold text-[#3D4852] hover:bg-[#E0E5EC] transition-colors">
-              <Upload className="w-3.5 h-3.5 text-[#6C63FF]" />
-              Choose a file
-            </span>
-          </div>
-        ) : (
-          /* Uploaded Media Preview */
-          <div className="space-y-4">
-            {/* Reel Video Player Preview */}
-            {state.mediaType === "reel" && state.media && (
-              <div className="relative rounded-2xl overflow-hidden border border-border/80 bg-[#3D4852]/30 aspect-video flex items-center justify-center group">
-                <video
-                  src={state.media.url}
-                  controls
-                  className="w-full h-full object-contain max-h-64"
-                  playsInline
-                />
-                <div className="absolute top-2.5 left-2.5 flex items-center gap-2 pointer-events-none">
-                  <span className="px-2 py-0.5 rounded-2xl bg-[#3D4852]/30 backdrop-blur-md text-[10px] font-mono text-[#3D4852] border border-transparent">
-                    {state.media.aspectRatio || "9:16 (Story / Reel)"}
+                <button
+                  type="button"
+                  onClick={handleRemoveMedia}
+                  className="absolute top-2.5 right-2.5 p-2 rounded-xl bg-white/90 hover:bg-[#F06F73] text-[#68677D] hover:text-white border border-[#E7E3F0] transition-all shadow-sm"
+                  title="Remove media file"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+
+                <div className="absolute bottom-2.5 left-2.5 flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-1 rounded-lg bg-white/95 border border-[#E7E3F0] text-[11px] font-mono text-[#242137] shadow-sm">
+                    {state.media.width && state.media.height
+                      ? `${state.media.width}×${state.media.height}`
+                      : (state.media.format || "MEDIA").toUpperCase()}
                   </span>
-                  {state.media.durationSec && (
-                    <span className="px-2 py-0.5 rounded-2xl bg-[#3D4852]/30 backdrop-blur-md text-[10px] font-mono text-[#6C63FF] border border-transparent">
-                      {state.media.durationSec}s
+                  {state.media.aspectRatio && (
+                    <span className="px-2 py-1 rounded-lg bg-white/95 border border-[#E7E3F0] text-[11px] font-mono text-[#68677D] shadow-sm">
+                      {state.media.aspectRatio}
+                    </span>
+                  )}
+                  {state.mediaType === "carousel" && (
+                    <span className="px-2 py-1 rounded-lg bg-[#F0EBFF] border border-[#6C4DFF]/30 text-[11px] font-mono text-[#6C4DFF] shadow-sm">
+                      {state.carouselItems.length} Slide{state.carouselItems.length > 1 ? "s" : ""}
                     </span>
                   )}
                 </div>
               </div>
-            )}
-
-            {/* Single Image Preview */}
-            {state.mediaType === "image" && state.media && (
-              <div className="relative rounded-2xl overflow-hidden border border-border/80 bg-[#3D4852]/30 aspect-video flex items-center justify-center">
-                <img
-                  src={state.media.url}
-                  alt={state.media.name}
-                  className="w-full h-full object-contain max-h-64"
-                />
-                <div className="absolute top-2.5 left-2.5 flex items-center gap-2 pointer-events-none">
-                  <span className="px-2 py-0.5 rounded-2xl bg-[#3D4852]/30 backdrop-blur-md text-[10px] font-mono text-[#3D4852] border border-transparent">
-                    {state.media.aspectRatio || "Image"}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Carousel Multi-Image Strip & Preview */}
-            {state.mediaType === "carousel" && (
-              <div className="space-y-3">
-                {state.media && (
-                  <div className="relative rounded-2xl overflow-hidden border border-border/80 bg-[#3D4852]/30 aspect-video flex items-center justify-center">
-                    <img
-                      src={state.media.url}
-                      alt={state.media.name}
-                      className="w-full h-full object-contain max-h-64"
-                    />
-                    <div className="absolute top-2.5 left-2.5 flex items-center gap-2 pointer-events-none">
-                      <span className="px-2 py-0.5 rounded-2xl bg-[#3D4852]/30 backdrop-blur-md text-[10px] font-mono text-[#3D4852] border border-transparent">
-                        Slide Preview ({state.carouselItems.findIndex((i) => i.url === state.media?.url) + 1}/{state.carouselItems.length})
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Slides Row */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
-                  {state.carouselItems.map((item, idx) => (
-                    <div
-                      key={item.id || idx}
-                      className={`relative w-16 h-16 shrink-0 rounded-xl overflow-hidden border group transition-all ${
-                        state.media?.url === item.url
-                          ? "border-primary-orange ring-2 ring-primary-orange/30"
-                          : "border-border/80 opacity-75 hover:opacity-100"
-                      }`}
-                    >
-                      <img
-                        src={item.url}
-                        alt={`Slide ${idx + 1}`}
-                        onClick={() => onChange((prev) => ({ ...prev, media: item }))}
-                        className="w-full h-full object-cover cursor-pointer"
-                      />
-                      <span className="absolute bottom-0.5 right-0.5 px-1 rounded bg-black/80 text-[8px] font-mono text-[#3D4852] pointer-events-none">
-                        #{idx + 1}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveCarouselItem(idx)}
-                        className="absolute top-0.5 right-0.5 p-0.5 rounded bg-rose-950/90 text-rose-300 hover:text-[#3D4852] opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Remove slide"
-                      >
-                        <Trash2 className="w-2.5 h-2.5" />
-                      </button>
-                    </div>
-                  ))}
-
-                  <button
-                    type="button"
-                    onClick={() => carouselInputRef.current?.click()}
-                    className="w-16 h-16 shrink-0 rounded-2xl border-2 border-dashed border-[#A3B1C6] bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] flex flex-col items-center justify-center text-[#6B7280] hover:text-[#6C63FF] transition-colors"
-                    title="Add slide"
-                  >
-                    <Plus className="w-4 h-4 text-[#6C63FF]" />
-                    <span className="text-[9px] font-bold mt-0.5">Add</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Media Metadata Pill & Actions */}
-            {state.media && (
-              <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-surface/60 border border-border text-xs">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="p-1.5 rounded-2xl bg-surface border border-transparent text-[#6C63FF] shrink-0">
-                    {state.mediaType === "reel" ? <Video className="w-4 h-4" /> : <ImageIcon className="w-4 h-4" />}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-[#3D4852] truncate max-w-[180px]" title={state.media.name}>
-                      {state.media.name}
-                    </p>
-                    <p className="text-[11px] text-[#6B7280]">
-                      {state.media.sizeKb} KB · {state.media.width}×{state.media.height}px · {state.media.format || "MEDIA"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (state.mediaType === "carousel") {
-                        carouselInputRef.current?.click();
-                      } else {
-                        fileInputRef.current?.click();
-                      }
-                    }}
-                    className="px-2.5 py-1 rounded-2xl bg-surface border border-border text-[#6B7280] hover:text-[#3D4852] text-xs inline-flex items-center gap-1.5 transition-colors"
-                  >
-                    <RefreshCw className="w-3 h-3 text-[#6C63FF]" />
-                    Replace
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleRemoveMedia}
-                    className="p-1.5 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-rose-300 hover:text-rose-100 transition-colors"
-                    title="Remove media"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Visual Signals Card (Image / Carousel) */}
-            {state.media?.visualMetrics && state.mediaType !== "reel" && (
-              <div className="p-4 rounded-xl bg-surface/40 border border-transparent space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#6B7280] uppercase tracking-wider">
-                    <Sliders className="w-3.5 h-3.5 text-[#6C63FF]" />
-                    <span>Visual Signals (Plan {planId})</span>
-                  </div>
-                  <span className="text-[10px] text-[#6B7280] font-mono">Calculated properties</span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
-                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Aspect Ratio</span>
-                    <strong className="text-[#3D4852] font-medium text-xs">{state.media.aspectRatio}</strong>
-                  </div>
-                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
-                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Brightness</span>
-                    <strong className="text-[#3D4852] font-medium text-xs">
-                      {state.media.visualMetrics.brightness_label} ({state.media.visualMetrics.brightness_pct}%)
-                    </strong>
-                  </div>
-                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
-                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Contrast</span>
-                    <strong className="text-[#3D4852] font-medium text-xs">
-                      {state.media.visualMetrics.contrast_label}
-                    </strong>
-                  </div>
-                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
-                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Text Pattern</span>
-                    <strong className="text-[#3D4852] font-medium text-xs">
-                      {state.media.visualMetrics.text_presence}
-                    </strong>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Reel Signals Card (Reel) */}
-            {state.mediaType === "reel" && state.media && (
-              <div className="p-4 rounded-xl bg-surface/40 border border-transparent space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#6B7280] uppercase tracking-wider">
-                    <Video className="w-3.5 h-3.5 text-[#6C63FF]" />
-                    <span>Reel Signals (Plan {planId})</span>
-                  </div>
-                  <span className="text-[10px] text-[#6B7280] font-mono">Detected media signals</span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
-                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Duration</span>
-                    <strong className="text-[#3D4852] font-medium text-xs">{state.media.durationSec || 15} sec</strong>
-                  </div>
-                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
-                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Resolution</span>
-                    <strong className="text-[#3D4852] font-medium text-xs">
-                      {state.media.width} × {state.media.height}
-                    </strong>
-                  </div>
-                  <div className="p-2.5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
-                    <span className="text-[#6B7280] text-[10px] block mb-0.5">Audio Stream</span>
-                    <strong className="text-[#3D4852] font-medium text-xs">
-                      {state.media.audioDetected ? "Detected in Video" : "No Audio Track"}
-                    </strong>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {uploadError && (
-          <div className="mt-3 p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-[#BE123C] shrink-0" />
-            <span>{uploadError}</span>
-          </div>
-        )}
-      </div>
-
-      {/* SECTION: Planned Audio (CONDITIONAL: ONLY FOR REELS!) */}
-      {state.mediaType === "reel" ? (
-        <div
-          className={`p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all space-y-3 ${
-            isFieldChanged("audio") ? "border-primary-orange " : "border-border/80"
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <label className="font-bold text-[#6B7280] uppercase tracking-wider text-xs flex items-center gap-1.5">
-              <Music className="w-3.5 h-3.5 text-[#6C63FF]" />
-              <span>Planned Audio</span>
-              {isFieldChanged("audio") && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
-                  ● Changed
-                </span>
-              )}
-            </label>
-            <span className="text-[11px] text-[#6B7280] font-mono">Reel sound configuration</span>
-          </div>
-
-          {/* Audio Source Options */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-            <button
-              type="button"
-              onClick={() =>
-                onChange((prev) => ({
-                  ...prev,
-                  audioType: "original",
-                  audioName: "Original Audio",
-                }))
-              }
-              className={`p-2.5 rounded-xl border text-center transition-all ${
-                state.audioType === "original"
-                  ? "bg-[#6C63FF] border-transparent text-white font-bold shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
-                  : "bg-surface/40 border-border text-[#6B7280] hover:text-[#3D4852]"
-              }`}
-            >
-              Original Audio
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                onChange((prev) => ({
-                  ...prev,
-                  audioType: "custom",
-                  audioName: prev.audioName && prev.audioName !== "Original Audio" ? prev.audioName : "Selected Instagram Audio",
-                }))
-              }
-              className={`p-2.5 rounded-xl border text-center transition-all ${
-                state.audioType === "custom"
-                  ? "bg-[#6C63FF] border-transparent text-white font-bold shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
-                  : "bg-surface/40 border-border text-[#6B7280] hover:text-[#3D4852]"
-              }`}
-            >
-              Instagram Audio
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                onChange((prev) => ({
-                  ...prev,
-                  audioType: "uploaded",
-                  audioName: "Uploaded Audio Track",
-                }))
-              }
-              className={`p-2.5 rounded-xl border text-center transition-all ${
-                state.audioType === "uploaded"
-                  ? "bg-[#6C63FF] border-transparent text-white font-bold shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
-                  : "bg-surface/40 border-border text-[#6B7280] hover:text-[#3D4852]"
-              }`}
-            >
-              Uploaded Audio
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                onChange((prev) => ({
-                  ...prev,
-                  audioType: "none",
-                  audioName: "No Audio (Muted)",
-                }))
-              }
-              className={`p-2.5 rounded-xl border text-center transition-all ${
-                state.audioType === "none"
-                  ? "bg-[#E0E5EC] border-transparent text-[#3D4852] font-bold shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]"
-                  : "bg-surface/40 border-border text-[#6B7280] hover:text-[#3D4852]"
-              }`}
-            >
-              No Audio
-            </button>
-          </div>
-
-          {/* Audio Inputs if not muted */}
-          {state.audioType !== "none" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              <div>
-                <label className="text-[10px] uppercase font-bold text-[#6B7280] block mb-1">
-                  Audio Track Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. CyberPulse Intro / Track Name"
-                  value={state.audioName}
-                  onChange={(e) => onChange((prev) => ({ ...prev, audioName: e.target.value }))}
-                  className="w-full rounded-xl bg-[#E0E5EC] border border-border px-3 py-2 text-[#3D4852] text-xs placeholder-[#A0AEC0] focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] uppercase font-bold text-[#6B7280] block mb-1">
-                  Audio ID / Reference (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. audio_18293740"
-                  value={state.audioId}
-                  onChange={(e) => onChange((prev) => ({ ...prev, audioId: e.target.value }))}
-                  className="w-full rounded-xl bg-[#E0E5EC] border border-border px-3 py-2 text-[#3D4852] text-xs placeholder-[#A0AEC0] focus:border-transparent"
-                />
-              </div>
             </div>
           ) : (
-            <div className="p-2.5 rounded-xl bg-surface/30 border border-transparent text-xs text-[#6B7280] flex items-center gap-2">
-              <VolumeX className="w-4 h-4 text-[#6B7280] shrink-0" />
-              <span>No audio stream selected (silent Reel).</span>
+            /* Empty Upload Dropzone */
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragActive(true);
+              }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={handleDrop}
+              onClick={() => {
+                if (state.mediaType === "carousel") {
+                  carouselInputRef.current?.click();
+                } else {
+                  fileInputRef.current?.click();
+                }
+              }}
+              className={`p-6 rounded-xl border-2 border-dashed text-center cursor-pointer transition-all ${
+                dragActive
+                  ? "border-[#6C4DFF] bg-[#F0EBFF]/40"
+                  : "border-[#D9D4E8] hover:border-[#6C4DFF] bg-[#F8F7FC] hover:bg-[#F0EBFF]/20"
+              }`}
+            >
+              {analyzingMedia ? (
+                <div className="flex flex-col items-center justify-center py-3 space-y-2">
+                  <div className="w-5 h-5 border-2 border-transparent border-t-[#6C4DFF] rounded-full animate-spin" />
+                  <span className="text-xs text-[#68677D]">Analyzing media composition...</span>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="w-9 h-9 rounded-xl bg-white border border-[#E7E3F0] mx-auto flex items-center justify-center text-[#6C4DFF] shadow-sm">
+                    <Upload className="w-4 h-4 text-[#6C4DFF]" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-[#242137] block">
+                      {state.mediaType === "carousel"
+                        ? "Upload Carousel Images"
+                        : state.mediaType === "reel"
+                        ? "Upload Video Reel"
+                        : "Upload Post Image"}
+                    </span>
+                    <span className="text-[11px] text-[#8B89A3]">
+                      JPG, PNG, or MP4 · Optional for caption comparisons
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
-
-          <p className="text-[10px] text-[#6B7280] font-mono">
-            Trend status: Unknown / Telemetry not indexed · Analyzed for creative planning
-          </p>
-        </div>
-      ) : (
-        /* Subtle informational note for Image & Carousel */
-        <div className="p-3 rounded-xl bg-surface/30 border border-transparent flex items-center justify-between text-xs text-[#6B7280]">
-          <div className="flex items-center gap-2">
-            <Volume2 className="w-3.5 h-3.5 text-[#6B7280]" />
-            <span>Planned Audio:</span>
-          </div>
-          <span className="font-mono text-[#6B7280] text-[11px]">
-            Audio applies to Reels only
-          </span>
-        </div>
-      )}
-
-      {/* SECTION: Caption */}
-      <div
-        className={`space-y-2 p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
-          isFieldChanged("caption") ? "border-primary-orange " : "border-border/80"
-        }`}
-      >
-        <div className="flex items-center justify-between">
-          <label htmlFor={`caption-${planId}`} className="flex items-center gap-2 font-bold text-[#6B7280] uppercase tracking-wider text-xs">
-            <span>Caption</span>
-            {isFieldChanged("caption") && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-orange/20 text-[#6C63FF] border border-transparent animate-pulse">
-                ● Changed
-              </span>
-            )}
-          </label>
-          <span className="text-[11px] text-[#6B7280]">
-            {captionData.metrics.words} words
-          </span>
         </div>
 
-        <textarea
-          id={`caption-${planId}`}
-          rows={4}
-          value={state.caption}
-          onChange={(e) => onChange((prev) => ({ ...prev, caption: e.target.value }))}
-          placeholder="Write the caption for this version..."
-          className="w-full rounded-xl bg-[#E0E5EC] border border-border p-3 text-[#3D4852] text-xs placeholder-[#A0AEC0] focus:border-transparent leading-relaxed"
-        />
-
-        {state.caption.trim() ? (
-          <div className="flex flex-wrap gap-1.5 text-[11px] text-[#6B7280]">
-            <span className="px-2 py-0.5 rounded-full bg-[#E0E5EC] shadow-[inset_2px_2px_4px_rgb(163,177,198,0.45),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
-              {captionData.metrics.hashtags} hashtags
+        {/* =========================================================================
+            CAPTION EDITOR & LINGUISTIC SIGNALS
+            ========================================================================= */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D] flex items-center gap-2">
+              <span>Caption & Hashtags</span>
+              <span className="text-[#6C4DFF] font-bold">*Required</span>
+              {isFieldChanged("caption") && (
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F0EBFF] text-[#6C4DFF] border border-[#6C4DFF]/30">
+                  Different from A
+                </span>
+              )}
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-[#E0E5EC] shadow-[inset_2px_2px_4px_rgb(163,177,198,0.45),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
-              {captionData.metrics.emojis} emoji
+            <span className="text-[10px] font-mono text-[#8B89A3]">
+              {captionData.metrics.characters} chars · {captionData.metrics.words} words
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-[#E0E5EC] shadow-[inset_2px_2px_4px_rgb(163,177,198,0.45),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]">
-              {captionData.metrics.questions} questions
-            </span>
-            {captionData.structure.has_cta && (
-              <span className="px-2 py-0.5 rounded-full text-[#0F766E]">
-                Asks people to respond
-              </span>
-            )}
           </div>
-        ) : (
-          <p className="text-[11px] text-[#6B7280]">A caption is required before you can compare.</p>
-        )}
-      </div>
 
-      {/* SECTION: Publishing Details Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-        {/* Followers */}
-        <div
-          className={`p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
-            isFieldChanged("followers") ? "border-primary-orange " : "border-border/80"
-          }`}
-        >
-          <div className="flex items-center justify-between mb-1.5">
-            <label htmlFor={`followers-${planId}`} className="font-bold text-[#6B7280] uppercase tracking-wider text-[11px]">
-              Account followers
-            </label>
-            {isFieldChanged("followers") && (
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary-orange/20 text-[#6C63FF]">
-                ● Changed
-              </span>
-            )}
-          </div>
-          <input
-            id={`followers-${planId}`}
-            type="number"
-            min={1}
-            value={state.followers}
+          <textarea
+            rows={5}
+            value={state.caption}
             onChange={(e) =>
               onChange((prev) => ({
                 ...prev,
-                followers: Math.max(1, parseInt(e.target.value) || 1),
+                caption: e.target.value,
               }))
             }
-            className="w-full rounded-xl bg-[#E0E5EC] border border-border p-2.5 text-[#3D4852] focus:border-transparent"
+            placeholder="Type your caption and hashtags here... Pose a question to prompt discussion! #creators #tips"
+            className="w-full p-3.5 rounded-xl bg-white border border-[#E7E3F0] text-sm text-[#242137] placeholder:text-[#9E9DB5] focus:outline-none focus:border-[#6C4DFF] transition-colors resize-y leading-relaxed shadow-sm"
           />
+
+          {/* Quick Caption Quality Indicators */}
+          <div className="flex items-center gap-2 flex-wrap pt-1 text-[11px]">
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border font-medium ${
+                captionData.structure.has_question
+                  ? "bg-[#E6F6F4] border-[#0F9D8A]/30 text-[#0F9D8A]"
+                  : "bg-[#F8F7FC] border-[#E7E3F0] text-[#68677D]"
+              }`}
+            >
+              {captionData.structure.has_question ? "✓ Question Hook" : "No Question Hook"}
+            </span>
+
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border font-medium ${
+                captionData.structure.has_cta
+                  ? "bg-[#ECF3FE] border-[#4285F4]/30 text-[#4285F4]"
+                  : "bg-[#F8F7FC] border-[#E7E3F0] text-[#68677D]"
+              }`}
+            >
+              {captionData.structure.has_cta ? "✓ CTA Included" : "No Call to Action"}
+            </span>
+
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border font-medium ${
+                captionData.metrics.hashtags >= 3 && captionData.metrics.hashtags <= 5
+                  ? "bg-[#FDF5EA] border-[#E9A23B]/30 text-[#E9A23B]"
+                  : "bg-[#F8F7FC] border-[#E7E3F0] text-[#68677D]"
+              }`}
+            >
+              {captionData.metrics.hashtags} Tags ({captionData.metrics.hashtags >= 3 && captionData.metrics.hashtags <= 5 ? "Target: 3-5" : "Target: 3-5"})
+            </span>
+          </div>
         </div>
 
-        {/* Date & Time */}
-        <div
-          className={`p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border transition-all ${
-            isFieldChanged("time") || isFieldChanged("date")
-              ? "border-primary-orange "
-              : "border-border/80"
-          }`}
-        >
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="font-bold text-[#6B7280] uppercase tracking-wider text-[11px]">
-              Posting date and time (UTC)
-            </label>
-            {(isFieldChanged("time") || isFieldChanged("date")) && (
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-primary-orange/20 text-[#6C63FF]">
-                ● Changed
+        {/* =========================================================================
+            SCHEDULING & AUDIENCE PARAMETERS
+            ========================================================================= */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Followers */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D] flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-[#6C4DFF]" />
+                Followers
               </span>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-2">
+              {isFieldChanged("followers") && (
+                <span className="text-[10px] text-[#6C4DFF]">Diff</span>
+              )}
+            </label>
             <input
-              type="date"
-              value={state.date}
-              onChange={(e) => onChange((prev) => ({ ...prev, date: e.target.value }))}
-              className="w-full rounded-xl bg-[#E0E5EC] border border-border p-2 text-[#3D4852] text-xs focus:border-transparent"
+              type="number"
+              min={1}
+              value={state.followers}
+              onChange={(e) =>
+                onChange((prev) => ({
+                  ...prev,
+                  followers: Math.max(1, parseInt(e.target.value) || 1),
+                }))
+              }
+              className="w-full px-3 py-2 rounded-xl bg-white border border-[#E7E3F0] text-xs font-mono text-[#242137] focus:outline-none focus:border-[#6C4DFF]"
             />
+          </div>
+
+          {/* Posting Time */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D] flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-[#6C4DFF]" />
+                Time (UTC)
+              </span>
+              {isFieldChanged("time") && (
+                <span className="text-[10px] text-[#6C4DFF]">Diff</span>
+              )}
+            </label>
             <input
               type="time"
               value={state.time}
-              onChange={(e) => onChange((prev) => ({ ...prev, time: e.target.value }))}
-              className="w-full rounded-xl bg-[#E0E5EC] border border-border p-2 text-[#3D4852] text-xs focus:border-transparent"
+              onChange={(e) =>
+                onChange((prev) => ({
+                  ...prev,
+                  time: e.target.value,
+                }))
+              }
+              className="w-full px-3 py-2 rounded-xl bg-white border border-[#E7E3F0] text-xs font-mono text-[#242137] focus:outline-none focus:border-[#6C4DFF]"
+            />
+          </div>
+
+          {/* Date */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D] flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-[#6C4DFF]" />
+                Date
+              </span>
+              {isFieldChanged("date") && (
+                <span className="text-[10px] text-[#6C4DFF]">Diff</span>
+              )}
+            </label>
+            <input
+              type="date"
+              value={state.date}
+              onChange={(e) =>
+                onChange((prev) => ({
+                  ...prev,
+                  date: e.target.value,
+                }))
+              }
+              className="w-full px-3 py-2 rounded-xl bg-white border border-[#E7E3F0] text-xs font-mono text-[#242137] focus:outline-none focus:border-[#6C4DFF]"
             />
           </div>
         </div>
+
+        {/* Category & Goal Context */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D] flex items-center gap-1.5">
+              <span>Category</span>
+            </label>
+            <select
+              value={state.category}
+              onChange={(e) =>
+                onChange((prev) => ({
+                  ...prev,
+                  category: e.target.value,
+                }))
+              }
+              className="w-full px-3 py-2 rounded-xl bg-white border border-[#E7E3F0] text-xs text-[#242137] focus:outline-none focus:border-[#6C4DFF]"
+            >
+              <option value="Technology">Technology</option>
+              <option value="Business">Business</option>
+              <option value="Lifestyle">Lifestyle</option>
+              <option value="Education">Education</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Photography">Photography</option>
+              <option value="Personal Development">Personal Development</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D] flex items-center gap-1.5">
+              <span>Campaign Goal</span>
+            </label>
+            <select
+              value={state.goal}
+              onChange={(e) =>
+                onChange((prev) => ({
+                  ...prev,
+                  goal: e.target.value,
+                }))
+              }
+              className="w-full px-3 py-2 rounded-xl bg-white border border-[#E7E3F0] text-xs text-[#242137] focus:outline-none focus:border-[#6C4DFF]"
+            >
+              <option value="Engagement">Engagement</option>
+              <option value="Reach">Reach & Discovery</option>
+              <option value="Conversion">Conversion / Clicks</option>
+              <option value="Community">Community Building</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Audio Track (for Reels) */}
+        {state.mediaType === "reel" && (
+          <div className="p-3.5 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-2">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#68677D] flex items-center gap-2">
+              <Music className="w-3.5 h-3.5 text-[#6C4DFF]" />
+              <span>Reel Audio Track</span>
+            </span>
+            <input
+              type="text"
+              value={state.audioName}
+              onChange={(e) =>
+                onChange((prev) => ({
+                  ...prev,
+                  audioName: e.target.value,
+                }))
+              }
+              placeholder="e.g., Original Audio or Trending Sound Title"
+              className="w-full px-3 py-2 rounded-xl bg-white border border-[#E7E3F0] text-xs text-[#242137] placeholder:text-[#9E9DB5] focus:outline-none focus:border-[#6C4DFF]"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

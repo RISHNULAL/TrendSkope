@@ -9,33 +9,65 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#E0E5EC",
-        clay: "#E0E5EC",
-        ink: "#3D4852",
-        muted: "#6B7280",
-        accent: {
-          DEFAULT: "#6C63FF",
-          light: "#8B84FF",
-        },
-        teal: "#38B2AC",
+        background: "#F8F7FC",
+        page: "#F8F7FC",
         surface: {
-          DEFAULT: "#E0E5EC",
-          hover: "#E0E5EC",
-          glass: "#E0E5EC",
-        },
-        border: {
-          DEFAULT: "transparent",
-          subtle: "transparent",
-          highlight: "transparent",
+          DEFAULT: "#FFFFFF",
+          card: "#FFFFFF",
+          light: "#F0EBFF",
+          hover: "#F5F3FF",
         },
         primary: {
-          DEFAULT: "#6C63FF",
-          orange: "#6C63FF",
-          coral: "#6C63FF",
-          pink: "#8B84FF",
+          DEFAULT: "#6C4DFF",
+          hover: "#5B3FE6",
+          deep: "#4B35B5",
+          light: "#F0EBFF",
+          orange: "#6C4DFF",
+          coral: "#F06F73",
         },
-        ready: "#0F766E",
-        soft: "#3D4852",
+        charcoal: {
+          DEFAULT: "#242137",
+          heading: "#1A172B",
+          text: "#242137",
+        },
+        ink: "#242137",
+        muted: "#68677D",
+        slate: {
+          DEFAULT: "#68677D",
+          muted: "#68677D",
+          light: "#8B89A3",
+        },
+        border: {
+          DEFAULT: "#E7E3F0",
+          subtle: "#F0EBFF",
+          focus: "#6C4DFF",
+        },
+        accent: {
+          DEFAULT: "#6C4DFF",
+          purple: "#6C4DFF",
+          teal: "#0F9D8A",
+          blue: "#4285F4",
+          amber: "#E9A23B",
+          coral: "#F06F73",
+        },
+        teal: {
+          DEFAULT: "#0F9D8A",
+          light: "#E6F6F4",
+        },
+        blue: {
+          DEFAULT: "#4285F4",
+          light: "#ECF3FE",
+        },
+        amber: {
+          DEFAULT: "#E9A23B",
+          light: "#FDF5EA",
+        },
+        coral: {
+          DEFAULT: "#F06F73",
+          light: "#FEEFF0",
+        },
+        ready: "#0F9D8A",
+        soft: "#242137",
       },
       fontFamily: {
         sans: [
@@ -54,21 +86,23 @@ const config: Config = {
         ],
       },
       borderRadius: {
-        card: "32px",
+        card: "20px",
+        xl: "16px",
+        "2xl": "20px",
+        "3xl": "24px",
       },
       boxShadow: {
-        extruded:
-          "9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)",
-        "extruded-hover":
-          "12px 12px 20px rgb(163,177,198,0.7), -12px -12px 20px rgba(255,255,255,0.6)",
-        "extruded-sm":
-          "5px 5px 10px rgb(163,177,198,0.6), -5px -5px 10px rgba(255,255,255,0.5)",
-        inset:
-          "inset 6px 6px 10px rgb(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)",
-        "inset-deep":
-          "inset 10px 10px 20px rgb(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6)",
-        "inset-sm":
-          "inset 3px 3px 6px rgb(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255,0.5)",
+        card: "0 1px 3px 0 rgba(36, 33, 55, 0.04), 0 4px 14px -1px rgba(108, 77, 255, 0.04)",
+        "card-hover": "0 4px 12px -1px rgba(36, 33, 55, 0.06), 0 12px 24px -2px rgba(108, 77, 255, 0.08)",
+        "card-elevated": "0 10px 30px -4px rgba(36, 33, 55, 0.08), 0 4px 8px -2px rgba(108, 77, 255, 0.04)",
+        dropdown: "0 10px 25px -3px rgba(36, 33, 55, 0.1), 0 4px 6px -2px rgba(36, 33, 55, 0.05)",
+        "purple-sm": "0 2px 8px rgba(108, 77, 255, 0.2)",
+        "purple-md": "0 4px 16px rgba(108, 77, 255, 0.25)",
+        inset: "inset 0 1px 2px 0 rgba(36, 33, 55, 0.04)",
+        "inset-sm": "inset 0 1px 1px 0 rgba(36, 33, 55, 0.03)",
+        extruded: "0 1px 3px 0 rgba(36, 33, 55, 0.04), 0 4px 14px -1px rgba(108, 77, 255, 0.04)",
+        "extruded-hover": "0 4px 12px -1px rgba(36, 33, 55, 0.06), 0 12px 24px -2px rgba(108, 77, 255, 0.08)",
+        "extruded-sm": "0 1px 2px 0 rgba(36, 33, 55, 0.04)",
       },
       keyframes: {
         slideBar: {

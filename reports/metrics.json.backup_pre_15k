@@ -1,0 +1,180 @@
+{
+  "test": {
+    "mae": 2.7117943298009184,
+    "rmse": 3.6250102593267886,
+    "r2": 0.40860113493211436,
+    "median_absolute_error": 2.2279557189675137
+  },
+  "dataset_size": 1100,
+  "features_used": 25,
+  "selected_model": "Linear Regression",
+  "splits": {
+    "train": 770,
+    "validation": 165,
+    "test": 165
+  },
+  "feature_coefficients": [
+    {
+      "feature": "word_count",
+      "coefficient": 0.384448,
+      "direction": "Positive association",
+      "abs_coefficient": 0.384448
+    },
+    {
+      "feature": "caption_length",
+      "coefficient": -0.226868,
+      "direction": "Negative association",
+      "abs_coefficient": 0.226868
+    },
+    {
+      "feature": "average_word_length",
+      "coefficient": 0.193466,
+      "direction": "Positive association",
+      "abs_coefficient": 0.193466
+    },
+    {
+      "feature": "media_type_image",
+      "coefficient": -0.146558,
+      "direction": "Negative association",
+      "abs_coefficient": 0.146558
+    },
+    {
+      "feature": "historical_mean_engagement",
+      "coefficient": 0.133496,
+      "direction": "Positive association",
+      "abs_coefficient": 0.133496
+    },
+    {
+      "feature": "log_followers",
+      "coefficient": -0.090704,
+      "direction": "Negative association",
+      "abs_coefficient": 0.090704
+    },
+    {
+      "feature": "media_type_reel",
+      "coefficient": 0.090377,
+      "direction": "Positive association",
+      "abs_coefficient": 0.090377
+    },
+    {
+      "feature": "recent_20_median",
+      "coefficient": -0.087569,
+      "direction": "Negative association",
+      "abs_coefficient": 0.087569
+    },
+    {
+      "feature": "followers",
+      "coefficient": 0.083352,
+      "direction": "Positive association",
+      "abs_coefficient": 0.083352
+    },
+    {
+      "feature": "media_type_carousel",
+      "coefficient": 0.05618,
+      "direction": "Positive association",
+      "abs_coefficient": 0.05618
+    },
+    {
+      "feature": "hashtag_count",
+      "coefficient": -0.045315,
+      "direction": "Negative association",
+      "abs_coefficient": 0.045315
+    },
+    {
+      "feature": "posting_hour",
+      "coefficient": 0.042571,
+      "direction": "Positive association",
+      "abs_coefficient": 0.042571
+    },
+    {
+      "feature": "is_weekend",
+      "coefficient": 0.038047,
+      "direction": "Positive association",
+      "abs_coefficient": 0.038047
+    },
+    {
+      "feature": "historical_post_count",
+      "coefficient": -0.032905,
+      "direction": "Negative association",
+      "abs_coefficient": 0.032905
+    },
+    {
+      "feature": "question_count",
+      "coefficient": 0.024573,
+      "direction": "Positive association",
+      "abs_coefficient": 0.024573
+    },
+    {
+      "feature": "emoji_count",
+      "coefficient": 0.021027,
+      "direction": "Positive association",
+      "abs_coefficient": 0.021027
+    },
+    {
+      "feature": "exclamation_count",
+      "coefficient": 0.018767,
+      "direction": "Positive association",
+      "abs_coefficient": 0.018767
+    },
+    {
+      "feature": "posting_day_of_week",
+      "coefficient": 0.018295,
+      "direction": "Positive association",
+      "abs_coefficient": 0.018295
+    },
+    {
+      "feature": "historical_std_engagement",
+      "coefficient": 0.016194,
+      "direction": "Positive association",
+      "abs_coefficient": 0.016194
+    },
+    {
+      "feature": "recent_5_median",
+      "coefficient": -0.014532,
+      "direction": "Negative association",
+      "abs_coefficient": 0.014532
+    },
+    {
+      "feature": "historical_median_engagement",
+      "coefficient": 0.014316,
+      "direction": "Positive association",
+      "abs_coefficient": 0.014316
+    },
+    {
+      "feature": "recent_10_median",
+      "coefficient": 0.011219,
+      "direction": "Positive association",
+      "abs_coefficient": 0.011219
+    },
+    {
+      "feature": "posting_day",
+      "coefficient": 0.00846,
+      "direction": "Positive association",
+      "abs_coefficient": 0.00846
+    },
+    {
+      "feature": "uppercase_ratio",
+      "coefficient": -0.007618,
+      "direction": "Negative association",
+      "abs_coefficient": 0.007618
+    },
+    {
+      "feature": "posting_month",
+      "coefficient": -0.002415,
+      "direction": "Negative association",
+      "abs_coefficient": 0.002415
+    },
+    {
+      "feature": "mention_count",
+      "coefficient": 0.0,
+      "direction": "Positive association",
+      "abs_coefficient": 0.0
+    },
+    {
+      "feature": "url_count",
+      "coefficient": -0.0,
+      "direction": "Negative association",
+      "abs_coefficient": 0.0
+    }
+  ]
+}

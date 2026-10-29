@@ -23,23 +23,23 @@ const tabTitles: Record<string, { title: string; subtitle: string }> = {
   },
   "Predict Post": {
     title: "Analyze Post",
-    subtitle: "Upload a photo, carousel, or Reel and see the expected engagement before it goes live.",
+    subtitle: "Upload a photo, carousel, or Reel to evaluate content craft quality and expected engagement.",
   },
   "What-If Analysis": {
-    title: "What-If Scenarios",
-    subtitle: "Compare two versions of a post and see which estimate is higher.",
+    title: "Content Comparison Studio",
+    subtitle: "Compare two content variations, understand what changes, and identify which improvements are worth testing.",
   },
   "Model Insights": {
     title: "Model Insights",
-    subtitle: "Candidate model comparison, validation scores, and feature influence",
+    subtitle: "Candidate model comparison, validation scores, and feature influence.",
   },
   Dataset: {
     title: "Dataset",
-    subtitle: "CSV validation, schema, and dataset provenance",
+    subtitle: "CSV validation, schema, and dataset provenance.",
   },
   Developers: {
     title: "Developers",
-    subtitle: "Meet the team behind TrendSkope",
+    subtitle: "Meet the team behind TrendSkope.",
   },
   "About Project": {
     title: "About & Methodology",
@@ -62,55 +62,55 @@ export default function Header({
   const isModelReady = Boolean(modelStatus?.trained && modelStatus?.status !== "not_ready");
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-[#E0E5EC]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-30 flex items-center justify-between gap-4 px-5 sm:px-8 py-4 bg-white/90 backdrop-blur-md border-b border-[#E7E3F0] transition-colors">
       <div className="flex items-center gap-4 min-w-0">
         <button
           onClick={onMobileMenuToggle}
           aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
-          className="lg:hidden h-12 w-12 shrink-0 inline-flex items-center justify-center rounded-2xl bg-[#E0E5EC] text-[#3D4852] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] active:shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] transition-all duration-300"
+          className="lg:hidden h-10 w-10 shrink-0 inline-flex items-center justify-center rounded-xl bg-[#F8F7FC] text-[#242137] border border-[#E7E3F0] hover:bg-[#F0EBFF] hover:text-[#6C4DFF] hover:border-[#6C4DFF]/30 transition-all"
         >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5 text-[#242137]" />}
         </button>
 
         <div>
-          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#3D4852] leading-tight">
+          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-[#242137] leading-tight">
             {current.title}
           </h2>
-          <p className="text-xs text-[#6B7280] font-medium hidden sm:block mt-0.5">
+          <p className="text-xs text-[#68677D] font-medium hidden sm:block mt-0.5">
             {current.subtitle}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2.5 sm:gap-3">
+      <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
         {/* Backend API Status */}
         <div
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-2xl text-xs font-semibold border transition-all ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
             apiHealthy
-              ? "bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border-transparent text-[#0F766E]"
-              : "bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border-transparent text-[#BE123C]"
+              ? "bg-[#F8F7FC] border-[#E7E3F0] text-[#0F9D8A]"
+              : "bg-[#FEEFF0] border-[#F06F73]/30 text-[#F06F73]"
           }`}
         >
           <span
             className={`w-2 h-2 rounded-full ${
-              apiHealthy ? "bg-[#38B2AC] animate-pulse" : "bg-[#E11D48]"
+              apiHealthy ? "bg-[#0F9D8A] animate-pulse" : "bg-[#F06F73]"
             }`}
           />
-          <span className="hidden md:inline text-[#6B7280] font-medium">Backend API:</span>
+          <span className="hidden md:inline text-[#68677D] font-medium">Backend API:</span>
           <span>{apiHealthy ? "Online" : "Offline"}</span>
         </div>
 
         {/* Model Status */}
         <div
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-2xl text-xs font-semibold border transition-all ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
             isModelReady
-              ? "bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border-transparent text-[#0F766E]"
-              : "bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border-transparent text-[#B45309]"
+              ? "bg-[#F8F7FC] border-[#E7E3F0] text-[#0F9D8A]"
+              : "bg-[#FDF5EA] border-[#E9A23B]/30 text-[#E9A23B]"
           }`}
         >
           <span
             className={`w-2 h-2 rounded-full ${
-              isModelReady ? "bg-[#38B2AC] animate-pulse" : "bg-[#D97706]"
+              isModelReady ? "bg-[#0F9D8A] animate-pulse" : "bg-[#E9A23B]"
             }`}
           />
           <span>{isModelReady ? "Model Ready" : "Model Not Trained"}</span>

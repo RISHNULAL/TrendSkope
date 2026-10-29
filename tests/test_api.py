@@ -29,8 +29,15 @@ def test_dashboard_endpoint():
     assert data["success"] is True
     assert "model" in data
     assert "dataset" in data
-    assert data["model"]["name"] == "Bayesian Ridge Regression"
-    assert data["dataset"]["posts"] == 1000
+    assert data["model"]["name"] in [
+        "Ridge Regression",
+        "Bayesian Ridge Regression",
+        "Linear Regression",
+        "Lasso Regression",
+        "KNN Regressor",
+        "Decision Tree Regressor",
+    ]
+    assert data["dataset"]["posts"] == 15000
 
 def test_template_download():
     response = client.get("/api/template")

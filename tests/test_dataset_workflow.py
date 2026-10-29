@@ -44,9 +44,15 @@ def preserve_master_dataset_and_models():
     yield
 
     # Restore
-    if master_backup.exists():
+    canonical_ref = DATA_RAW / "master_canonical_reference_15k.csv"
+    if canonical_ref.exists():
+        shutil.copy2(canonical_ref, MASTER_DATASET_PATH)
+        sample_path = DATA_RAW / "sample_test_posts.csv"
+        if sample_path.exists():
+            shutil.copy2(canonical_ref, sample_path)
+    elif master_backup.exists():
         shutil.copy2(master_backup, MASTER_DATASET_PATH)
-        master_backup.unlink(missing_ok=True)
+    master_backup.unlink(missing_ok=True)
     if model_backup.exists():
         shutil.copy2(model_backup, MODELS / "final_model.joblib")
         model_backup.unlink(missing_ok=True)

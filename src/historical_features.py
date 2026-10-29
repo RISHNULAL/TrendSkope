@@ -5,16 +5,37 @@ import pandas as pd
 
 def add_historical_features(frame: pd.DataFrame) -> pd.DataFrame:
     out = frame.sort_values("published_at").copy()
-    cols = ["historical_post_count", "historical_mean_engagement", "historical_median_engagement", "historical_std_engagement", "recent_5_median", "recent_10_median", "recent_20_median"]
-    for col in cols: out[col] = np.nan
-    for _, idx in out.groupby("account_id", sort=False).groups.items():
+    n = len(out)
+    hist_count = np.zeros(n, dtype=float)
+    hist_mean = np.full(n, np.nan)
+    hist_median = np.full(n, np.nan)
+    hist_std = np.full(n, np.nan)
+    rec_5 = np.full(n, np.nan)
+    rec_10 = np.full(n, np.nan)
+    rec_20 = np.full(n, np.nan)
+
+    idx_map = {idx: pos for pos, idx in enumerate(out.index)}
+    eng_values = out["engagement_rate"].values
+
+    for _, idx_group in out.groupby("account_id", sort=False).groups.items():
         history: list[float] = []
-        for row_id in idx:
-            out.loc[row_id, "historical_post_count"] = len(history)
+        for row_id in idx_group:
+            pos = idx_map[row_id]
+            hist_count[pos] = len(history)
             if history:
-                out.loc[row_id, "historical_mean_engagement"] = np.mean(history)
-                out.loc[row_id, "historical_median_engagement"] = np.median(history)
-                out.loc[row_id, "historical_std_engagement"] = np.std(history)
-                for n in (5, 10, 20): out.loc[row_id, f"recent_{n}_median"] = np.median(history[-n:])
-            history.append(float(out.loc[row_id, "engagement_rate"]))
+                hist_mean[pos] = np.mean(history)
+                hist_median[pos] = np.median(history)
+                hist_std[pos] = np.std(history)
+                rec_5[pos] = np.median(history[-5:])
+                rec_10[pos] = np.median(history[-10:])
+                rec_20[pos] = np.median(history[-20:])
+            history.append(float(eng_values[pos]))
+
+    out["historical_post_count"] = hist_count
+    out["historical_mean_engagement"] = hist_mean
+    out["historical_median_engagement"] = hist_median
+    out["historical_std_engagement"] = hist_std
+    out["recent_5_median"] = rec_5
+    out["recent_10_median"] = rec_10
+    out["recent_20_median"] = rec_20
     return out

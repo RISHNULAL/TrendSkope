@@ -17,12 +17,26 @@ import {
   ShieldCheck,
   Zap,
   FileText,
-  SlidersHorizontal,
+  Copy,
+  Check,
+  Download,
+  Layers,
+  Sparkles,
+  RotateCcw,
+  Target,
+  BarChart3,
+  Eye,
+  CheckSquare,
 } from "lucide-react";
-import { predictPost } from "@/lib/api";
-import { ModelStatusResponse, PredictionResultData } from "@/types";
+import { compareScenarios, compareScenariosMultipart } from "@/lib/api";
+import {
+  ModelStatusResponse,
+  CompareScenariosResponse,
+  ScenarioTemplateItem,
+  QualityPillarComparison,
+  SmartRecommendationItem,
+} from "@/types";
 import ScenarioPostCard, { StudioScenarioFormState } from "@/components/studio/ScenarioPostCard";
-import { detectScenarioDifferences } from "@/lib/media-signals";
 
 interface WhatIfViewProps {
   modelStatus: ModelStatusResponse | null;
@@ -32,28 +46,17 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
   const isTrained = Boolean(modelStatus?.trained);
   const today = new Date().toISOString().split("T")[0];
 
-  // Comparison Mode: "single" | "multiple"
+  // Comparison Mode: "single" (isolate one variable) | "multiple" (full alternate scenario)
   const [comparisonMode, setComparisonMode] = useState<"single" | "multiple">("single");
 
-  // Plan A (Current Planned Scenario)
-  const [planA, setPlanA] = useState<StudioScenarioFormState>({
-    caption: "Excited to share our latest product launch! Check out the details at the link in bio #launch #tech #startup",
-    mediaType: "image",
-    followers: 2500,
-    date: today,
-    time: "10:30",
-    category: "Technology",
-    goal: "Engagement",
-    audioName: "Original Audio",
-    audioType: "original",
-    audioId: "",
-    media: null,
-    carouselItems: [],
-  });
+  // Selected Active Template ID (optional highlight)
+  const [activeTemplateId, setActiveTemplateId] = useState<string | null>("hook_split_test");
 
-  // Plan B (Alternative Planned Scenario)
-  const [planB, setPlanB] = useState<StudioScenarioFormState>({
-    caption: "Excited to share our latest product launch! Check out the details at the link in bio #launch #tech #startup",
+  // Scenario A Form State (Original / Baseline)
+  const [scenarioA, setScenarioA] = useState<StudioScenarioFormState>({
+    name: "Scenario A — Original",
+    caption:
+      "We are releasing our new creator analytics dashboard today. Link in bio to try it out. #analytics #creators #marketing #socialmedia",
     mediaType: "image",
     followers: 2500,
     date: today,
@@ -64,18 +67,46 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
     audioType: "original",
     audioId: "",
     media: null,
+    rawFile: null,
     carouselItems: [],
+    carouselFiles: [],
   });
 
+  // Scenario B Form State (Alternative Variation)
+  const [scenarioB, setScenarioB] = useState<StudioScenarioFormState>({
+    name: "Scenario B — Alternative",
+    caption:
+      "Which metric actually predicts your post reach? We rebuilt our analytics engine to find out—and the answer surprised us. Which stat do you watch closest? Drop a comment below! 🔥 #analytics #creators #datascience #socialmedia",
+    mediaType: "image",
+    followers: 2500,
+    date: today,
+    time: "19:00",
+    category: "Technology",
+    goal: "Engagement",
+    audioName: "Original Audio",
+    audioType: "original",
+    audioId: "",
+    media: null,
+    rawFile: null,
+    carouselItems: [],
+    carouselFiles: [],
+  });
+
+  // API Interaction State
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [resA, setResA] = useState<PredictionResultData | null>(null);
-  const [resB, setResB] = useState<PredictionResultData | null>(null);
+  const [comparisonResponse, setComparisonResponse] = useState<CompareScenariosResponse | null>(null);
+  const [copiedSummary, setCopiedSummary] = useState(false);
+  const [copiedRecId, setCopiedRecId] = useState<string | null>(null);
+  const [appliedRecId, setAppliedRecId] = useState<string | null>(null);
+
   const resultRef = useRef<HTMLDivElement | null>(null);
 
-  // Smooth scroll to comparison result when both results arrive
+  // Smooth scroll ONLY after user explicitly clicks Compare and results arrive
+  const hasTriggeredCompare = useRef(false);
   useEffect(() => {
-    if (resA && resB && resultRef.current) {
+    if (comparisonResponse && hasTriggeredCompare.current && resultRef.current) {
+      hasTriggeredCompare.current = false;
       const prefersReducedMotion =
         typeof window !== "undefined" &&
         window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -86,702 +117,1315 @@ export default function WhatIfView({ modelStatus }: WhatIfViewProps) {
         });
       });
     }
-  }, [resA, resB]);
+  }, [comparisonResponse]);
 
-  // Compute live differences between Plan A and Plan B
-  const differences = useMemo(() => {
-    return detectScenarioDifferences(
+  // Compute live changed fields between Scenario A and Scenario B
+  const changedFieldsSet = useMemo(() => {
+    const set = new Set<string>();
+    if (scenarioA.mediaType !== scenarioB.mediaType) set.add("media_type");
+    if (scenarioA.caption.trim() !== scenarioB.caption.trim()) set.add("caption");
+    if (scenarioA.followers !== scenarioB.followers) set.add("followers");
+    if (scenarioA.time !== scenarioB.time) set.add("time");
+    if (scenarioA.date !== scenarioB.date) set.add("date");
+    if (scenarioA.category !== scenarioB.category) set.add("category");
+    if (scenarioA.goal !== scenarioB.goal) set.add("goal");
+    if (scenarioA.audioName !== scenarioB.audioName) set.add("audio");
+    return set;
+  }, [scenarioA, scenarioB]);
+
+  // Built-in Templates
+  const templates: ScenarioTemplateItem[] = useMemo(
+    () => [
       {
-        caption: planA.caption,
-        mediaType: planA.mediaType,
-        followers: planA.followers,
-        date: planA.date,
-        time: planA.time,
-        category: planA.category,
-        goal: planA.goal,
-        audioName: planA.audioName,
-        audioType: planA.audioType,
-        media: planA.media,
+        id: "hook_split_test",
+        name: "Hook Split Test",
+        tagline: "Question Hook vs Announcement",
+        category: "Copywriting",
+        description: "Tests an intriguing question hook against a standard passive announcement.",
+        scenario_a: {
+          name: "Original Announcement",
+          caption:
+            "We are releasing our new creator analytics dashboard today. Link in bio to try it out. #analytics #creators #marketing #socialmedia",
+          media_type: "image",
+          followers: 2500,
+          date: today,
+          time: "19:00",
+          category: "Technology",
+          goal: "Engagement",
+        },
+        scenario_b: {
+          name: "Curiosity Question Hook",
+          caption:
+            "Which metric actually predicts your post reach? We rebuilt our analytics engine to find out—and the answer surprised us. Which stat do you watch closest? Drop a comment below! 🔥 #analytics #creators #datascience #socialmedia",
+          media_type: "image",
+          followers: 2500,
+          date: today,
+          time: "19:00",
+          category: "Technology",
+          goal: "Engagement",
+        },
       },
       {
-        caption: planB.caption,
-        mediaType: planB.mediaType,
-        followers: planB.followers,
-        date: planB.date,
-        time: planB.time,
-        category: planB.category,
-        goal: planB.goal,
-        audioName: planB.audioName,
-        audioType: planB.audioType,
-        media: planB.media,
-      }
-    );
-  }, [planA, planB]);
+        id: "cta_clarity",
+        name: "CTA Clarity Test",
+        tagline: "Conversational CTA vs Passive Link",
+        category: "Engagement",
+        description: "Examines whether an explicit conversation question prompts more comments.",
+        scenario_a: {
+          name: "Passive Link CTA",
+          caption:
+            "Here are 3 tips to streamline your content creation process: 1. Batch produce 2. Schedule ahead 3. Repurpose top performing posts. Check the link in our bio for details. #tips #creators #productivity",
+          media_type: "image",
+          followers: 3000,
+          date: today,
+          time: "18:00",
+          category: "Education",
+          goal: "Engagement",
+        },
+        scenario_b: {
+          name: "Actionable Question CTA",
+          caption:
+            "Here are 3 tips to streamline your content creation process:\n\n1. Batch produce\n2. Schedule ahead\n3. Repurpose top performing posts\n\nWhich of these 3 habits made the biggest difference in your routine this month? Save this for your next planning session! 📌 #productivity #creators #contentstrategy",
+          media_type: "image",
+          followers: 3000,
+          date: today,
+          time: "18:00",
+          category: "Education",
+          goal: "Engagement",
+        },
+      },
+      {
+        id: "storytelling_vs_short",
+        name: "Storytelling vs Short",
+        tagline: "Detailed Narrative vs Quick Note",
+        category: "Length",
+        description: "Compares an in-depth behind-the-scenes narrative against a punchy note.",
+        scenario_a: {
+          name: "Short Punchy Note",
+          caption:
+            "Late nights in the studio paying off. Big update dropping Friday! Stay tuned. ✨ #buildinpublic #behindthescenes",
+          media_type: "image",
+          followers: 4500,
+          date: today,
+          time: "18:30",
+          category: "Lifestyle",
+          goal: "Awareness",
+        },
+        scenario_b: {
+          name: "Detailed Behind-The-Scenes",
+          caption:
+            "Three weeks ago, our entire design system looked completely different.\n\nWe scraped 40 mockups and started fresh because the user experience didn't feel seamless enough. After 120 user tests, we finally unlocked a flow that cuts publishing time in half.\n\nWhat is one project you had to restart from scratch before getting it right? Tell us your story below! 💬 #buildinpublic #founders #productdesign #learning",
+          media_type: "image",
+          followers: 4500,
+          date: today,
+          time: "18:30",
+          category: "Lifestyle",
+          goal: "Engagement",
+        },
+      },
+      {
+        id: "format_image_vs_reel",
+        name: "Format: Photo vs Reel",
+        tagline: "Static Feed Image vs Video Reel",
+        category: "Media Format",
+        description: "Isolates media format under identical copy and timing.",
+        scenario_a: {
+          name: "Static Feed Image",
+          caption:
+            "Visual breakdown of the 2026 content distribution landscape. Save this framework to reference before your next campaign launch! 📊 #contentmarketing #digitalstrategy #trends",
+          media_type: "image",
+          followers: 5000,
+          date: today,
+          time: "19:00",
+          category: "Business",
+          goal: "Engagement",
+        },
+        scenario_b: {
+          name: "Reel Video with Audio",
+          caption:
+            "Visual breakdown of the 2026 content distribution landscape. Save this framework to reference before your next campaign launch! 📊 #contentmarketing #digitalstrategy #trends",
+          media_type: "reel",
+          followers: 5000,
+          date: today,
+          time: "19:00",
+          category: "Business",
+          goal: "Reach",
+          audio_name: "Trending Audio Sound",
+          audio_type: "custom",
+        },
+      },
+      {
+        id: "timing_peak_vs_offpeak",
+        name: "Publishing Time Test",
+        tagline: "Morning Off-Peak vs Evening Peak",
+        category: "Scheduling",
+        description: "Compares morning timing (10:30 UTC) with prime evening hours (19:00 UTC).",
+        scenario_a: {
+          name: "Morning Schedule (10:30 UTC)",
+          caption:
+            "Quick morning thought: Consistency beats intensity every single time. What is one habit you never skip on weekdays? Let's discuss below! ☕ #morningroutine #discipline #growthmindset",
+          media_type: "image",
+          followers: 3200,
+          date: today,
+          time: "10:30",
+          category: "Personal Development",
+          goal: "Engagement",
+        },
+        scenario_b: {
+          name: "Evening Schedule (19:00 UTC)",
+          caption:
+            "Quick morning thought: Consistency beats intensity every single time. What is one habit you never skip on weekdays? Let's discuss below! ☕ #morningroutine #discipline #growthmindset",
+          media_type: "image",
+          followers: 3200,
+          date: today,
+          time: "19:00",
+          category: "Personal Development",
+          goal: "Engagement",
+        },
+      },
+      {
+        id: "hashtag_consolidation",
+        name: "Hashtag Allocation",
+        tagline: "Targeted (3–5 tags) vs Dense Block",
+        category: "Hashtags",
+        description: "Tests whether focused tags outperform a cluster of 15+ broad hashtags.",
+        scenario_a: {
+          name: "High-Density Block",
+          caption:
+            "Mastering the fundamentals of natural light photography. Which setup is your go-to? #photo #photographer #photography #art #instaphoto #nature #love #camera #sony #canon #lighting #nikon #picoftheday #visuals #frame",
+          media_type: "image",
+          followers: 2000,
+          date: today,
+          time: "17:00",
+          category: "Photography",
+          goal: "Engagement",
+        },
+        scenario_b: {
+          name: "Curated 4 Niche Tags",
+          caption:
+            "Mastering the fundamentals of natural light photography. Which setup is your go-to for outdoor golden hour shots? 📸 #naturallightphotography #portraitlighting #cameragear #phototips",
+          media_type: "image",
+          followers: 2000,
+          date: today,
+          time: "17:00",
+          category: "Photography",
+          goal: "Engagement",
+        },
+      },
+    ],
+    [today]
+  );
 
-  const changedFieldsSet = useMemo(() => {
-    return new Set(differences.changed.map((c) => c.field));
-  }, [differences]);
-
-  // Quick Preset Test Scenarios
-  const handleApplyPreset = (preset: "time" | "caption" | "mediaType" | "reelAudio") => {
+  // Apply a template to the scenario editors
+  const handleApplyTemplate = (tpl: ScenarioTemplateItem) => {
     setError(null);
-    setResA(null);
-    setResB(null);
-
-    const baseCaption = "✨ Revealing the full journey behind our newest release. Which feature are you most excited to test? Tell us below! 🔥 #innovation #buildinpublic #community";
-
-    if (preset === "time") {
-      setComparisonMode("single");
-      setPlanA((prev) => ({
-        ...prev,
-        caption: baseCaption,
-        mediaType: "image",
-        followers: 2500,
-        time: "10:30",
-      }));
-      setPlanB((prev) => ({
-        ...prev,
-        caption: baseCaption,
-        mediaType: "image",
-        followers: 2500,
-        time: "19:00",
-      }));
-    } else if (preset === "caption") {
-      setComparisonMode("single");
-      setPlanA((prev) => ({
-        ...prev,
-        caption: "Short announcement: New features available now in bio link.",
-        mediaType: "image",
-        time: "18:00",
-        followers: 2500,
-      }));
-      setPlanB((prev) => ({
-        ...prev,
-        caption: "✨ Behind the scenes: We spent 6 months rebuilding our analytics engine from scratch. Which metric matters most to your team? Drop a comment below! 🔥 #buildinpublic #creators #datascience #community",
-        mediaType: "image",
-        time: "18:00",
-        followers: 2500,
-      }));
-    } else if (preset === "mediaType") {
-      setComparisonMode("single");
-      setPlanA((prev) => ({
-        ...prev,
-        caption: baseCaption,
-        mediaType: "image",
-        time: "18:00",
-        followers: 2500,
-      }));
-      setPlanB((prev) => ({
-        ...prev,
-        caption: baseCaption,
-        mediaType: "reel",
-        time: "18:00",
-        followers: 2500,
-        audioType: "original",
-        audioName: "Original Audio",
-      }));
-    } else if (preset === "reelAudio") {
-      setComparisonMode("single");
-      setPlanA((prev) => ({
-        ...prev,
-        caption: baseCaption,
-        mediaType: "reel",
-        time: "19:00",
-        followers: 2500,
-        audioType: "original",
-        audioName: "CyberPulse Original Audio",
-      }));
-      setPlanB((prev) => ({
-        ...prev,
-        caption: baseCaption,
-        mediaType: "reel",
-        time: "19:00",
-        followers: 2500,
-        audioType: "custom",
-        audioName: "Trending Instagram Sound",
-      }));
-    }
+    setActiveTemplateId(tpl.id);
+    setScenarioA((prev) => ({
+      ...prev,
+      name: tpl.scenario_a.name,
+      caption: tpl.scenario_a.caption,
+      mediaType: tpl.scenario_a.media_type,
+      followers: tpl.scenario_a.followers,
+      date: tpl.scenario_a.date,
+      time: tpl.scenario_a.time,
+      category: tpl.scenario_a.category,
+      goal: tpl.scenario_a.goal,
+      media: null,
+      rawFile: null,
+      carouselItems: [],
+      carouselFiles: [],
+    }));
+    setScenarioB((prev) => ({
+      ...prev,
+      name: tpl.scenario_b.name,
+      caption: tpl.scenario_b.caption,
+      mediaType: tpl.scenario_b.media_type,
+      followers: tpl.scenario_b.followers,
+      date: tpl.scenario_b.date,
+      time: tpl.scenario_b.time,
+      category: tpl.scenario_b.category,
+      goal: tpl.scenario_b.goal,
+      audioName: tpl.scenario_b.audio_name || "Original Audio",
+      audioType: (tpl.scenario_b.audio_type as any) || "original",
+      media: null,
+      rawFile: null,
+      carouselItems: [],
+      carouselFiles: [],
+    }));
   };
 
-  // Copy Plan A into Plan B
-  const handleCopyPlanA = () => {
-    setPlanB({
-      ...planA,
-      carouselItems: [...planA.carouselItems],
+  // Duplicate Scenario A into Scenario B as an editable starting point
+  const handleDuplicateA = () => {
+    setScenarioB({
+      ...scenarioA,
+      name: `${scenarioA.name || "Scenario A"} (Copy)`,
+      carouselItems: [...scenarioA.carouselItems],
+      carouselFiles: scenarioA.carouselFiles ? [...scenarioA.carouselFiles] : [],
     });
   };
 
-  // Run Comparison Prediction
+  // Reset Scenario B independently
+  const handleResetB = () => {
+    setScenarioB({
+      name: "Scenario B — Alternative",
+      caption: "",
+      mediaType: "image",
+      followers: scenarioA.followers,
+      date: scenarioA.date,
+      time: scenarioA.time,
+      category: scenarioA.category,
+      goal: scenarioA.goal,
+      audioName: "Original Audio",
+      audioType: "original",
+      audioId: "",
+      media: null,
+      rawFile: null,
+      carouselItems: [],
+      carouselFiles: [],
+    });
+  };
+
+  // Reset Scenario A independently
+  const handleResetA = () => {
+    setScenarioA({
+      name: "Scenario A — Original",
+      caption: "",
+      mediaType: "image",
+      followers: 2500,
+      date: today,
+      time: "19:00",
+      category: "Technology",
+      goal: "Engagement",
+      audioName: "Original Audio",
+      audioType: "original",
+      audioId: "",
+      media: null,
+      rawFile: null,
+      carouselItems: [],
+      carouselFiles: [],
+    });
+  };
+
+  // Run Comparison Prediction Pipeline
   const handleCompare = async () => {
     if (!isTrained) {
-      setError("The prediction model is not ready yet. Train it from the Dataset page first.");
+      setError("The prediction model is not trained yet. Train it on the Dataset page first.");
       return;
     }
 
-    if (!planA.caption.trim()) {
-      setError("Add a caption to Option A.");
+    if (!scenarioA.caption.trim()) {
+      setError("Please add a caption to Scenario A before comparing.");
       return;
     }
-    if (!planB.caption.trim()) {
-      setError("Add a caption to Option B.");
+    if (!scenarioB.caption.trim()) {
+      setError("Please add a caption to Scenario B before comparing.");
       return;
     }
 
     setLoading(true);
     setError(null);
+    hasTriggeredCompare.current = true;
 
     try {
-      const [respA, respB] = await Promise.all([
-        predictPost({
-          caption: planA.caption,
-          media_type: planA.mediaType,
-          followers_at_or_near_collection: planA.followers,
-          published_at: `${planA.date}T${planA.time}:00Z`,
-        }),
-        predictPost({
-          caption: planB.caption,
-          media_type: planB.mediaType,
-          followers_at_or_near_collection: planB.followers,
-          published_at: `${planB.date}T${planB.time}:00Z`,
-        }),
-      ]);
+      const payloadData = {
+        scenario_a: {
+          name: scenarioA.name || "Scenario A",
+          caption: scenarioA.caption,
+          media_type: scenarioA.mediaType,
+          followers: scenarioA.followers,
+          date: scenarioA.date,
+          time: scenarioA.time,
+          category: scenarioA.category,
+          goal: scenarioA.goal,
+          audio_name: scenarioA.audioName,
+          audio_type: scenarioA.audioType,
+        },
+        scenario_b: {
+          name: scenarioB.name || "Scenario B",
+          caption: scenarioB.caption,
+          media_type: scenarioB.mediaType,
+          followers: scenarioB.followers,
+          date: scenarioB.date,
+          time: scenarioB.time,
+          category: scenarioB.category,
+          goal: scenarioB.goal,
+          audio_name: scenarioB.audioName,
+          audio_type: scenarioB.audioType,
+        },
+        comparison_mode: comparisonMode,
+      };
 
-      if (respA.success && respB.success) {
-        setResA(respA.result);
-        setResB(respB.result);
+      let response: CompareScenariosResponse;
+
+      // If user provided files for either scenario, use multipart endpoint
+      if (scenarioA.rawFile || scenarioB.rawFile) {
+        const formData = new FormData();
+        formData.append("data", JSON.stringify(payloadData));
+        if (scenarioA.rawFile) formData.append("file_a", scenarioA.rawFile);
+        if (scenarioB.rawFile) formData.append("file_b", scenarioB.rawFile);
+        response = await compareScenariosMultipart(formData);
       } else {
-        throw new Error("The comparison did not finish. Try again.");
+        // Standard JSON comparison
+        response = await compareScenarios(payloadData);
+      }
+
+      if (response && response.success) {
+        setComparisonResponse(response);
+      } else {
+        throw new Error("Comparison did not return valid result data.");
       }
     } catch (err: any) {
-      setError(err.message || "The comparison did not finish. Try again.");
+      setError(err.message || "Scenario comparison failed. Please check the backend connection.");
     } finally {
       setLoading(false);
     }
   };
 
-  const delta = resA && resB ? Number((resB.prediction - resA.prediction).toFixed(2)) : null;
+  // Apply a smart recommendation directly to Scenario B
+  const handleApplyRecommendation = (rec: SmartRecommendationItem) => {
+    setAppliedRecId(rec.id);
+    setScenarioB((prev) => {
+      const updated = { ...prev };
+      if (rec.action_payload?.caption) {
+        updated.caption = rec.action_payload.caption;
+      }
+      if (rec.action_payload?.time) {
+        updated.time = rec.action_payload.time;
+      }
+      if (rec.action_payload?.media_type) {
+        updated.mediaType = rec.action_payload.media_type;
+      }
+      return updated;
+    });
 
-  // Check if intervals overlap
-  const intervalsOverlap =
-    resA && resB ? Math.max(resA.lower, resB.lower) <= Math.min(resA.upper, resB.upper) : false;
+    setTimeout(() => setAppliedRecId(null), 2500);
+  };
+
+  // Copy suggested caption to clipboard
+  const handleCopyCaption = (recId: string, captionText: string) => {
+    if (navigator?.clipboard) {
+      navigator.clipboard.writeText(captionText);
+      setCopiedRecId(recId);
+      setTimeout(() => setCopiedRecId(null), 2200);
+    }
+  };
+
+  // Copy full Markdown comparison summary to clipboard
+  const handleCopySummary = () => {
+    if (!comparisonResponse || !navigator?.clipboard) return;
+
+    const comp = comparisonResponse.comparison;
+    const metrics = comparisonResponse.comparison_metrics;
+    const whatChanged = comparisonResponse.what_changed;
+
+    const summaryText = `# TrendSkope Content Comparison Studio Report
+Generated: ${new Date().toUTCString()}
+
+## 1. Executive Summary
+- Scenario A Point Estimate: ${comp.prediction_a.prediction.toFixed(2)}% (${comp.prediction_a.band} Band, 90% CI: ${comp.prediction_a.lower.toFixed(2)}% - ${comp.prediction_a.upper.toFixed(2)}%)
+- Scenario B Point Estimate: ${comp.prediction_b.prediction.toFixed(2)}% (${comp.prediction_b.band} Band, 90% CI: ${comp.prediction_b.lower.toFixed(2)}% - ${comp.prediction_b.upper.toFixed(2)}%)
+- Absolute Difference: ${metrics?.delta_absolute !== undefined ? (metrics.delta_absolute > 0 ? `+${metrics.delta_absolute.toFixed(2)}` : metrics.delta_absolute.toFixed(2)) : comp.delta_pp} percentage points
+- Relative Difference: ${metrics?.delta_relative_pct !== null && metrics?.delta_relative_pct !== undefined ? `${metrics.delta_relative_pct > 0 ? "+" : ""}${metrics.delta_relative_pct.toFixed(1)}%` : "N/A"}
+- Uncertainty Bands Overlap: ${comp.intervals_overlap ? "Yes (High Overlap)" : "No (Distinct Intervals)"}
+${metrics?.is_inconclusive ? "\n*Note: The model does not provide strong evidence that one scenario will outperform the other.*" : ""}
+
+## 2. Parameter Differences (What Changed)
+${whatChanged?.changed_parameters.map((p) => `- ${p.label}: "${p.value_a}" → "${p.value_b}"`).join("\n") || "No model-consumed inputs modified"}
+
+## 3. Controlled Variables (What Stayed The Same)
+${whatChanged?.unchanged_parameters.map((p) => `- ${p.label}: "${p.value}"`).join("\n") || "None"}
+
+## 4. Craft Quality Scores
+${comp.quality_a ? `- Scenario A Overall Quality: ${comp.quality_a.score}/100 (${comp.quality_a.band})` : ""}
+${comp.quality_b ? `- Scenario B Overall Quality: ${comp.quality_b.score}/100 (${comp.quality_b.band})` : ""}
+`;
+
+    navigator.clipboard.writeText(summaryText);
+    setCopiedSummary(true);
+    setTimeout(() => setCopiedSummary(false), 2400);
+  };
+
+  // Download Report as JSON
+  const handleDownloadReport = () => {
+    if (!comparisonResponse) return;
+    const blob = new Blob([JSON.stringify(comparisonResponse, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `trendskope_comparison_${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const comp = comparisonResponse?.comparison;
+  const metrics = comparisonResponse?.comparison_metrics;
+  const whatChanged = comparisonResponse?.what_changed;
+  const qualityPillars = comp?.content_quality_comparison?.pillars || [];
+  const smartRecs = comp?.smart_recommendations || [];
+  const experimentProtocol = comp?.experiment_protocol;
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-7xl mx-auto pb-12">
-      <div className="glass-card p-5 sm:p-6 rounded-3xl space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <p className="text-sm text-[#6B7280] max-w-xl leading-relaxed">
-            {comparisonMode === "single"
-              ? "Change one detail in Option B, such as the time or the caption. That makes it easier to see what caused the difference."
-              : "Change as many details as you want. Option B is a full alternative to Option A."}
-          </p>
-          <div className="bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] p-1 rounded-2xl flex items-center shrink-0 self-start">
+    <div className="space-y-8 animate-fade-in max-w-7xl mx-auto pb-16 text-[#242137]">
+      {/* =========================================================================
+          SECTION 1: STUDIO HEADER & INTRO
+          ========================================================================= */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E3F0] shadow-card relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F0EBFF] border border-[#6C4DFF]/30 text-[#6C4DFF] text-xs font-bold uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                Content Comparison Studio
+              </span>
+              <span className="px-3 py-1 rounded-full bg-[#F8F7FC] border border-[#E7E3F0] text-[#68677D] text-xs font-mono">
+                Model: Gradient Booster
+              </span>
+              <span className="px-3 py-1 rounded-full bg-[#F8F7FC] border border-[#E7E3F0] text-[#68677D] text-xs font-mono">
+                90% Empirical CI
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-black text-[#242137] tracking-tight flex items-center gap-3">
+              Content Comparison Studio
+            </h1>
+
+            <p className="text-sm text-[#68677D] max-w-2xl leading-relaxed">
+              Compare two content variations, understand what changes, and identify which improvements
+              are worth testing in a controlled experiment.
+            </p>
+          </div>
+
+          {/* Mode Switcher */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 bg-[#F8F7FC] p-1.5 rounded-xl border border-[#E7E3F0] self-start lg:self-auto shrink-0">
             <button
               type="button"
               onClick={() => setComparisonMode("single")}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all min-h-11 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                 comparisonMode === "single"
-                  ? "bg-[#E0E5EC] text-[#6C63FF] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
-                  : "text-[#6B7280] hover:text-[#3D4852]"
+                  ? "bg-[#6C4DFF] text-white shadow-sm"
+                  : "text-[#68677D] hover:text-[#242137]"
               }`}
             >
-              Change one thing
+              Isolate 1 Variable
             </button>
             <button
               type="button"
               onClick={() => setComparisonMode("multiple")}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all min-h-11 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                 comparisonMode === "multiple"
-                  ? "bg-[#E0E5EC] text-[#6C63FF] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
-                  : "text-[#6B7280] hover:text-[#3D4852]"
+                  ? "bg-[#6C4DFF] text-white shadow-sm"
+                  : "text-[#68677D] hover:text-[#242137]"
               }`}
             >
-              Change several things
+              Multi-Variable Alternative
             </button>
           </div>
         </div>
-        {comparisonMode === "single" && (
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-[#6B7280]">Try an example:</span>
-          <button type="button" onClick={() => handleApplyPreset("time")} className="btn-secondary px-3 py-2 text-xs">
-            Posting time
-          </button>
-          <button type="button" onClick={() => handleApplyPreset("caption")} className="btn-secondary px-3 py-2 text-xs">
-            Caption
-          </button>
-          <button type="button" onClick={() => handleApplyPreset("mediaType")} className="btn-secondary px-3 py-2 text-xs">
-            Photo or Reel
-          </button>
-          <button type="button" onClick={() => handleApplyPreset("reelAudio")} className="btn-secondary px-3 py-2 text-xs">
-            Reel audio
-          </button>
-        </div>
-        )}
       </div>
 
-      {/* Untrained Model Warning */}
+      {/* =========================================================================
+          SECTION 2: SCENARIO TEMPLATES (PRESETS)
+          ========================================================================= */}
+      <div className="p-6 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E7E3F0]">
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4 text-[#6C4DFF]" />
+            <h2 className="text-xs font-mono font-bold text-[#68677D] tracking-wide uppercase">
+              Scenario Templates
+            </h2>
+          </div>
+          <span className="text-xs text-[#68677D]">
+            Click any template to populate editable starting values
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {templates.map((tpl) => (
+            <button
+              key={tpl.id}
+              type="button"
+              onClick={() => handleApplyTemplate(tpl)}
+              className={`p-3.5 rounded-xl border text-left transition-all relative overflow-hidden group ${
+                activeTemplateId === tpl.id
+                  ? "bg-[#F0EBFF] border-[#6C4DFF] ring-1 ring-[#6C4DFF]/30"
+                  : "bg-[#F8F7FC] hover:bg-white border-[#E7E3F0] hover:border-[#6C4DFF]/40 shadow-sm"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#68677D]">
+                  {tpl.category}
+                </span>
+                {activeTemplateId === tpl.id && (
+                  <span className="w-2 h-2 rounded-full bg-[#6C4DFF]" />
+                )}
+              </div>
+              <strong className="text-xs font-bold text-[#242137] block mb-0.5 group-hover:text-[#6C4DFF] transition-colors">
+                {tpl.name}
+              </strong>
+              <p className="text-[11px] text-[#68677D] line-clamp-1">{tpl.tagline}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Untrained Model Alert */}
       {!isTrained && (
-        <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] text-xs flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-[#B45309] shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-[#FDF5EA] border border-[#E9A23B]/30 text-[#E9A23B] text-xs flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-[#B45309] text-sm">The prediction model is not ready yet</p>
-            <p className="mt-0.5 text-[#6B7280] leading-relaxed">
-              Train it from the Dataset page before comparing two options.
+            <p className="font-bold text-sm">The prediction model is not ready yet</p>
+            <p className="mt-0.5 text-[#68677D] leading-relaxed">
+              Train the model from the Dataset page before comparing scenario outcomes.
             </p>
           </div>
         </div>
       )}
 
+      {/* Validation / Execution Error Alert */}
       {error && (
-        <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] text-xs text-[#BE123C] flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-[#FEEFF0] border border-[#F06F73]/30 text-[#F06F73] text-xs flex items-center gap-3">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* SECTION: Scenario Input Cards (Plan A & Plan B) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* =========================================================================
+          SECTION 3: TWO COMPLETE SCENARIO EDITORS (SIDE-BY-SIDE)
+          ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* Scenario A Card */}
         <ScenarioPostCard
           planId="A"
-          title="Option A"
-          state={planA}
-          onChange={setPlanA}
+          title={scenarioA.name || "Scenario A — Original"}
+          subtitle="Baseline post reference"
+          state={scenarioA}
+          onChange={setScenarioA}
           changedFields={changedFieldsSet}
           singleVariableMode={comparisonMode === "single"}
+          onReset={handleResetA}
         />
 
+        {/* Scenario B Card */}
         <ScenarioPostCard
           planId="B"
-          title="Option B"
-          state={planB}
-          onChange={setPlanB}
+          title={scenarioB.name || "Scenario B — Alternative"}
+          subtitle="Alternative variation being tested"
+          state={scenarioB}
+          onChange={setScenarioB}
           changedFields={changedFieldsSet}
           singleVariableMode={comparisonMode === "single"}
-          onCopyFromA={handleCopyPlanA}
+          onCopyFromA={handleDuplicateA}
+          onReset={handleResetB}
         />
       </div>
 
-      {/* SECTION: Compare Action Button */}
-      <div className="flex flex-col items-center justify-center gap-3 pt-2">
+      {/* =========================================================================
+          SECTION 4: COMPARE ACTION BUTTON
+          ========================================================================= */}
+      <div className="flex flex-col items-center justify-center gap-3 pt-3">
         <button
           onClick={handleCompare}
           disabled={loading || !isTrained}
-          className="btn-primary px-10 py-4 text-base font-bold shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] disabled:opacity-50 transition-transform active:scale-95"
+          className="px-9 py-3.5 rounded-xl bg-[#6C4DFF] hover:bg-[#5B3FE6] text-white font-bold text-sm shadow-purple-md disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2.5"
         >
           {loading ? (
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2.5">
               <span className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin" />
-              Comparing the two options...
+              Running Multi-Pipeline Comparison...
             </span>
           ) : (
             <span className="flex items-center gap-2.5">
-              <GitCompare className="w-5 h-5" />
-              Compare options
+              <GitCompare className="w-4 h-4" />
+              Compare Scenarios
             </span>
           )}
         </button>
 
-        <p className="text-xs text-[#6B7280] text-center">
-          Both options need a caption. A file is optional.
+        <p className="text-xs text-[#68677D] text-center">
+          Both scenarios require a caption. Media upload is optional.
         </p>
       </div>
 
-      {/* SECTION: What Changed? & Unchanged Panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* What Changed? */}
-        <div className="glass-card p-6 rounded-3xl border border-border/80 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-border">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-primary-orange" />
-              <h2 className="text-sm font-bold text-[#3D4852]">What is different</h2>
-            </div>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary-orange/20 text-[#6C63FF]">
-              {differences.changed.length === 0
-                ? "Nothing yet"
-                : `${differences.changed.length} change${differences.changed.length > 1 ? "s" : ""}`}
-            </span>
-          </div>
-
-          {differences.changed.length === 0 ? (
-            <p className="text-xs text-[#6B7280] py-2">
-              Option A and Option B match. Change something in Option B, then compare.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {differences.changed.map((param) => (
-                <div key={param.field} className="p-3 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-[#3D4852]">{param.label}</span>
-                    <span className="text-[10px] text-[#6C63FF]">Different</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-[#6B7280]">
-                    <span className="px-2 py-0.5 rounded bg-surface border border-transparent text-[#6B7280] font-mono truncate max-w-[140px]">
-                      {param.value_a}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#6B7280] shrink-0" />
-                    <span className="px-2 py-0.5 rounded bg-primary-orange/20 border border-transparent text-[#6C63FF] font-mono truncate max-w-[140px]">
-                      {param.value_b}
-                    </span>
-                  </div>
-                  {param.impact_note && (
-                    <p className="text-[11px] text-[#6B7280] mt-1">{param.impact_note}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Unchanged Parameters */}
-        <div className="glass-card p-6 rounded-3xl border border-border/80 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-border">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#0F766E]" />
-              <h2 className="text-sm font-bold text-[#3D4852]">What stays the same</h2>
-            </div>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#E0E5EC] text-[#0F766E] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.55),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
-              {differences.unchanged.length} matching
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-            {differences.unchanged.map((item) => (
-              <div key={item.field} className="p-2.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent">
-                <span className="text-[#6B7280] text-[10px] block">{item.label}</span>
-                <span className="font-mono text-[#3D4852] truncate block mt-0.5">{item.value}</span>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-xs text-[#6B7280] pt-1">
-            These details match, so the comparison is only about what you changed.
-          </p>
-        </div>
-      </div>
-
-      {/* SECTION: Dedicated Media Content Comparison (if media uploaded) */}
-      {(planA.media || planB.media) && (
-        <div className="glass-card p-6 md:p-8 rounded-3xl border border-border/80 space-y-5">
-          <div className="flex items-center justify-between pb-3 border-b border-border">
-            <div className="flex items-center gap-2.5">
-              <ImageIcon className="w-5 h-5 text-[#6C63FF]" />
+      {/* =========================================================================
+          SECTION 5: DETAILED COMPARISON RESULTS DASHBOARD
+          ========================================================================= */}
+      {comp && metrics && (
+        <div id="comparison-results" ref={resultRef} className="space-y-8 scroll-mt-20">
+          {/* A. EXECUTIVE COMPARISON SUMMARY CARD */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-[#E7E3F0] gap-4">
               <div>
-                <h2 className="text-base font-bold text-[#3D4852]">The files</h2>
-                <p className="text-xs text-[#6B7280]">Details from the files you uploaded</p>
-              </div>
-            </div>
-            <span className="text-xs text-[#6B7280]">Uploaded files</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Plan A Media Profile */}
-            <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-3">
-              <span className="text-xs font-bold text-[#6B7280] block pb-1 border-b border-transparent">
-                Option A file
-              </span>
-              {planA.media ? (
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-transparent">
-                    <span className="text-[#6B7280]">Format & Type</span>
-                    <span className="text-[#3D4852] font-mono">{planA.media.format} ({planA.mediaType.toUpperCase()})</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-transparent">
-                    <span className="text-[#6B7280]">Aspect Ratio</span>
-                    <span className="text-[#3D4852] font-mono">{planA.media.aspectRatio}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-transparent">
-                    <span className="text-[#6B7280]">Dimensions</span>
-                    <span className="text-[#3D4852] font-mono">{planA.media.width} × {planA.media.height} px</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-transparent">
-                    <span className="text-[#6B7280]">Playback Duration</span>
-                    <span className="text-[#3D4852] font-mono">
-                      {planA.media.durationSec ? `${planA.media.durationSec}s` : "Static (Image)"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-1">
-                    <span className="text-[#6B7280]">Audio Stream</span>
-                    <span className="text-[#3D4852] font-mono">
-                      {planA.mediaType === "reel" ? (planA.media.audioDetected ? "Detected in Video" : "No Audio Track") : "Not applicable (Image)"}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-xs text-[#6B7280]">No file added for Option A.</p>
-              )}
-            </div>
-
-            {/* Plan B Media Profile */}
-            <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-3">
-              <span className="text-xs font-bold text-[#6B7280] block pb-1 border-b border-transparent">
-                Option B file
-              </span>
-              {planB.media ? (
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-transparent">
-                    <span className="text-[#6B7280]">Format & Type</span>
-                    <span className="text-[#3D4852] font-mono">{planB.media.format} ({planB.mediaType.toUpperCase()})</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-transparent">
-                    <span className="text-[#6B7280]">Aspect Ratio</span>
-                    <span className="text-[#3D4852] font-mono">{planB.media.aspectRatio}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-transparent">
-                    <span className="text-[#6B7280]">Dimensions</span>
-                    <span className="text-[#3D4852] font-mono">{planB.media.width} × {planB.media.height} px</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-transparent">
-                    <span className="text-[#6B7280]">Playback Duration</span>
-                    <span className="text-[#3D4852] font-mono">
-                      {planB.media.durationSec ? `${planB.media.durationSec}s` : "Static (Image)"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-1">
-                    <span className="text-[#6B7280]">Audio Stream</span>
-                    <span className="text-[#3D4852] font-mono">
-                      {planB.mediaType === "reel" ? (planB.media.audioDetected ? "Detected in Video" : "No Audio Track") : "Not applicable (Image)"}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-xs text-[#6B7280]">No file added for Option B.</p>
-              )}
-            </div>
-          </div>
-
-          <p className="text-xs text-[#6B7280]">
-            These file details are shown for context. The estimate uses the format, caption, time, and follower count.
-          </p>
-        </div>
-      )}
-
-      {/* SECTION: Model Results & Comparison Card */}
-      {delta !== null && resA && resB && (
-        <div
-          id="what-if-result"
-          ref={resultRef}
-          className="glass-card-accent p-6 md:p-10 rounded-3xl animate-fade-in space-y-8 scroll-mt-24"
-        >
-          {/* Main Delta Result Header */}
-          <div className="text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#6B7280]">
-              How the estimate changes
-            </span>
-
-            <div className="flex items-center justify-center gap-3">
-              {delta > 0 ? (
-                <div className="p-2 rounded-2xl bg-emerald-500/20 text-[#0F766E]">
-                  <TrendingUp className="w-8 h-8" />
-                </div>
-              ) : delta < 0 ? (
-                <div className="p-2 rounded-2xl bg-rose-500/20 text-[#BE123C]">
-                  <TrendingDown className="w-8 h-8" />
-                </div>
-              ) : (
-                <div className="p-2 rounded-2xl bg-[#E0E5EC] text-[#6B7280] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
-                  <Sliders className="w-8 h-8" />
-                </div>
-              )}
-
-              <div
-                className={`text-4xl sm:text-6xl font-black font-mono ${
-                  delta > 0 ? "text-[#0F766E]" : delta < 0 ? "text-[#BE123C]" : "text-[#6B7280]"
-                }`}
-              >
-                {delta > 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)}
-              </div>
-            </div>
-
-            <p className="text-sm text-[#6B7280] font-medium">
-              Option A: <strong className="text-[#3D4852]">{resA.prediction.toFixed(2)}%</strong>
-              {" · "}
-              Option B: <strong className="text-[#3D4852]">{resB.prediction.toFixed(2)}%</strong>
-            </p>
-
-            <p className="text-xs text-[#6B7280] max-w-xl mx-auto">
-              {delta > 0
-                ? `Option B is about ${delta.toFixed(2)} percentage points higher. This is an estimate, not a guarantee.`
-                : delta < 0
-                ? `Option B is about ${Math.abs(delta).toFixed(2)} percentage points lower. This is an estimate, not a guarantee.`
-                : "Both options get the same estimate."}
-            </p>
-          </div>
-
-          {/* Uncertainty Intervals */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-transparent text-xs">
-            <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent text-center space-y-1">
-              <span className="text-[#6B7280] block font-medium">Option A likely range</span>
-              <strong className="text-[#3D4852] font-mono text-base block">
-                {resA.lower.toFixed(2)}% — {resA.upper.toFixed(2)}%
-              </strong>
-              <span className="text-[11px] text-[#6B7280]">Band: {resA.band}</span>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#E0E5EC] border border-transparent text-center space-y-1">
-              <span className="text-[#6B7280] block font-medium">Option B likely range</span>
-              <strong className="text-[#3D4852] font-mono text-base block">
-                {resB.lower.toFixed(2)}% — {resB.upper.toFixed(2)}%
-              </strong>
-              <span className="text-[11px] text-[#6B7280]">Band: {resB.band}</span>
-            </div>
-          </div>
-
-          {/* Overlap Caution & Disclaimer */}
-          <div className="space-y-2">
-            {intervalsOverlap && (
-              <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.55),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-[#B45309] text-xs flex items-center justify-center gap-2 text-center">
-                <AlertTriangle className="w-4 h-4 shrink-0" />
-                <span>
-                  The two ranges overlap, so the difference is small enough that either option could land in the same place.
+                <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#6C4DFF]">
+                  Prediction Comparison Results
                 </span>
+                <h2 className="text-xl sm:text-2xl font-black text-[#242137] tracking-tight mt-0.5">
+                  Outcome & Uncertainty Evaluation
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleCopySummary}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F8F7FC] hover:bg-[#F0EBFF] border border-[#E7E3F0] text-xs font-semibold text-[#242137] hover:text-[#6C4DFF] transition-colors shadow-sm"
+                >
+                  {copiedSummary ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-[#0F9D8A]" />
+                      <span>Copied Summary</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-[#6C4DFF]" />
+                      <span>Copy Summary</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadReport}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F8F7FC] hover:bg-[#F0EBFF] border border-[#E7E3F0] text-xs font-semibold text-[#242137] hover:text-[#6C4DFF] transition-colors shadow-sm"
+                >
+                  <Download className="w-3.5 h-3.5 text-[#4285F4]" />
+                  <span>Export JSON</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Inconclusive Result Banner (Section 9) */}
+            {metrics.is_inconclusive && (
+              <div className="p-4 rounded-xl bg-[#FDF5EA] border border-[#E9A23B]/30 text-xs text-[#E9A23B] flex items-start gap-3">
+                <Info className="w-5 h-5 shrink-0 mt-0.5 text-[#E9A23B]" />
+                <div className="space-y-1">
+                  <strong className="text-sm font-bold block text-[#B45309]">
+                    Result Inconclusive (Honest Uncertainty)
+                  </strong>
+                  <p className="text-[#68677D] leading-relaxed">
+                    {metrics.inconclusive_reason ||
+                      "The model does not provide strong statistical evidence that one scenario will outperform the other. Both estimates fall within overlapping uncertainty bands."}
+                  </p>
+                  <p className="text-[11px] text-[#B45309]">
+                    You can decide based on content quality, copywriting clarity, brand fit, or run a controlled A/B test.
+                  </p>
+                </div>
               </div>
             )}
 
-            <div className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-center text-xs text-[#6B7280] flex items-center justify-center gap-2">
-              <Info className="w-4 h-4 text-[#6C63FF] shrink-0" />
-              <span>
-                The ranges show uncertainty. They are not a promise of future likes or comments.
+            {/* Confounding Variables Warning (Section 3) */}
+            {metrics.is_confounded && (
+              <div className="p-4 rounded-xl bg-[#FEEFF0] border border-[#F06F73]/30 text-xs text-[#F06F73] flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-[#F06F73]" />
+                <div className="space-y-1">
+                  <strong className="text-sm font-bold block text-[#BE123C]">
+                    Confounding Variables Detected
+                  </strong>
+                  <p className="text-[#68677D] leading-relaxed">
+                    {metrics.confounding_warning}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Main Absolute & Relative Delta Display */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-2">
+              {/* Scenario A Metric */}
+              <div className="p-5 rounded-2xl bg-[#F8F7FC] border border-[#E7E3F0] text-center space-y-1">
+                <span className="text-xs font-mono font-bold text-[#68677D] uppercase tracking-wider block">
+                  Scenario A Estimate
+                </span>
+                <strong className="text-3xl sm:text-4xl font-black font-mono text-[#242137] block">
+                  {comp.prediction_a.prediction.toFixed(2)}%
+                </strong>
+                <span className="text-[11px] text-[#68677D] block">
+                  Range: {comp.prediction_a.lower.toFixed(2)}% — {comp.prediction_a.upper.toFixed(2)}%
+                </span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-[#242137] border border-[#E7E3F0] mt-1 shadow-sm">
+                  Band: {comp.prediction_a.band}
+                </span>
+              </div>
+
+              {/* Center Delta Badge */}
+              <div className="p-5 rounded-2xl bg-white border border-[#E7E3F0] text-center space-y-2 shadow-sm">
+                <span className="text-xs font-mono font-bold text-[#68677D] uppercase tracking-wider block">
+                  Predicted Variance (B vs A)
+                </span>
+
+                <div className="flex items-center justify-center gap-2">
+                  {metrics.delta_absolute > 0 ? (
+                    <TrendingUp className="w-6 h-6 text-[#0F9D8A] shrink-0" />
+                  ) : metrics.delta_absolute < 0 ? (
+                    <TrendingDown className="w-6 h-6 text-[#F06F73] shrink-0" />
+                  ) : (
+                    <Sliders className="w-6 h-6 text-[#68677D] shrink-0" />
+                  )}
+                  <span
+                    className={`text-3xl sm:text-4xl font-black font-mono ${
+                      metrics.delta_absolute > 0
+                        ? "text-[#0F9D8A]"
+                        : metrics.delta_absolute < 0
+                        ? "text-[#F06F73]"
+                        : "text-[#242137]"
+                    }`}
+                  >
+                    {metrics.delta_absolute > 0
+                      ? `+${metrics.delta_absolute.toFixed(2)}`
+                      : metrics.delta_absolute.toFixed(2)}{" "}
+                    <span className="text-lg">pp</span>
+                  </span>
+                </div>
+
+                <div className="text-xs font-mono font-bold text-[#242137]">
+                  Relative:{" "}
+                  {metrics.delta_relative_pct !== null && metrics.delta_relative_pct !== undefined ? (
+                    <span
+                      className={
+                        metrics.delta_relative_pct > 0
+                          ? "text-[#0F9D8A]"
+                          : metrics.delta_relative_pct < 0
+                          ? "text-[#F06F73]"
+                          : "text-[#68677D]"
+                      }
+                    >
+                      {metrics.delta_relative_pct > 0 ? "+" : ""}
+                      {metrics.delta_relative_pct.toFixed(1)}%
+                    </span>
+                  ) : (
+                    <span className="text-[#8B89A3]">N/A</span>
+                  )}
+                </div>
+
+                <p className="text-[11px] text-[#68677D] leading-tight">
+                  Model statistical estimate, not a guaranteed outcome.
+                </p>
+              </div>
+
+              {/* Scenario B Metric */}
+              <div className="p-5 rounded-2xl bg-[#F0EBFF]/40 border border-[#6C4DFF]/30 text-center space-y-1">
+                <span className="text-xs font-mono font-bold text-[#6C4DFF] uppercase tracking-wider block">
+                  Scenario B Estimate
+                </span>
+                <strong className="text-3xl sm:text-4xl font-black font-mono text-[#242137] block">
+                  {comp.prediction_b.prediction.toFixed(2)}%
+                </strong>
+                <span className="text-[11px] text-[#68677D] block">
+                  Range: {comp.prediction_b.lower.toFixed(2)}% — {comp.prediction_b.upper.toFixed(2)}%
+                </span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-[#6C4DFF] border border-[#6C4DFF]/30 mt-1 shadow-sm">
+                  Band: {comp.prediction_b.band}
+                </span>
+              </div>
+            </div>
+
+            {/* Overlap Explanation */}
+            <div className="p-3.5 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] text-xs text-[#68677D] flex items-center justify-between gap-4">
+              <span className="flex items-center gap-2">
+                <Info className="w-4 h-4 text-[#6C4DFF] shrink-0" />
+                <span>{comp.overlap_explanation}</span>
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-white border border-[#E7E3F0] font-mono text-[11px] text-[#242137] shrink-0 shadow-sm">
+                {comp.intervals_overlap ? "Overlapping CIs" : "Distinct CIs"}
               </span>
             </div>
           </div>
 
-          {/* THREE-TIER SEPARATION: Extracted Signals vs Model Inputs vs Model Estimate */}
-          <div className="p-6 rounded-2xl bg-[#E0E5EC] border border-transparent space-y-4 text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-transparent">
-              <span className="font-bold text-[#3D4852] uppercase tracking-wider flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-[#6C63FF]" />
-                How this result was built
+          {/* B. "WHAT CHANGED?" PARAMETER MATRIX (SECTION 3) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Changed Parameters */}
+            <div className="p-6 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#E7E3F0]">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#6C4DFF]" />
+                  <h3 className="text-xs font-mono font-bold text-[#242137] tracking-wide uppercase">
+                    What Changed?
+                  </h3>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-[#F0EBFF] text-[#6C4DFF] border border-[#6C4DFF]/30">
+                  {whatChanged?.count_changed || 0} parameter
+                  {(whatChanged?.count_changed || 0) !== 1 ? "s" : ""} modified
+                </span>
+              </div>
+
+              {!whatChanged || whatChanged.changed_parameters.length === 0 ? (
+                <p className="text-xs text-[#68677D] py-3">
+                  Scenario A and Scenario B are identical. Modify a variable in Scenario B to test sensitivity.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {whatChanged.changed_parameters.map((param) => (
+                    <div
+                      key={param.field}
+                      className="p-3.5 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-[#242137]">{param.label}</span>
+                        <span className="text-[10px] font-mono text-[#6C4DFF] font-bold">Changed</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-[#68677D]">
+                        <span className="px-2 py-0.5 rounded bg-white border border-[#E7E3F0] font-mono truncate max-w-[150px] shadow-sm">
+                          {param.value_a}
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-[#68677D] shrink-0" />
+                        <span className="px-2 py-0.5 rounded bg-[#F0EBFF] border border-[#6C4DFF]/30 text-[#6C4DFF] font-mono truncate max-w-[150px] font-semibold">
+                          {param.value_b}
+                        </span>
+                      </div>
+                      {param.impact_note && (
+                        <p className="text-[11px] text-[#68677D] leading-tight">
+                          {param.impact_note}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Unchanged Parameters (What Stays The Same) */}
+            <div className="p-6 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#E7E3F0]">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#0F9D8A]" />
+                  <h3 className="text-xs font-mono font-bold text-[#242137] tracking-wide uppercase">
+                    What Stays The Same
+                  </h3>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-[#E6F6F4] text-[#0F9D8A] border border-[#0F9D8A]/20">
+                  {whatChanged?.count_unchanged || 0} controlled
+                </span>
+              </div>
+
+              {!whatChanged || whatChanged.unchanged_parameters.length === 0 ? (
+                <p className="text-xs text-[#68677D] py-3">
+                  All inputs are currently differing between Scenario A and B.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  {whatChanged.unchanged_parameters.map((param) => (
+                    <div
+                      key={param.field}
+                      className="p-3 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]"
+                    >
+                      <span className="text-[10px] font-mono text-[#68677D] block">
+                        {param.label}
+                      </span>
+                      <span className="font-mono text-[#242137] truncate block mt-0.5 font-semibold">
+                        {param.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="text-[11px] text-[#68677D] pt-2">
+                Keeping these variables identical isolates what caused any model differences.
+              </p>
+            </div>
+          </div>
+
+          {/* C. VISUAL & CAPTION CREATIVE SIDE-BY-SIDE (SECTION 5B) */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E7E3F0]">
+              <div className="flex items-center gap-2.5">
+                <Eye className="w-4 h-4 text-[#6C4DFF]" />
+                <h3 className="text-base font-bold text-[#242137] tracking-wide">
+                  Creative Side-by-Side Comparison
+                </h3>
+              </div>
+              <span className="text-xs text-[#68677D]">Media & Copy Verification</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Creative A */}
+              <div className="p-4 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#242137]">Scenario A</span>
+                  <span className="text-[11px] font-mono text-[#68677D]">
+                    {scenarioA.mediaType.toUpperCase()}
+                  </span>
+                </div>
+
+                {scenarioA.media?.url ? (
+                  <div className="aspect-[4/3] rounded-xl overflow-hidden bg-white border border-[#E7E3F0] flex items-center justify-center">
+                    <img
+                      src={scenarioA.media.url}
+                      alt="Scenario A creative"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-white border border-[#E7E3F0] text-xs text-[#68677D] text-center">
+                    Text / Metadata Mode (No media file attached)
+                  </div>
+                )}
+
+                <div className="p-3 rounded-xl bg-white border border-[#E7E3F0] text-xs text-[#242137] whitespace-pre-wrap leading-relaxed max-h-40 overflow-y-auto shadow-sm">
+                  {scenarioA.caption}
+                </div>
+              </div>
+
+              {/* Creative B */}
+              <div className="p-4 rounded-xl bg-[#F0EBFF]/30 border border-[#6C4DFF]/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#6C4DFF]">Scenario B</span>
+                  <span className="text-[11px] font-mono text-[#6C4DFF]">
+                    {scenarioB.mediaType.toUpperCase()}
+                  </span>
+                </div>
+
+                {scenarioB.media?.url ? (
+                  <div className="aspect-[4/3] rounded-xl overflow-hidden bg-white border border-[#E7E3F0] flex items-center justify-center">
+                    <img
+                      src={scenarioB.media.url}
+                      alt="Scenario B creative"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-white border border-[#E7E3F0] text-xs text-[#68677D] text-center">
+                    Text / Metadata Mode (No media file attached)
+                  </div>
+                )}
+
+                <div className="p-3 rounded-xl bg-white border border-[#E7E3F0] text-xs text-[#242137] whitespace-pre-wrap leading-relaxed max-h-40 overflow-y-auto shadow-sm">
+                  {scenarioB.caption}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* D. COMPARISON INTERVAL CHART (SECTION 5C) */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E7E3F0]">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-[#6C4DFF]" />
+                <h3 className="text-base font-bold text-[#242137] tracking-wide">
+                  Model Prediction & Uncertainty Interval Chart
+                </h3>
+              </div>
+              <span className="text-xs font-mono text-[#68677D]">Target: Engagement Rate %</span>
+            </div>
+
+            {/* SVG Responsive Comparison Bar & Interval Chart */}
+            <div className="space-y-4 pt-2">
+              {/* Scenario A Bar */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-[#242137]">Scenario A</span>
+                  <span className="font-mono text-[#68677D]">
+                    {comp.prediction_a.prediction.toFixed(2)}% (CI: {comp.prediction_a.lower.toFixed(2)}% – {comp.prediction_a.upper.toFixed(2)}%)
+                  </span>
+                </div>
+                <div className="h-6 w-full rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] relative overflow-hidden flex items-center">
+                  <div
+                    className="h-full bg-[#4B35B5] transition-all duration-500 rounded-l-xl"
+                    style={{ width: `${Math.min(100, Math.max(5, comp.prediction_a.prediction * 12))}%` }}
+                  />
+                  {/* Confidence Interval Shadow */}
+                  <div
+                    className="absolute h-3 bg-[#6C4DFF]/20 border-x border-[#4B35B5]"
+                    style={{
+                      left: `${Math.min(100, Math.max(0, comp.prediction_a.lower * 12))}%`,
+                      width: `${Math.min(100, Math.max(4, (comp.prediction_a.upper - comp.prediction_a.lower) * 12))}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Scenario B Bar */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-[#6C4DFF]">Scenario B</span>
+                  <span className="font-mono text-[#6C4DFF]">
+                    {comp.prediction_b.prediction.toFixed(2)}% (CI: {comp.prediction_b.lower.toFixed(2)}% – {comp.prediction_b.upper.toFixed(2)}%)
+                  </span>
+                </div>
+                <div className="h-6 w-full rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] relative overflow-hidden flex items-center">
+                  <div
+                    className="h-full bg-[#6C4DFF] transition-all duration-500 rounded-l-xl"
+                    style={{ width: `${Math.min(100, Math.max(5, comp.prediction_b.prediction * 12))}%` }}
+                  />
+                  {/* Confidence Interval Shadow */}
+                  <div
+                    className="absolute h-3 bg-[#6C4DFF]/30 border-x border-[#6C4DFF]"
+                    style={{
+                      left: `${Math.min(100, Math.max(0, comp.prediction_b.lower * 12))}%`,
+                      width: `${Math.min(100, Math.max(4, (comp.prediction_b.upper - comp.prediction_b.lower) * 12))}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] text-[#8B89A3] pt-2 border-t border-[#E7E3F0]">
+                <span>0% Baseline</span>
+                <span>Uncertainty error bars depict the 90% empirical boundary</span>
+                <span>Scale: Engagement Rate %</span>
+              </div>
+            </div>
+          </div>
+
+          {/* E. CONTENT QUALITY COMPARISON (SECTION 6) */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#E7E3F0] gap-2">
+              <div>
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#6C4DFF]">
+                  Craft Quality Assessment
+                </span>
+                <h3 className="text-lg font-black text-[#242137]">
+                  Content Quality Comparison
+                </h3>
+              </div>
+              <span className="text-xs text-[#68677D]">
+                Independent of offline engagement predictions
               </span>
-              <span className="text-[11px] text-[#6B7280]">Three parts</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Tier 1: Extracted Media Signals */}
-              <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2">
-                <div className="flex items-center gap-1.5 text-[#6C63FF] font-bold uppercase text-[11px]">
-                  <Video className="w-3.5 h-3.5" />
-                  <span>1. The files</span>
+            {/* Overall Craft Quality Comparison Header */}
+            {comp.quality_a && comp.quality_b && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]">
+                <div className="text-center">
+                  <span className="text-[11px] font-mono text-[#68677D] uppercase">Scenario A Craft</span>
+                  <div className="text-2xl font-black text-[#242137] font-mono mt-1">
+                    {comp.quality_a.score}/100
+                  </div>
+                  <span className="text-xs text-[#68677D]">({comp.quality_a.band})</span>
                 </div>
-                <ul className="text-[#6B7280] text-[11px] space-y-1 list-disc list-inside">
-                  <li>Option A: {planA.media ? `${planA.media.aspectRatio}, ${planA.media.width}×${planA.media.height}` : "No file"}</li>
-                  <li>Option B: {planB.media ? `${planB.media.aspectRatio}, ${planB.media.width}×${planB.media.height}` : "No file"}</li>
-                  <li>Audio: {planA.mediaType === "reel" ? planA.audioName || planA.audioType : "Not applicable"} → {planB.mediaType === "reel" ? planB.audioName || planB.audioType : "Not applicable"}</li>
-                </ul>
-                <p className="text-[11px] text-[#6B7280] pt-1">Shown for context. Not all of this is used in the estimate.</p>
-              </div>
 
-              {/* Tier 2: Model Inputs */}
-              <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2">
-                <div className="flex items-center gap-1.5 text-[#6C63FF] font-bold uppercase text-[11px]">
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>2. What the estimate uses</span>
+                <div className="text-center flex flex-col justify-center">
+                  <span className="text-[11px] font-mono text-[#68677D] uppercase">Quality Delta</span>
+                  <div
+                    className={`text-2xl font-black font-mono mt-1 ${
+                      (comp.quality_delta || 0) > 0
+                        ? "text-[#0F9D8A]"
+                        : (comp.quality_delta || 0) < 0
+                        ? "text-[#F06F73]"
+                        : "text-[#242137]"
+                    }`}
+                  >
+                    {(comp.quality_delta || 0) > 0 ? `+${comp.quality_delta}` : comp.quality_delta} pts
+                  </div>
                 </div>
-                <ul className="text-[#6B7280] text-[11px] space-y-1 list-disc list-inside">
-                  <li>Media Type: {planA.mediaType.toUpperCase()} → {planB.mediaType.toUpperCase()}</li>
-                  <li>Caption Length: {planA.caption.length} → {planB.caption.length} chars</li>
-                  <li>Posting Hour: {planA.time} → {planB.time} UTC</li>
-                  <li>Followers: {planA.followers.toLocaleString()} → {planB.followers.toLocaleString()}</li>
-                </ul>
-                <p className="text-[11px] text-[#6B7280] pt-1">Format, caption, posting time, and followers.</p>
-              </div>
 
-              {/* Tier 3: Model Estimate */}
-              <div className="p-3.5 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2">
-                <div className="flex items-center gap-1.5 text-[#0F766E] font-bold uppercase text-[11px]">
-                  <Zap className="w-3.5 h-3.5" />
-                  <span>3. The result</span>
+                <div className="text-center">
+                  <span className="text-[11px] font-mono text-[#6C4DFF] uppercase font-bold">Scenario B Craft</span>
+                  <div className="text-2xl font-black text-[#6C4DFF] font-mono mt-1">
+                    {comp.quality_b.score}/100
+                  </div>
+                  <span className="text-xs text-[#68677D]">({comp.quality_b.band})</span>
                 </div>
-                <ul className="text-[#6B7280] text-[11px] space-y-1 list-disc list-inside">
-                  <li>Option A: {resA.prediction.toFixed(2)}%</li>
-                  <li>Option B: {resB.prediction.toFixed(2)}%</li>
-                  <li>Difference: {delta >= 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)} points</li>
-                </ul>
-                <p className="text-[11px] text-[#6B7280] pt-1">An estimate from similar posts, not a guarantee.</p>
               </div>
+            )}
+
+            {/* Quality Pillars Table */}
+            <div className="space-y-3">
+              {qualityPillars.map((pillar) => (
+                <div
+                  key={pillar.key}
+                  className="p-4 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-2"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <span className="text-xs font-bold text-[#242137] flex items-center gap-2">
+                      <span>{pillar.pillar}</span>
+                      {!pillar.applicable && (
+                        <span className="text-[10px] font-mono text-[#8B89A3] bg-white border border-[#E7E3F0] px-2 py-0.5 rounded">
+                          Not Applicable
+                        </span>
+                      )}
+                    </span>
+
+                    {pillar.applicable && pillar.score_a !== null && pillar.score_b !== null && (
+                      <div className="flex items-center gap-3 text-xs font-mono">
+                        <span className="text-[#68677D]">A: {pillar.score_a}</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-[#8B89A3]" />
+                        <span className="text-[#6C4DFF] font-bold">B: {pillar.score_b}</span>
+                        <span
+                          className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                            (pillar.delta || 0) > 0
+                              ? "bg-[#E6F6F4] text-[#0F9D8A]"
+                              : (pillar.delta || 0) < 0
+                              ? "bg-[#FEEFF0] text-[#F06F73]"
+                              : "bg-white text-[#68677D] border border-[#E7E3F0]"
+                          }`}
+                        >
+                          {(pillar.delta || 0) > 0 ? `+${pillar.delta}` : pillar.delta}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-[#242137] leading-relaxed">
+                    {pillar.observation}
+                  </p>
+
+                  <p className="text-[11px] text-[#68677D] italic">
+                    💡 Recommendation: {pillar.recommendation}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* SECTION: Model Sensitivity Analysis */}
-          <div className="p-5 rounded-2xl bg-[#E0E5EC] border border-transparent space-y-3 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-[#3D4852] uppercase tracking-wider flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#6C63FF]" />
-                What moved the estimate
+          {/* F. SMART RECOMMENDATION PANEL ("WHAT SHOULD YOU IMPROVE?") (SECTION 7) */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E7E3F0]">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#6C4DFF]" />
+                <h3 className="text-base font-bold text-[#242137] tracking-wide">
+                  What Should You Improve?
+                </h3>
+              </div>
+              <span className="text-xs text-[#68677D]">
+                Actionable Next Steps for Scenario B
               </span>
-              <span className="text-[11px] text-[#6B7280]">From your changes</span>
             </div>
 
-            <p className="text-[#6B7280]">
-              The estimate changed by{" "}
-              <strong className={delta >= 0 ? "text-[#0F766E]" : "text-[#BE123C]"}>
-                {delta >= 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)} percentage points
-              </strong>{" "}
-              after the changes below.
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {smartRecs.map((rec) => (
+                <div
+                  key={rec.id}
+                  className="p-5 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] flex flex-col justify-between space-y-3 hover:border-[#6C4DFF]/40 transition-colors"
+                >
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#6C4DFF] font-bold">
+                        {rec.evidence_type}
+                      </span>
+                      <span className="text-[10px] text-[#8B89A3]">
+                        Confidence: {rec.confidence}
+                      </span>
+                    </div>
 
-            <div className="space-y-1.5 pt-1">
-              <span className="text-[#6B7280] text-[11px] block font-semibold">What you changed:</span>
-              <ul className="list-disc list-inside space-y-1 text-[#6B7280] pl-1">
-                {differences.changed.map((param) => (
-                  <li key={param.field}>
-                    <strong>{param.label}:</strong> {param.value_a} → {param.value_b}
-                  </li>
-                ))}
-              </ul>
+                    <strong className="text-sm font-bold text-[#242137] block">
+                      {rec.title}
+                    </strong>
+
+                    <p className="text-xs text-[#68677D] leading-relaxed">
+                      {rec.observation}
+                    </p>
+
+                    <p className="text-[11px] text-[#8B89A3] leading-relaxed">
+                      {rec.rationale}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2 border-t border-[#E7E3F0]">
+                    {rec.action_payload && Object.keys(rec.action_payload).length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => handleApplyRecommendation(rec)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F0EBFF] hover:bg-[#E2D8FF] border border-[#6C4DFF]/30 text-xs font-bold text-[#6C4DFF] transition-colors"
+                      >
+                        {appliedRecId === rec.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-[#0F9D8A]" />
+                            <span>Applied to B</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>Apply to Scenario B</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {rec.action_payload?.caption && (
+                      <button
+                        type="button"
+                        onClick={() => handleCopyCaption(rec.id, rec.action_payload.caption)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#F8F7FC] border border-[#E7E3F0] text-xs font-semibold text-[#242137] transition-colors"
+                      >
+                        {copiedRecId === rec.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-[#0F9D8A]" />
+                            <span>Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy Caption</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* SECTION: Model Capability & Scientific Integrity */}
-          <div className="p-5 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent space-y-2 text-xs">
-            <div className="flex items-center gap-2 text-[#6B7280] font-bold uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-[#6C63FF]" />
-              <span>What this estimate includes</span>
+          {/* G. PRACTICAL CONTROLLED EXPERIMENT PROTOCOL (SECTION 10) */}
+          {experimentProtocol && (
+            <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E3F0] shadow-card space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#E7E3F0]">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-[#0F9D8A]" />
+                  <h3 className="text-base font-bold text-[#242137] tracking-wide">
+                    Controlled Experiment Protocol
+                  </h3>
+                </div>
+                <span className="text-xs font-mono font-bold text-[#0F9D8A]">
+                  {experimentProtocol.experiment_name}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div className="p-4 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1">
+                  <span className="text-[10px] font-mono text-[#8B89A3] uppercase block">
+                    Isolated Test Variable
+                  </span>
+                  <strong className="text-sm text-[#242137] block">
+                    {experimentProtocol.test_variable}
+                  </strong>
+                  <p className="text-[#68677D] mt-1 leading-relaxed">
+                    {experimentProtocol.hypothesis}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#F8F7FC] border border-[#E7E3F0] space-y-1">
+                  <span className="text-[10px] font-mono text-[#8B89A3] uppercase block">
+                    Controlled Variables
+                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                    {experimentProtocol.control_variables.map((cv) => (
+                      <span
+                        key={cv}
+                        className="px-2 py-0.5 rounded bg-white border border-[#E7E3F0] text-[11px] text-[#242137] font-mono shadow-sm"
+                      >
+                        ✓ {cv}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-[11px] text-[#68677D] block pt-1">
+                    Measurement Window: {experimentProtocol.measurement_window}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-xs text-[#68677D] leading-relaxed pt-1">
+                {experimentProtocol.guidance}
+              </p>
             </div>
-            <p className="text-[#6B7280] leading-relaxed">
-              The estimate uses the caption, format, posting time, and follower count. File details and audio are shown so you can compare them, and they are not part of the number unless the model was trained on them.
-            </p>
-          </div>
-
-          {/* SECTION: Interpretation / What You Could Test Next */}
-          <div className="p-5 rounded-2xl bg-surface/50 border border-transparent space-y-3 text-xs">
-            <span className="font-bold text-[#3D4852] block">Try another comparison</span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button
-                type="button"
-                onClick={() => handleApplyPreset("time")}
-                className="p-3 rounded-2xl bg-[#E0E5EC] text-left shadow-[5px_5px_10px_rgb(163,177,198,0.55),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:shadow-[inset_4px_4px_8px_rgb(163,177,198,0.55),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-shadow"
-              >
-                <Clock className="w-4 h-4 text-[#6C63FF] mb-1.5" />
-                <strong className="text-[#3D4852] block mb-1">Posting time</strong>
-                <p className="text-[11px] text-[#6B7280]">Morning at 10:30 UTC versus evening at 19:00 UTC.</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleApplyPreset("caption")}
-                className="p-3 rounded-2xl bg-[#E0E5EC] text-left shadow-[5px_5px_10px_rgb(163,177,198,0.55),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:shadow-[inset_4px_4px_8px_rgb(163,177,198,0.55),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-shadow"
-              >
-                <Type className="w-4 h-4 text-[#6C63FF] mb-1.5" />
-                <strong className="text-[#3D4852] block mb-1">Caption</strong>
-                <p className="text-[11px] text-[#6B7280]">A short note versus a longer caption with a question.</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleApplyPreset("mediaType")}
-                className="p-3 rounded-2xl bg-[#E0E5EC] text-left shadow-[5px_5px_10px_rgb(163,177,198,0.55),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:shadow-[inset_4px_4px_8px_rgb(163,177,198,0.55),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-shadow"
-              >
-                <Video className="w-4 h-4 text-[#6C63FF] mb-1.5" />
-                <strong className="text-[#3D4852] block mb-1">Photo or Reel</strong>
-                <p className="text-[11px] text-[#6B7280]">Keep the caption and switch the format.</p>
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       )}
 
-      {/* Privacy Notice */}
-      <div className="text-center text-xs text-[#6B7280] pt-4">
-        <p>Uploaded media is used for scenario analysis and is not automatically added to model training data.</p>
+      {/* =========================================================================
+          PRIVACY & SCIENTIFIC INTEGRITY FOOTER
+          ========================================================================= */}
+      <div className="p-6 rounded-2xl bg-white border border-[#E7E3F0] text-center text-xs text-[#8B89A3] space-y-1 shadow-sm">
+        <p>
+          Uploaded media and scenario configurations are evaluated in-memory and are never modified
+          in or appended to the canonical 15,000-record master dataset.
+        </p>
+        <p>
+          Model predictions are statistical estimates calibrated against historical post patterns,
+          not guaranteed commercial results.
+        </p>
       </div>
     </div>
   );

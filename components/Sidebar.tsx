@@ -30,7 +30,7 @@ interface SidebarProps {
 const userNavItems = [
   { id: "Home", label: "Home", icon: Home, route: "/" },
   { id: "Predict Post", label: "Analyze Post", icon: Sparkles, route: "/analyze" },
-  { id: "What-If Analysis", label: "What-If Scenario", icon: GitCompare, route: "/what-if" },
+  { id: "What-If Analysis", label: "Comparison Studio", icon: GitCompare, route: "/what-if" },
   { id: "Developers", label: "Developers", icon: Users, route: "/developers" },
   { id: "About Project", label: "About & Methodology", icon: Info, route: "/about" },
 ];
@@ -38,7 +38,7 @@ const userNavItems = [
 // Dashboard-specific navigation items (Internal ML Analytics Control Center)
 const dashboardNavItems = [
   { id: "Dashboard", label: "Dashboard Overview", icon: LayoutDashboard, route: "/dashboard" },
-  { id: "Dataset", label: "Dataset", icon: Database, route: "/dataset" },
+  { id: "Dataset", label: "Dataset & Provenance", icon: Database, route: "/dataset" },
   { id: "Model Insights", label: "Model Insights", icon: BarChart3, route: "/insights" },
 ];
 
@@ -64,14 +64,14 @@ export default function Sidebar({
       {/* Mobile backdrop overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-[#3D4852]/30 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+          className="fixed inset-0 bg-[#242137]/40 backdrop-blur-sm z-40 lg:hidden transition-opacity"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Sidebar container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-[#E0E5EC] flex flex-col justify-between transition-transform duration-300 ease-out lg:translate-x-0 shadow-[9px_0_16px_rgb(163,177,198,0.35)] ${
+        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-[#E7E3F0] flex flex-col justify-between transition-transform duration-300 ease-out lg:translate-x-0 shadow-sm ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -85,29 +85,29 @@ export default function Sidebar({
                 event.preventDefault();
                 window.location.href = "/";
               }}
-              className="rounded-2xl cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6C63FF]"
+              className="rounded-2xl cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6C4DFF]"
             >
               <BrandLockup variant="sidebar" />
             </a>
             <button
               onClick={() => setMobileOpen(false)}
               aria-label="Close navigation menu"
-              className="lg:hidden h-12 w-12 shrink-0 inline-flex items-center justify-center text-[#6B7280] hover:text-[#3D4852] rounded-2xl bg-[#E0E5EC] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+              className="lg:hidden h-9 w-9 shrink-0 inline-flex items-center justify-center text-[#68677D] hover:text-[#242137] rounded-xl bg-[#F8F7FC] border border-[#E7E3F0]"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
           <div className="mb-6">
-            <p className="text-xs text-[#6B7280] font-medium tracking-wide">
+            <p className="text-xs text-[#68677D] font-medium tracking-wide">
               {isDashboardMode ? "Analytics & Model Control Center" : "Understand. Predict. Optimize."}
             </p>
           </div>
 
           {/* Navigation Items */}
-          <nav aria-label="Main navigation" className="space-y-2">
+          <nav aria-label="Main navigation" className="space-y-1.5">
             {isDashboardMode && (
-              <div className="text-[10px] font-bold text-[#6C63FF] uppercase tracking-wider px-3.5 pb-1">
+              <div className="text-[10px] font-bold text-[#6C4DFF] uppercase tracking-wider px-3.5 pb-2">
                 Dashboard Controls
               </div>
             )}
@@ -120,15 +120,15 @@ export default function Sidebar({
                 <button
                   key={item.id}
                   onClick={() => handleSelectTab(item.id)}
-                  className={`w-full min-h-[44px] flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-300 ease-out text-left ${
+                  className={`w-full min-h-[44px] flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 text-left ${
                     isActive
-                      ? "bg-[#E0E5EC] text-[#6C63FF] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
-                      : "text-[#6B7280] hover:text-[#3D4852] hover:-translate-y-px shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                      ? "bg-[#F0EBFF] text-[#6C4DFF] font-bold border-l-4 border-[#6C4DFF] rounded-r-xl rounded-l-none shadow-sm"
+                      : "text-[#68677D] hover:text-[#242137] hover:bg-[#F8F7FC] rounded-xl"
                   }`}
                 >
                   <Icon
                     className={`w-4 h-4 transition-colors shrink-0 ${
-                      isActive ? "text-[#6C63FF]" : "text-[#6B7280]"
+                      isActive ? "text-[#6C4DFF]" : "text-[#68677D]"
                     }`}
                   />
                   <span>{item.label}</span>
@@ -138,10 +138,10 @@ export default function Sidebar({
 
             {/* Back to main app link when in dashboard mode */}
             {isDashboardMode && (
-              <div className="pt-4 mt-4 border-t border-transparent">
+              <div className="pt-4 mt-4 border-t border-[#E7E3F0]">
                 <a
                   href="/"
-                  className="w-full min-h-[40px] flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-semibold text-[#6B7280] hover:text-[#6C63FF] shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:-translate-y-px transition-all"
+                  className="w-full min-h-[40px] flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#68677D] hover:text-[#6C4DFF] hover:bg-[#F0EBFF] transition-all"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Back to Main App</span>
@@ -152,36 +152,34 @@ export default function Sidebar({
         </div>
 
         {/* Bottom Model Status Section */}
-        <div className="p-6 border-t border-transparent bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]">
-          <div className="mb-3">
-            <div className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider mb-1 flex items-center justify-between">
+        <div className="p-5 border-t border-[#E7E3F0] bg-[#F8F7FC]">
+          <div className="mb-2">
+            <div className="text-[11px] font-mono font-bold text-[#68677D] uppercase tracking-wider mb-1 flex items-center justify-between">
               <span>Model Status</span>
               <Radio
                 className={`w-3.5 h-3.5 ${
-                  isReady ? "text-ready animate-pulse" : "text-[#6C63FF]"
+                  isReady ? "text-[#0F9D8A] animate-pulse" : "text-[#E9A23B]"
                 }`}
               />
             </div>
             <div className="flex items-center gap-2">
               <span
                 className={`inline-block w-2.5 h-2.5 rounded-full ${
-                  isReady
-                    ? "bg-ready shadow-[0_0_8px_rgba(66,214,164,0.8)]"
-                    : "bg-primary-coral"
+                  isReady ? "bg-[#0F9D8A]" : "bg-[#E9A23B]"
                 }`}
               />
               <span
-                className={`text-sm font-bold ${
-                  isReady ? "text-ready" : "text-[#6C63FF]"
+                className={`text-xs font-bold ${
+                  isReady ? "text-[#0F9D8A]" : "text-[#E9A23B]"
                 }`}
               >
-                {isReady ? "Model Ready" : "Model Not Trained"}
+                {isReady ? "Model Active" : "Model Not Trained"}
               </span>
             </div>
           </div>
 
-          <p className="text-[11px] text-[#6B7280] leading-relaxed">
-            CSV input only · No Instagram login or API required
+          <p className="text-[11px] text-[#68677D] leading-relaxed">
+            CSV inputs verified · No Instagram credentials required
           </p>
         </div>
       </aside>

@@ -1,6 +1,6 @@
-"""Evidence-based suggestion rules for pre-publication content improvement."""
+"""Evidence-based suggestion rules for pre-publication content improvement derived from measurable multimodal signals."""
 from __future__ import annotations
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 def evaluate_suggestions(
@@ -8,9 +8,11 @@ def evaluate_suggestions(
     media_analysis: Optional[Dict[str, Any]],
     context: Dict[str, Any],
     prediction_result: Dict[str, Any],
+    audio_analysis: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, str]]:
     """
     Generate evidence-based pre-publication suggestions using cautious, professional phrasing.
+    Derives recommendations strictly from verified observable signals.
     """
     suggestions: List[Dict[str, str]] = []
     
@@ -28,7 +30,7 @@ def evaluate_suggestions(
     posting_hour = context.get("posting_hour", 19)
     is_weekend = context.get("is_weekend", 0)
     
-    # 1. Caption Suggestions
+    # 1. Caption Strategy Suggestions
     if ht_count > 12:
         suggestions.append({
             "category": "Caption Strategy",
@@ -41,8 +43,8 @@ def evaluate_suggestions(
         suggestions.append({
             "category": "Caption Strategy",
             "title": "Add Discoverability Tags",
-            "suggestion": "Consider adding 2 to 5 relevant topic hashtags to assist topic categorization.",
-            "reason": "Topical hashtags provide clear metadata signals for initial content indexing.",
+            "suggestion": "Consider adding 2 to 5 relevant topic hashtags to assist algorithmic indexing.",
+            "reason": "Topical hashtags provide clear metadata signals for initial content categorization.",
             "impact_level": "Medium"
         })
         
@@ -64,15 +66,16 @@ def evaluate_suggestions(
             "impact_level": "Low"
         })
 
-    # 2. Visual / Media Suggestions
+    # 2. Visual / Image / Carousel / Video Suggestions
     if media_analysis and media_analysis.get("available"):
         dims = media_analysis.get("dimensions", {})
         aspect = dims.get("aspect_ratio", "")
         
+        # Image-Specific Signals
         if media_type == "image":
             if "1.91:1" in aspect or "16:9" in aspect or "Landscape" in aspect:
                 suggestions.append({
-                    "category": "Visual Formatting",
+                    "category": "Visual Framing",
                     "title": "Optimize for Vertical Screen Area",
                     "suggestion": "Consider cropping your image to portrait 4:5 instead of horizontal landscape.",
                     "reason": "Portrait 4:5 images occupy ~25% more screen area in vertical mobile feeds than horizontal formats.",
@@ -80,16 +83,24 @@ def evaluate_suggestions(
                 })
             
             vm = media_analysis.get("visual_metrics", {})
-            if vm.get("brightness_label") == "Low / Moody":
+            if vm.get("is_blurry"):
                 suggestions.append({
-                    "category": "Visual Quality",
+                    "category": "Image Sharpness",
+                    "title": "Review Focus and Blur",
+                    "suggestion": "The image exhibits low edge sharpness (Laplacian variance < 50). Verify focus clarity on high-DPI mobile screens.",
+                    "reason": "Crisp focal sharpness improves initial thumb-stop dwell time.",
+                    "impact_level": "Medium"
+                })
+            elif vm.get("brightness_label") == "Low / Moody":
+                suggestions.append({
+                    "category": "Visual Exposure",
                     "title": "Check Shadow Detail on Mobile",
-                    "suggestion": "The image has a relatively dark luminance profile. Test whether key details remain legible on dimmed mobile screens.",
+                    "suggestion": "The image has a dark luminance profile. Test whether key details remain legible on dimmed mobile screens.",
                     "reason": "High ambient light on mobile devices can obscure subtle dark gradients.",
                     "impact_level": "Low"
                 })
                 
-                
+        # Carousel-Specific Signals
         elif media_type == "carousel":
             slide_cnt = media_analysis.get("slide_count", 0)
             if slide_cnt < 2:
@@ -109,16 +120,27 @@ def evaluate_suggestions(
                     "impact_level": "Medium"
                 })
             
-            slides = media_analysis.get("slides", [])
-            if slides and slides[0].get("visual_metrics", {}).get("text_presence") == "Likely Present":
+            v_cons = media_analysis.get("visual_consistency", {})
+            if v_cons.get("exposure_std_dev", 0.0) > 25.0:
                 suggestions.append({
-                    "category": "Carousel Hook",
-                    "title": "Verify Cover Slide Hook Readability",
-                    "suggestion": "The first slide contains high-contrast text overlay patterns. Check mobile feed readability.",
-                    "reason": "The cover slide acts as the primary feed thumbnail determining whether users swipe.",
+                    "category": "Carousel Consistency",
+                    "title": "Harmonize Cross-Slide Exposure",
+                    "suggestion": "There is noticeable exposure and color discrepancy across slides. Consider harmonizing color grading.",
+                    "reason": "Visual cohesion across slides provides a professional, unified reading experience.",
                     "impact_level": "Medium"
                 })
 
+            slides = media_analysis.get("slides", [])
+            if slides and slides[0].get("visual_metrics", {}).get("text_presence") != "Likely Present":
+                suggestions.append({
+                    "category": "Carousel Hook",
+                    "title": "Strengthen Cover Slide Text Hook",
+                    "suggestion": "The first slide does not appear to contain a strong title overlay. Consider adding a clear headline card.",
+                    "reason": "Carousel cover slides with concise, legible headlines capture significantly higher swipe curiosity.",
+                    "impact_level": "High"
+                })
+
+        # Video / Reel-Specific Signals
         elif media_type == "reel":
             if "9:16" not in aspect:
                 suggestions.append({
@@ -129,6 +151,26 @@ def evaluate_suggestions(
                     "impact_level": "High"
                 })
             
+            hook_analysis = media_analysis.get("hook_analysis", {})
+            if hook_analysis.get("hook_contrast", 50.0) < 32.0:
+                suggestions.append({
+                    "category": "Reel Hook Quality",
+                    "title": "Increase Opening 3-Second Contrast",
+                    "suggestion": "The opening 3 seconds have low visual contrast. Add a bolder opening title graphic or dynamic visual hook.",
+                    "reason": "The initial 3-second window is critical for viewer retention before dropoff.",
+                    "impact_level": "High"
+                })
+
+            motion_info = media_analysis.get("motion", {})
+            if motion_info.get("score", 20.0) < 12.0:
+                suggestions.append({
+                    "category": "Video Pacing",
+                    "title": "Introduce Dynamic Visual Pacing",
+                    "suggestion": "The video exhibits static motion dynamics. Consider subtle cuts, b-roll transitions, or kinetic captions.",
+                    "reason": "Reels with moderate motion pacing sustain higher complete-view rates.",
+                    "impact_level": "Medium"
+                })
+
             audio_info = media_analysis.get("audio", {})
             if not audio_info.get("audio_detected"):
                 suggestions.append({
@@ -136,11 +178,32 @@ def evaluate_suggestions(
                     "title": "Assign Video Audio Track",
                     "suggestion": "No audio stream was detected. Consider attaching a music track or spoken voiceover.",
                     "reason": "Audio playback is a primary engagement vector in video content discovery.",
-                    "impact_level": "Medium"
+                    "impact_level": "High"
                 })
 
-    # 3. Publishing Timing Suggestions
-    # Model distribution shows evening windows (17:00-21:00) have stronger density
+    # 3. Audio Intelligence Suggestions
+    if audio_analysis and audio_analysis.get("available"):
+        alignment = audio_analysis.get("alignment_with_video", "")
+        if "Shorter" in alignment:
+            suggestions.append({
+                "category": "Audio Alignment",
+                "title": "Loop or Extend Audio Duration",
+                "suggestion": "The audio track terminates before the video finishes. Configure an audio loop to avoid silence.",
+                "reason": "Abrupt audio cutoffs disrupt viewer immersion and lower watch time.",
+                "impact_level": "Medium"
+            })
+        
+        style_rec = audio_analysis.get("style_recommendation", {})
+        if style_rec:
+            suggestions.append({
+                "category": "Audio Pacing",
+                "title": f"Target {style_rec.get('suggested_category', 'Audio Track')}",
+                "suggestion": f"For {style_rec.get('theme', 'your')} content, an audio tempo around {style_rec.get('target_bpm', '110-125 BPM')} matches typical video pacing.",
+                "reason": "Tempo alignment between visual cut cadence and music rhythm enhances viewer engagement.",
+                "impact_level": "Low"
+            })
+
+    # 4. Publishing Timing Suggestions
     if posting_hour < 6 or posting_hour > 23:
         suggestions.append({
             "category": "Publishing Schedule",

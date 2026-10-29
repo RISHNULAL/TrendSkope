@@ -1,7 +1,7 @@
 """Unified content report generator combining feature signals, readiness, recommendations, and what-if previews."""
 from __future__ import annotations
-from typing import Any, Dict, List, Optional
 from .rules import evaluate_suggestions
+from .audit_studio import compute_content_audit_studio
 
 
 def generate_content_report(
@@ -150,7 +150,8 @@ def generate_content_report(
         caption_analysis=caption_analysis,
         media_analysis=media_analysis,
         context=context,
-        prediction_result=prediction_result
+        prediction_result=prediction_result,
+        audio_analysis=audio_analysis,
     )
 
     # 4. What-If Scenarios Preview
@@ -205,6 +206,15 @@ def generate_content_report(
         except Exception:
             pass
 
+    # 5. Professional Content Audit & Improvement Studio Assessment
+    audit_studio = compute_content_audit_studio(
+        prediction_result=prediction_result,
+        caption_analysis=caption_analysis,
+        media_analysis=media_analysis,
+        audio_analysis=audio_analysis,
+        context=context,
+    )
+
     return {
         "readiness": readiness,
         "signals": {
@@ -213,6 +223,7 @@ def generate_content_report(
         },
         "recommendations": recommendations,
         "what_if_scenarios": what_if_scenarios,
+        "audit_studio": audit_studio,
         "limitations": [
             "Predictions reflect expected historical engagement rates derived from observable pre-publication signals.",
             "TrendSkope does not reverse-engineer or claim to predict Instagram's proprietary ranking algorithm.",

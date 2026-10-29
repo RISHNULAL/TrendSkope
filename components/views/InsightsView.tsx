@@ -14,6 +14,10 @@ import {
   ShieldAlert,
   Info,
   Sliders,
+  Sparkles,
+  Film,
+  Music,
+  ShieldCheck,
 } from "lucide-react";
 import { fetchInsights } from "@/lib/api";
 import { InsightsResponse } from "@/types";
@@ -44,6 +48,8 @@ export default function InsightsView() {
   const splits = data?.metrics?.splits;
   const comparison = data?.comparison || [];
   const coefficients = data?.metrics?.feature_coefficients || [];
+  const multimodalData = data?.multimodal;
+  const multimodalComparison = data?.multimodal_comparison || [];
 
   return (
     <div className="space-y-8 animate-fade-in max-w-6xl mx-auto pb-8">
@@ -220,6 +226,184 @@ export default function InsightsView() {
                     })}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {/* Multimodal vs Baseline Model Benchmark */}
+          {multimodalComparison.length > 0 && (
+            <div className="glass-card p-6 md:p-8 rounded-3xl border-border/80 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-lg font-bold text-[#3D4852] flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-[#6C63FF]" />
+                    Multimodal Content Analysis vs Baseline Evaluation
+                  </h3>
+                  <p className="text-xs text-[#6B7280] mt-0.5">
+                    Rigorous comparison on identical chronological test partition between tabular metadata-only baseline and multimodal feature pipeline.
+                  </p>
+                </div>
+                <span className="text-xs text-[#6B7280] font-mono bg-[#E0E5EC] px-3 py-1 rounded-xl shadow-[inset_4px_4px_8px_rgb(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
+                  reports/multimodal_comparison.csv
+                </span>
+              </div>
+
+              {/* Comparison Table */}
+              <div className="overflow-x-auto rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] p-2">
+                <table className="w-full text-xs text-left">
+                  <thead className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider border-b border-transparent">
+                    <tr>
+                      <th className="py-3 px-4">Evaluation Architecture</th>
+                      <th className="py-3 px-4">Model Class</th>
+                      <th className="py-3 px-4 text-center">Feature Count</th>
+                      <th className="py-3 px-4 text-right">Test MAE (pp)</th>
+                      <th className="py-3 px-4 text-right">Test RMSE</th>
+                      <th className="py-3 px-4 text-right">Test R² Score</th>
+                      <th className="py-3 px-4 text-center">Modality Pipeline</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/30">
+                    {multimodalComparison.map((row, idx) => {
+                      const isMulti = row.model_type.includes("Multimodal");
+                      return (
+                        <tr
+                          key={idx}
+                          className={`transition-colors ${
+                            isMulti ? "bg-[#6C63FF]/5 font-semibold" : ""
+                          }`}
+                        >
+                          <td className="py-3.5 px-4 text-[#3D4852] font-medium flex items-center gap-2">
+                            {isMulti ? (
+                              <Sparkles className="w-4 h-4 text-[#6C63FF] shrink-0" />
+                            ) : (
+                              <Layers className="w-4 h-4 text-[#6B7280] shrink-0" />
+                            )}
+                            <span>{row.model_type}</span>
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-xs text-[#3D4852]">
+                            {row.selected_model}
+                          </td>
+                          <td className="py-3.5 px-4 text-center font-mono text-[#3D4852]">
+                            <span className="px-2 py-0.5 rounded-full bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] text-[11px]">
+                              {row.features_count} features
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right font-mono font-bold text-[#0F766E]">
+                            {row.test_mae.toFixed(4)}
+                          </td>
+                          <td className="py-3.5 px-4 text-right font-mono text-[#6B7280]">
+                            {row.test_rmse.toFixed(4)}
+                          </td>
+                          <td className="py-3.5 px-4 text-right font-mono text-[#6B7280]">
+                            {row.test_r2.toFixed(4)}
+                          </td>
+                          <td className="py-3.5 px-4 text-center">
+                            {isMulti ? (
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#6C63FF]/10 text-[#6C63FF] border border-[#6C63FF]/20">
+                                Multimodal Active
+                              </span>
+                            ) : (
+                              <span className="text-[#6B7280] text-[10px] font-mono">
+                                Baseline
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Modality Distribution Breakdown */}
+              {multimodalData?.modality_counts && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div className="p-3 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-center">
+                    <span className="text-[10px] text-[#6B7280] block uppercase font-mono">Text & Scheduling</span>
+                    <strong className="text-[#3D4852] font-mono text-sm">{multimodalData.modality_counts.text_features} Features</strong>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-center">
+                    <span className="text-[10px] text-[#6B7280] block uppercase font-mono">Visual & Acoustics</span>
+                    <strong className="text-[#0F766E] font-mono text-sm">{multimodalData.modality_counts.media_features} Features</strong>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-center">
+                    <span className="text-[10px] text-[#6B7280] block uppercase font-mono">Modality Masks</span>
+                    <strong className="text-[#6C63FF] font-mono text-sm">{multimodalData.modality_counts.modality_masks} Masks</strong>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgb(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] text-center">
+                    <span className="text-[10px] text-[#6B7280] block uppercase font-mono">Categorical Encodings</span>
+                    <strong className="text-[#3D4852] font-mono text-sm">{multimodalData.modality_counts.categorical_features} Features</strong>
+                  </div>
+                </div>
+              )}
+
+              {/* Multimodal Feature Coefficients (Top Visual & Acoustic Weights) */}
+              {multimodalData?.top_coefficients && multimodalData.top_coefficients.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
+                      <Sliders className="w-3.5 h-3.5 text-[#6C63FF]" />
+                      Multimodal Feature Weights (Top Visual, Acoustic & Text Signals)
+                    </h4>
+                    <span className="text-[10.5px] font-mono text-[#6B7280]">models/multimodal_model.joblib</span>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] p-2">
+                    <table className="w-full text-xs text-left">
+                      <thead className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider border-b border-transparent">
+                        <tr>
+                          <th className="py-2.5 px-4">Feature Name</th>
+                          <th className="py-2.5 px-4">Modality Source</th>
+                          <th className="py-2.5 px-4 text-right">Standardized Coef</th>
+                          <th className="py-2.5 px-4 text-right">Relative Magnitude</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/30">
+                        {multimodalData.top_coefficients.map((item, idx) => {
+                          const isMedia = item.modality.includes("Media");
+                          const isPositive = item.coefficient > 0;
+                          return (
+                            <tr key={idx} className="hover:bg-primary-orange/5 transition-colors">
+                              <td className="py-2.5 px-4 font-mono font-medium text-[#3D4852]">
+                                {item.feature}
+                              </td>
+                              <td className="py-2.5 px-4">
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                  isMedia ? "bg-[#0F766E]/10 text-[#0F766E] border border-[#0F766E]/20" : "bg-gray-500/10 text-[#6B7280]"
+                                }`}>
+                                  {isMedia ? <Film className="w-2.5 h-2.5" /> : <Layers className="w-2.5 h-2.5" />}
+                                  {item.modality}
+                                </span>
+                              </td>
+                              <td className={`py-2.5 px-4 text-right font-mono font-bold ${
+                                isPositive ? "text-[#0F766E]" : "text-[#BE123C]"
+                              }`}>
+                                {isPositive ? `+${item.coefficient.toFixed(4)}` : item.coefficient.toFixed(4)}
+                              </td>
+                              <td className="py-2.5 px-4 text-right font-mono text-[#6B7280]">
+                                {item.abs_coefficient.toFixed(4)}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Zero-Leakage & Missing-Modality Scientific Disclosure */}
+              <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-xs text-[#6B7280] flex items-start gap-3">
+                <ShieldCheck className="w-5 h-5 text-[#0F766E] shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <strong className="text-[#3D4852] block font-bold text-xs uppercase tracking-wider">
+                    Scientific Data Leakage Prevention & Missing-Modality Architecture
+                  </strong>
+                  <p className="leading-relaxed">
+                    {multimodalData?.scientific_integrity_note ||
+                      "Model evaluated on strictly chronological test splits with prior-only historical statistics. Explicit indicator masks (has_media, has_text, audio_present) allow the model to serve both media-analyzed posts and tabular records without artificial imputation artifacts."}
+                  </p>
+                </div>
               </div>
             </div>
           )}

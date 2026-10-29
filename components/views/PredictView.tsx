@@ -29,6 +29,7 @@ import {
   ChevronRight,
   Sliders,
   Maximize2,
+  Minimize2,
   Volume2,
   VolumeX,
   FileAudio,
@@ -38,6 +39,7 @@ import {
   ModelStatusResponse,
   AnalyzeContentResponse,
 } from "@/types";
+import ContentAuditStudio from "@/components/studio/ContentAuditStudio";
 
 interface PredictViewProps {
   modelStatus: ModelStatusResponse | null;
@@ -119,6 +121,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
   const [loadingStep, setLoadingStep] = useState<string>("Preparing analysis...");
   const [error, setError] = useState<string | null>(null);
   const [analysisReport, setAnalysisReport] = useState<AnalyzeContentResponse | null>(null);
+  const [isStudioExpanded, setIsStudioExpanded] = useState<boolean>(false);
   const resultRef = useRef<HTMLDivElement | null>(null);
 
   // Live Caption Statistics
@@ -408,6 +411,9 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
             ? uploadedAudioMeta.name || "Uploaded Audio"
             : "No Audio"
         );
+        if (audioSource === "uploaded" && uploadedAudioFile) {
+          formData.append("audio_file", uploadedAudioFile);
+        }
       }
 
       const response = await analyzeContent(formData);
@@ -468,7 +474,7 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
       {/* Main Grid: Input Form on Left, Pre-Publish Report on Right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Post Creator Form */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className={`${isStudioExpanded ? "hidden" : analysisReport ? "lg:col-span-5" : "lg:col-span-6"} space-y-6 transition-all`}>
           <form onSubmit={handleAnalyze} className="glass-card p-6 sm:p-7 rounded-3xl space-y-6 border-border/80">
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs pointer-events-none select-none">
               {[
@@ -1290,335 +1296,50 @@ export default function PredictView({ modelStatus }: PredictViewProps) {
         </div>
 
         {/* Right Column: Pre-Publish Performance Report */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className={`${isStudioExpanded ? "lg:col-span-12" : analysisReport ? "lg:col-span-7" : "lg:col-span-6"} space-y-6 transition-all`}>
           {analysisReport ? (
             <div
               id="analysis-result"
               ref={resultRef}
               className="scroll-mt-24 space-y-6 animate-fade-in"
             >
-              {/* 22. Prediction Score Card */}
-              <div className="glass-card-accent p-7 sm:p-8 text-center space-y-4 ">
-                <span className="text-[11px] font-mono font-bold text-[#6B7280] uppercase tracking-widest block">
-                  Expected Engagement Rate
-                </span>
-
-                <div className="text-5xl sm:text-6xl font-black text-[#3D4852] tracking-tight">
-                  {analysisReport.prediction.expected_engagement_rate.toFixed(2)}%
-                </div>
-
-                {/* 90% Uncertainty Interval & Performance Band */}
-                <div className="pt-2 flex flex-col items-center gap-2">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold border border-transparent bg-[#E0E5EC] text-[#3D4852]">
-                    <span>90% Uncertainty Interval:</span>
-                    <strong className="text-[#3D4852] font-mono">
-                      {analysisReport.prediction.lower_bound.toFixed(2)}% — {analysisReport.prediction.upper_bound.toFixed(2)}%
-                    </strong>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-xs pt-1">
-                    <span className="text-[#6B7280]">Performance Band:</span>
-                    <span
-                      className={`px-3 py-0.5 rounded-full text-xs font-bold border ${getBandBadge(
-                        analysisReport.prediction.performance_band
-                      )}`}
-                    >
-                      {analysisReport.prediction.performance_band} Engagement
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-xs text-[#6B7280] max-w-sm mx-auto pt-1 leading-relaxed">
-                  An estimate from this post&apos;s caption, format, and posting time. It is not a guarantee.
-                </p>
-              </div>
-
-              {/* 21. Content Analysis (Photo / Carousel / Reel) */}
-              <div className="glass-card p-6 rounded-3xl border-border/80 space-y-4">
-                <div className="flex items-center justify-between border-b border-transparent pb-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
-                    {contentFormat === "carousel" ? (
-                      <Layers className="w-4 h-4 text-[#6C63FF]" />
-                    ) : contentFormat === "reel" ? (
-                      <Video className="w-4 h-4 text-[#6C63FF]" />
-                    ) : (
-                      <ImageIcon className="w-4 h-4 text-[#6C63FF]" />
-                    )}
-                    Content Analysis
-                  </h3>
-                  <span className="text-[10.5px] font-mono text-[#6B7280] uppercase">
-                    Format: {contentFormat.toUpperCase()}
+              {/* Workspace View Mode Toggle */}
+              <div className="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#0D131F] border border-slate-800 shadow-xl">
+                <div className="flex items-center gap-2.5 text-xs">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-mono text-slate-200 font-bold">
+                    Professional Audit & Scoring Studio
                   </span>
                 </div>
-
-                {/* Photo Analysis Breakdown */}
-                {contentFormat === "photo" && analysisReport.media_analysis && (
-                  <div className="space-y-3 text-xs">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Aspect Ratio</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
-                          {analysisReport.media_analysis.dimensions?.aspect_ratio || photoMeta.aspectRatio || "4:5"}
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Resolution</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
-                          {analysisReport.media_analysis.dimensions?.width
-                            ? `${analysisReport.media_analysis.dimensions.width} × ${analysisReport.media_analysis.dimensions.height}`
-                            : photoMeta.width
-                            ? `${photoMeta.width} × ${photoMeta.height}`
-                            : "1080 × 1350"}
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Illumination</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
-                          {analysisReport.media_analysis.visual_metrics?.brightness_label || "Balanced"}
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Text Presence</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
-                          {analysisReport.media_analysis.visual_metrics?.text_presence || "Evaluated"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Carousel Analysis Breakdown */}
-                {contentFormat === "carousel" && (
-                  <div className="space-y-3 text-xs">
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Total Slides</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
-                          {analysisReport.media_analysis?.slide_count || carouselSlides.length} Slides
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Common Ratio</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
-                          {analysisReport.media_analysis?.common_aspect_ratio || "4:5 (Portrait Feed)"}
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Text Detected</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
-                          {analysisReport.media_analysis?.text_detected_slides ?? "Analyzed"} / {carouselSlides.length} slides
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Per-Slide Sequence Breakdown */}
-                    {analysisReport.media_analysis?.slides && analysisReport.media_analysis.slides.length > 0 && (
-                      <div className="space-y-1.5 pt-2">
-                        <span className="text-[10.5px] font-mono font-bold text-[#6B7280] uppercase tracking-wider block">
-                          Slide Sequence Breakdown
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-                          {analysisReport.media_analysis.slides.map((slide, sIdx) => (
-                            <div
-                              key={sIdx}
-                              className="p-2.5 rounded-xl bg-[#E0E5EC] border border-transparent flex items-center justify-between"
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
-                                  slide.is_first_slide ? "bg-primary-orange text-white" : "bg-[#E0E5EC] text-[#6B7280]"
-                                }`}>
-                                  {slide.is_first_slide ? "1 FIRST" : `Slide ${slide.slide_index}`}
-                                </span>
-                                <span className="text-[11px] text-[#6B7280] truncate max-w-[100px]">
-                                  {slide.filename || `Slide ${slide.slide_index}`}
-                                </span>
-                              </div>
-                              <span className="text-[10px] font-mono text-[#6B7280]">
-                                {slide.dimensions?.aspect_ratio?.split(" ")[0] || "4:5"}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Reel Video Analysis Breakdown */}
-                {contentFormat === "reel" && (
-                  <div className="space-y-3 text-xs">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Duration</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
-                          {analysisReport.media_analysis?.duration?.label || reelMeta.duration || "18.4s"}
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Framing</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px]">
-                          {analysisReport.media_analysis?.dimensions?.aspect_ratio || reelMeta.aspectRatio || "9:16"}
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Audio Stream</span>
-                        <span className="font-semibold text-[#0F766E] text-[11.5px]">
-                          {analysisReport.media_analysis?.audio?.audio_detected ? "Detected" : "Verified"}
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface border border-border">
-                        <span className="text-[10px] font-mono text-[#6B7280] block">Planned Audio</span>
-                        <span className="font-semibold text-[#3D4852] text-[11.5px] truncate block">
-                          {audioSource === "original" ? "Original Audio" : audioSource === "instagram" ? audioName || "Instagram Audio" : audioSource === "uploaded" ? "Custom Audio" : "None"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* 23. Features Used by Prediction Model */}
-              <div className="glass-card p-6 rounded-3xl border-border/80 space-y-3.5">
-                <div className="flex items-center justify-between border-b border-transparent pb-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
-                    <Sliders className="w-4 h-4 text-[#6C63FF]" />
-                    Features Used by Prediction Model
-                  </h3>
-                  <span className="text-[10px] font-mono text-[#6B7280]">Offline Trained Inputs</span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
-                    <span className="text-[10px] font-mono text-[#6B7280] block">Media Type</span>
-                    <span className="font-semibold text-[#3D4852] uppercase text-[11px]">
-                      {contentFormat === "photo" ? "Photo" : contentFormat === "carousel" ? "Carousel" : "Reel"}
-                    </span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
-                    <span className="text-[10px] font-mono text-[#6B7280] block">Posting Hour</span>
-                    <span className="font-semibold text-[#3D4852] text-[11px]">
-                      {time} UTC
-                    </span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
-                    <span className="text-[10px] font-mono text-[#6B7280] block">Followers</span>
-                    <span className="font-semibold text-[#3D4852] text-[11px]">
-                      {followers.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
-                    <span className="text-[10px] font-mono text-[#6B7280] block">Caption Length</span>
-                    <span className="font-semibold text-[#3D4852] text-[11px]">
-                      {charCount} chars
-                    </span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
-                    <span className="text-[10px] font-mono text-[#6B7280] block">Word Count</span>
-                    <span className="font-semibold text-[#3D4852] text-[11px]">
-                      {wordCount} words
-                    </span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
-                    <span className="text-[10px] font-mono text-[#6B7280] block">Hashtags</span>
-                    <span className="font-semibold text-[#3D4852] text-[11px]">
-                      {hashtagCount} tags
-                    </span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
-                    <span className="text-[10px] font-mono text-[#6B7280] block">Schedule Day</span>
-                    <span className="font-semibold text-[#3D4852] text-[11px]">
-                      {new Date(date).toLocaleDateString("en-US", { weekday: "short" })}
-                    </span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#E0E5EC] border border-transparent">
-                    <span className="text-[10px] font-mono text-[#6B7280] block">Category</span>
-                    <span className="font-semibold text-[#3D4852] text-[11px] truncate block">
-                      {category}
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-[10.5px] text-[#6B7280] font-mono">
-                  * Note: The current regression model computes predictions based on tabular post structure, media format, and temporal features.
-                </p>
-              </div>
-
-              {/* 24. Media Signals (Separated from Model Inputs) */}
-              <div className="glass-card p-6 rounded-3xl border-border/80 space-y-3.5">
-                <div className="flex items-center justify-between border-b border-transparent pb-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
-                    <Maximize2 className="w-4 h-4 text-[#6C63FF]" />
-                    Media Signals
-                  </h3>
-                  <span className="text-[10px] font-mono text-[#6B7280]">Visual & Audio Diagnostics</span>
-                </div>
-
-                <div className="space-y-1.5 text-xs text-[#6B7280]">
-                  {analysisReport.media_analysis?.signals && analysisReport.media_analysis.signals.length > 0 ? (
-                    analysisReport.media_analysis.signals.map((sig, idx) => (
-                      <div key={idx} className="flex items-start gap-2 p-2 rounded-2xl bg-[#E0E5EC] border border-transparent">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#0F766E] shrink-0 mt-0.5" />
-                        <span>{sig}</span>
-                      </div>
-                    ))
+                <button
+                  type="button"
+                  onClick={() => setIsStudioExpanded(!isStudioExpanded)}
+                  className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-sm"
+                >
+                  {isStudioExpanded ? (
+                    <>
+                      <Minimize2 className="w-3.5 h-3.5 text-[#FF6B4A]" />
+                      <span>Split Screen View</span>
+                    </>
                   ) : (
-                    <div className="text-[#6B7280] text-xs">
-                      Media analyzed successfully across aspect ratio, encoding framing, and presentation attributes.
-                    </div>
+                    <>
+                      <Maximize2 className="w-3.5 h-3.5 text-[#FF6B4A]" />
+                      <span>Full Studio Workspace</span>
+                    </>
                   )}
-                </div>
-
-                <div className="p-3 rounded-xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-[10.5px] text-[#6B7280] leading-relaxed">
-                  These media signals are analyzed separately for content presentation and are not predictive inputs unless supported by the trained model.
-                </div>
+                </button>
               </div>
 
-              {/* 25. Improve Before Publishing (Recommendations) */}
-              {analysisReport.recommendations.length > 0 && (
-                <div className="glass-card p-6 rounded-3xl border-border/80 space-y-3.5">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5 border-b border-transparent pb-3">
-                    <TrendingUp className="w-4 h-4 text-[#6C63FF]" />
-                    Improve Before Publishing
-                  </h3>
-
-                  <div className="space-y-3">
-                    {analysisReport.recommendations.map((rec, idx) => (
-                      <div key={idx} className="p-3.5 rounded-2xl bg-[#E0E5EC] border border-transparent space-y-1.5 text-xs">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-[#3D4852] flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary-orange" />
-                            {rec.title}
-                          </span>
-                          <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-primary-orange/10 text-[#6C63FF] border border-transparent">
-                            {rec.category}
-                          </span>
-                        </div>
-
-                        <p className="text-[#3D4852] leading-relaxed font-medium">
-                          {rec.suggestion}
-                        </p>
-
-                        <p className="text-[11px] text-[#6B7280] leading-snug">
-                          {rec.reason}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Model Limitations Disclaimer */}
-              <div className="p-4 rounded-2xl bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)] border border-transparent text-[11px] text-[#6B7280] leading-relaxed space-y-1">
-                <div className="flex items-center gap-1.5 font-bold text-[#6B7280] text-xs">
-                  <HelpCircle className="w-3.5 h-3.5 text-[#6C63FF]" />
-                  <span>Model Limitations & Methodology</span>
-                </div>
-                <ul className="list-disc list-inside space-y-0.5 text-[#6B7280]">
-                  {analysisReport.limitations.map((lim, idx) => (
-                    <li key={idx}>{lim}</li>
-                  ))}
-                </ul>
-              </div>
+              {/* Comprehensive Professional Content Audit & Improvement Studio */}
+              <ContentAuditStudio
+                report={analysisReport}
+                mediaPreviewUrl={
+                  photoPreview ||
+                  (carouselSlides.length > 0 ? carouselSlides[0].previewUrl : null) ||
+                  reelPreview
+                }
+                onApplyCaption={(newCaption) => setCaption(newCaption)}
+              />
             </div>
           ) : (
             /* Standby State */

@@ -106,7 +106,7 @@ export default function AppShell({
       )}
 
       <div
-        className={`min-h-screen flex bg-[#E0E5EC] text-[#3D4852] selection:bg-primary-orange/30 selection:text-white transition-opacity duration-500 ease-out ${
+        className={`min-h-screen flex bg-[#F8F7FC] text-[#242137] selection:bg-[#6C4DFF]/20 selection:text-[#4B35B5] transition-opacity duration-500 ease-out ${
           loadingComplete ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
@@ -159,8 +159,8 @@ export default function AppShell({
             {activeTab === "About Project" && <AboutView />}
           </main>
 
-          {/* Minimal Footer */}
-          <footer className="px-8 py-6 text-center text-xs text-[#6B7280]">
+          {/* SaaS Footer */}
+          <footer className="px-8 py-6 text-center text-xs text-[#68677D] border-t border-[#E7E3F0] bg-white/50">
             <p>
               TrendSkope · AI-Powered Instagram Content Performance Intelligence · Academic Machine Learning Research
             </p>
